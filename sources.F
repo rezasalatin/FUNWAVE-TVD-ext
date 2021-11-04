@@ -347,6 +347,22 @@ ENDIF
          ENDIF
        ENDIF ! current balance
 
+       ! Chen, Salatin, include cross-shore gradient of Syx in the source for WK
+       IF(OUT_RadStr)THEN
+# if defined (PARALLEL)
+	      xmk=(I-Ibeg)*DXg + (iista-1)*DXg
+	      ymk=(J-Jbeg)*DYg + (jjsta-1)*DYg
+# else
+            xmk=(I-Ibeg)*DXg
+            ymk=(J-Jbeg)*DYg
+# endif
+         IF(ABS(xmk-Xc_WK)<Width_WK.AND. &
+            ABS(ymk-Yc_WK)<Ywidth_WK/2.0_SP)THEN
+            SourceX(I,J) = SourceX(I,J)-Syx_x
+            SourceY(I,J) = SourceY(I,J)-Syx_x
+         ENDIF
+       ENDIF ! add Syx_x to WK source
+
 
        IF(BREAKWATER) THEN
           ! note that, compared to wei et al, we used flux. so need multiply D
