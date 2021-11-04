@@ -65,8 +65,8 @@ SUBROUTINE MIXING_STUFF
            HrmsSum,HavgSum,ETA2,ETA2sum,SigWaveHeight,ETAvariance, &
            Vor_Instant, Vor_Mean, Vor_Intensity, NumDT1, NumDT2,Vor2,&
            Vor2sum,Vorsum,&
-           Depth,MA_Window,T_MA_Sum,T_MA_STEP,T_Mean_RadStr,window_temp,&
-           Syx_temp_sum,Syx,U_Window,V_Window)
+           Depth,MA_Window,T_MA_Sum,T_MA_STEP,T_Mean_RadStr,Syx_temp,&
+           Syx,U_Window,V_Window)
 	ENDIF    !ykchoi
 
 END SUBROUTINE MIXING_STUFF
@@ -91,8 +91,8 @@ SUBROUTINE CALCULATE_MEAN(T_INTV_mean,T_INTV_UVmean,T_sum,T_sumUVmean,&
                 HrmsSum,HavgSum,ETA2,ETA2sum,SigWaveHeight,ETAvariance, &
                 Vor_Instant, Vor_Mean, Vor_Intensity, NumDT1, NumDT2,Vor2, &
                 Vor2sum,Vorsum,&
-                Depth,MA_Window,T_MA_Sum,T_MA_STEP,T_Mean_RadStr,window_temp,&
-                Syx_temp_sum,Syx,U_Window,V_Window)
+                Depth,MA_Window,T_MA_Sum,T_MA_STEP,T_Mean_RadStr,Syx_temp,&
+                Syx,U_Window,V_Window)
 
 ! calculate mean for smagorinsky mixing and wave height
       USE PARAM
@@ -122,12 +122,13 @@ SUBROUTINE CALCULATE_MEAN(T_INTV_mean,T_INTV_UVmean,T_sum,T_sumUVmean,&
       REAL(SP),INTENT(IN) :: T_MA_STEP,T_Mean_RadStr
       REAL(SP),INTENT(OUT) :: T_MA_Sum
       REAL(SP),DIMENSION(M,N) :: U_temp1,V_temp1,Syx_temp
-      REAL(SP),DIMENSION(M,N),INTENT(INOUT) :: Syx_temp_sum
-      REAL(SP),DIMENSION(M,N),INTENT(OUT) :: Syx
-      INTEGER,INTENT(INOUT)::window_temp
       REAL(SP),DIMENSION(M,N,MA_Window),INTENT(INOUT) :: U_Window,V_Window
       REAL(SP),DIMENSION(M,N) :: U_Window_Sum,V_Window_Sum
       REAL(SP),DIMENSION(M,N) :: U_MA,V_MA
+      REAL(SP),DIMENSION(M,N,MA_Window),INTENT(INOUT) :: Syx_temp
+      REAL(SP),DIMENSION(M,N) :: Syx_temp_sum
+      REAL(SP),DIMENSION(M,N) :: Syx
+
 
       T_sum=T_sum+DT ! for wave height and MSL
       T_sumUVmean=T_sumUVmean+DT ! Chen, Salatin, for current and vortcty field
@@ -146,11 +147,6 @@ SUBROUTINE CALCULATE_MEAN(T_INTV_mean,T_INTV_UVmean,T_sum,T_sumUVmean,&
         ENDDO
         ENDDO
         SigWaveHeight = 4.0*SQRT(ETAvariance)
-
-        ! Chen, Salatin, Oct 2021, for Radiation Stress Calculation
-        ! Based on Chen et al 2003
-        ! we time average for longer period like Hrms
-        Syx = Syx_temp_sum/T_sum
 
         ETAsum=ZERO
         ETA2sum=ZERO
@@ -288,12 +284,12 @@ SUBROUTINE CALCULATE_MEAN(T_INTV_mean,T_INTV_UVmean,T_sum,T_sumUVmean,&
         U_temp1 = U - U_MA
         V_temp1 = V - V_MA
         ! Calculate the radiation shear stress
-        Syx_temp = RHO_WATER*U_temp1*V_temp1*(Depth+Eta)
+        Syx_temp = CSHIFT(Syx_temp,-1,3)
+        Syx_temp(:,:,1) = RHO_WATER*U_temp1*V_temp1*(Depth+Eta)
+        Syx_temp_sum = SUM(Syx_temp,3)
+        Syx = Syx_temp_sum/MA_Window
 
-        window_temp = window_temp + 1
-        IF(window_temp.GE.MA_Window)THEN
-            Syx_temp_sum = Syx_temp*T_MA_STEP+Syx_temp_sum
-        ENDIF
+        CALL DERIVATIVE_X(M,N,Ibeg,Iend,Jbeg,Jend,MASK,DX,Syx,Syx_x)
 
         T_MA_Sum=T_MA_Sum-T_MA_STEP
       ENDIF

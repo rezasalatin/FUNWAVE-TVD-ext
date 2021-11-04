@@ -4296,6 +4296,12 @@ SUBROUTINE PREVIEW
         call PutFile(TMP_NAME,Vor_Instant)
      ENDIF
 
+     ! Chen, Salatin, output cross-shore gradient of radiation shear stress
+     IF(OUT_RadStr)THEN
+       TMP_NAME = TRIM(FDIR)//'Syx_x_'//TRIM(FILE_NAME)
+       call PutFile(TMP_NAME,Syx_x)
+     ENDIF
+
 101   continue
 
 END SUBROUTINE PREVIEW
@@ -4353,11 +4359,6 @@ SUBROUTINE PREVIEW_MEAN
           call PutFile(TMP_NAME,WaveHeightAve)
           TMP_NAME = TRIM(FDIR)//'Hsig_'//TRIM(FILE_NAME)
           call PutFile(TMP_NAME,SigWaveHeight)
-        ENDIF
-
-        IF(OUT_RadStr)THEN
-          TMP_NAME = TRIM(FDIR)//'Syx_'//TRIM(FILE_NAME)
-          call PutFile(TMP_NAME,Syx)
         ENDIF
 
 END SUBROUTINE PREVIEW_MEAN

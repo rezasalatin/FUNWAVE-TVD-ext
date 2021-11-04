@@ -293,9 +293,9 @@ MODULE GLOBAL
       Vor2sum,Vorsum,Vorsum2
 
 ! Chen, Salatin, Oct 2021, Radiation Stress
-      REAL(SP),DIMENSION(:,:),ALLOCATABLE :: Syx_temp_sum, Syx
+      REAL(SP),DIMENSION(:,:),ALLOCATABLE :: Syx_x
       REAL(SP),DIMENSION(:,:,:),ALLOCATABLE :: U_Window, V_Window
-      INTEGER :: window_temp
+      REAL(SP),DIMENSION(:,:,:),ALLOCATABLE :: Syx_temp
 
 ! smagorinsky and wave height
       REAL(SP),DIMENSION(:,:),ALLOCATABLE :: Umean,Vmean,&
