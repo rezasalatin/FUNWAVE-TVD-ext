@@ -66,7 +66,7 @@ SUBROUTINE MIXING_STUFF
            Vor_Instant, Vor_Mean, Vor_Intensity, NumDT1, NumDT2,Vor2,&
            Vor2sum,Vorsum,&
            Depth,MA_Window,T_MA_Sum,T_MA_STEP,T_Mean_RadStr,Syx_temp,&
-           Syx,U_Window,V_Window)
+           U_Window,V_Window)
 	ENDIF    !ykchoi
 
 END SUBROUTINE MIXING_STUFF
@@ -92,7 +92,7 @@ SUBROUTINE CALCULATE_MEAN(T_INTV_mean,T_INTV_UVmean,T_sum,T_sumUVmean,&
                 Vor_Instant, Vor_Mean, Vor_Intensity, NumDT1, NumDT2,Vor2, &
                 Vor2sum,Vorsum,&
                 Depth,MA_Window,T_MA_Sum,T_MA_STEP,T_Mean_RadStr,Syx_temp,&
-                Syx,U_Window,V_Window)
+                U_Window,V_Window)
 
 ! calculate mean for smagorinsky mixing and wave height
       USE PARAM
@@ -121,7 +121,7 @@ SUBROUTINE CALCULATE_MEAN(T_INTV_mean,T_INTV_UVmean,T_sum,T_sumUVmean,&
       INTEGER, INTENT(IN) :: MA_Window
       REAL(SP),INTENT(IN) :: T_MA_STEP,T_Mean_RadStr
       REAL(SP),INTENT(OUT) :: T_MA_Sum
-      REAL(SP),DIMENSION(M,N) :: U_temp1,V_temp1,Syx_temp
+      REAL(SP),DIMENSION(M,N) :: U_temp1,V_temp1
       REAL(SP),DIMENSION(M,N,MA_Window),INTENT(INOUT) :: U_Window,V_Window
       REAL(SP),DIMENSION(M,N) :: U_Window_Sum,V_Window_Sum
       REAL(SP),DIMENSION(M,N) :: U_MA,V_MA
