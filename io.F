@@ -3639,6 +3639,7 @@ ENDIF ! endif WK_NEW_IRR
       CALL READ_LOGICAL(OUT_RUNUP,FILE_NAME,'RUNUP',ierr) ! Chen, Salatin
       CALL READ_LOGICAL(OUT_VOR,FILE_NAME,'VOR',ierr) ! Chen, Salatin
       CALL READ_LOGICAL(OUT_RadStr,FILE_NAME,'RadStr',ierr) ! Chen, Salatin
+      CALL READ_LOGICAL(OUT_uvMA,FILE_NAME,'uvMA',ierr) ! Chen, Salatin
 
 !ykchoi
 !	CALL READ_FLOAT(EtaBlowVal,FILE_NAME,'EtaBlowVal',ierr)
@@ -3695,6 +3696,7 @@ ENDIF ! endif WK_NEW_IRR
       WRITE(3,'(A15,L2)')'OUT_RUNUP',OUT_RUNUP ! Chen, Salatin
       WRITE(3,'(A15,L2)')'OUT_VOR',OUT_VOR ! Chen, Salatin
       WRITE(3,'(A15,L2)')'OUT_RadStr',OUT_RadStr ! Chen, Salatin
+      WRITE(3,'(A15,L2)')'OUT_uvMA',OUT_uvMA ! Chen, Salatin
 # if defined (PARALLEL)
       endif
 # endif
@@ -4300,6 +4302,13 @@ SUBROUTINE PREVIEW
      IF(OUT_RadStr)THEN
        TMP_NAME = TRIM(FDIR)//'Syx_x_'//TRIM(FILE_NAME)
        call PutFile(TMP_NAME,Syx_x)
+     ENDIF
+     ! Chen, Salatin, output moving average velocity components u and v
+     IF(OUT_uvMA)THEN
+       TMP_NAME = TRIM(FDIR)//'uMA_'//TRIM(FILE_NAME)
+       call PutFile(TMP_NAME,uMA)
+       TMP_NAME = TRIM(FDIR)//'vMA_'//TRIM(FILE_NAME)
+       call PutFile(TMP_NAME,vMA)
      ENDIF
 
 101   continue
