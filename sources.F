@@ -358,8 +358,8 @@ ENDIF
 # endif
          IF(ABS(xmk-Xc_WK)<Width_WK.AND. &
             ABS(ymk-Yc_WK)<Ywidth_WK/2.0_SP)THEN
-            SourceX(I,J) = SourceX(I,J)-Syx_x
-            SourceY(I,J) = SourceY(I,J)-Syx_x
+            SourceX(I,J) = SourceX(I,J)-Syx_x(I,J)
+            SourceY(I,J) = SourceY(I,J)-Syx_x(I,J)
          ENDIF
        ENDIF ! add Syx_x to WK source
 
