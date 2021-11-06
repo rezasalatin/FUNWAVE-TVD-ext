@@ -4316,8 +4316,8 @@ SUBROUTINE PREVIEW
      ENDIF
      ! Chen, Salatin, output moving average of the surface elevation
      IF(OUT_etaMA)THEN
-       TMP_NAME = TRIM(FDIR)//'etaMA_'//TRIM(FILE_NAME)
-       call PutFile(TMP_NAME,etaMA)
+       TMP_NAME = TRIM(FDIR)//'eta_MA_'//TRIM(FILE_NAME)
+       call PutFile(TMP_NAME,eta_MA)
      ENDIF
 
 101   continue

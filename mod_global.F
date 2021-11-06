@@ -298,8 +298,8 @@ MODULE GLOBAL
 ! Chen, Salatin, Oct 2021, moving average of u, v, and eta
       REAL(SP),DIMENSION(:,:),ALLOCATABLE :: uMA,vMA
       REAL(SP),DIMENSION(:,:,:),ALLOCATABLE :: U_Window, V_Window
-      REAL(SP),DIMENSION(:,:),ALLOCATABLE :: etaMA
-      REAL(SP),DIMENSION(:,:,:),ALLOCATABLE :: etaMA_temp
+      REAL(SP),DIMENSION(:,:),ALLOCATABLE :: eta_MA
+      REAL(SP),DIMENSION(:,:,:),ALLOCATABLE :: eta_MA_temp
 
 ! smagorinsky and wave height
       REAL(SP),DIMENSION(:,:),ALLOCATABLE :: Umean,Vmean,&

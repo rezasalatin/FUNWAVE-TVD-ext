@@ -66,7 +66,7 @@ SUBROUTINE MIXING_STUFF
            Vor_Instant, Vor_Mean, Vor_Intensity, NumDT1, NumDT2,Vor2,&
            Vor2sum,Vorsum,&
            Depth,MA_Window,T_MA_Sum,T_MA_STEP,T_Mean_RadStr,Syx_temp,&
-           U_Window,V_Window,Syx_x,MASK,DX,uMA,vMA,etaMA_temp,etaMA)
+           U_Window,V_Window,Syx_x,MASK,DX,uMA,vMA,eta_MA_temp,eta_MA)
 	ENDIF    !ykchoi
 
 END SUBROUTINE MIXING_STUFF
@@ -92,7 +92,7 @@ SUBROUTINE CALCULATE_MEAN(T_INTV_mean,T_INTV_UVmean,T_sum,T_sumUVmean,&
                 Vor_Instant, Vor_Mean, Vor_Intensity, NumDT1, NumDT2,Vor2, &
                 Vor2sum,Vorsum,&
                 Depth,MA_Window,T_MA_Sum,T_MA_STEP,T_Mean_RadStr,Syx_temp,&
-                U_Window,V_Window,Syx_x,MASK,DX,uMA,vMA,etaMA_temp,etaMA)
+                U_Window,V_Window,Syx_x,MASK,DX,uMA,vMA,eta_MA_temp,eta_MA)
 
 ! calculate mean for smagorinsky mixing and wave height
       USE PARAM
@@ -131,9 +131,9 @@ SUBROUTINE CALCULATE_MEAN(T_INTV_mean,T_INTV_UVmean,T_sum,T_sumUVmean,&
       REAL(SP),DIMENSION(M,N) :: Syx_temp_sum,Syx
       REAL(SP),DIMENSION(M,N),INTENT(OUT) :: Syx_x
       ! moving average of surface elevation
-      REAL(SP),DIMENSION(M,N,MA_Window),INTENT(INOUT) :: etaMA_temp
-      REAL(SP),DIMENSION(M,N),INTENT(OUT) :: etaMA
-      REAL(SP),DIMENSION(M,N) :: etaMA_Sum
+      REAL(SP),DIMENSION(M,N,MA_Window),INTENT(INOUT) :: eta_MA_temp
+      REAL(SP),DIMENSION(M,N),INTENT(OUT) :: eta_MA
+      REAL(SP),DIMENSION(M,N) :: eta_MA_Sum
       !
       REAL(SP),DIMENSION(M,N),INTENT(IN) :: MASK
       REAL(SP),INTENT(IN) :: DX
@@ -298,10 +298,10 @@ SUBROUTINE CALCULATE_MEAN(T_INTV_mean,T_INTV_UVmean,T_sum,T_sumUVmean,&
         Syx = Syx_temp_sum/MA_Window
         CALL DERIVATIVE_X(M,N,Ibeg,Iend,Jbeg,Jend,MASK,DX,Syx,Syx_x)
         ! moving average of the surface elevation
-        etaMA_temp = CSHIFT(etaMA_temp,-1,3)
-        etaMA_temp(:,:,1) = ETA
-        etaMA_Sum = SUM(etaMA_temp,3)
-        etaMA = etaMA_Sum/MA_Window
+        eta_MA_temp = CSHIFT(eta_MA_temp,-1,3)
+        eta_MA_temp(:,:,1) = ETA
+        eta_MA_Sum = SUM(eta_MA_temp,3)
+        eta_MA = eta_MA_Sum/MA_Window
         ! go to next time step
         T_MA_Sum=T_MA_Sum-T_MA_STEP
       ENDIF
