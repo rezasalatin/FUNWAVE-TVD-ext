@@ -347,7 +347,7 @@ ENDIF
          ENDIF
        ENDIF ! current balance
 
-       ! Chen, Salatin, include cross-shore gradient of Syx in the source for WK
+       ! Chen, Salatin, subtract cross-shore gradient of Syx from source in WK
        IF(OUT_RadStr)THEN
 # if defined (PARALLEL)
 	      xmk=(I-Ibeg)*DXg + (iista-1)*DXg
@@ -358,7 +358,7 @@ ENDIF
 # endif
          IF(ABS(xmk-Xc_WK)<Width_WK.AND. &
             ABS(ymk-Yc_WK)<Ywidth_WK/2.0_SP)THEN
-            SourceX(I,J) = SourceX(I,J)-Syx_x(I,J)
+            ! SourceX(I,J) = SourceX(I,J)-Syx_x(I,J)
             ! SourceY(I,J) = SourceY(I,J)-Syx_x(I,J)
          ENDIF
        ENDIF ! add Syx_x to WK source
