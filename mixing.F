@@ -66,7 +66,7 @@ SUBROUTINE MIXING_STUFF
            Vor_Instant, Vor_Mean, Vor_Intensity, NumDT1, NumDT2,Vor2,&
            Vor2sum,Vorsum,&
            Depth,MA_Window,T_MA_Sum,T_MA_STEP,T_Mean_RadStr,Syx_temp,&
-           U_Window,V_Window,Syx_x,MASK,DX,uMA,vMA)
+           U_Window,V_Window,Syx_x,MASK,DX,uMA,vMA,etaMA_temp,etaMA)
 	ENDIF    !ykchoi
 
 END SUBROUTINE MIXING_STUFF
@@ -92,7 +92,7 @@ SUBROUTINE CALCULATE_MEAN(T_INTV_mean,T_INTV_UVmean,T_sum,T_sumUVmean,&
                 Vor_Instant, Vor_Mean, Vor_Intensity, NumDT1, NumDT2,Vor2, &
                 Vor2sum,Vorsum,&
                 Depth,MA_Window,T_MA_Sum,T_MA_STEP,T_Mean_RadStr,Syx_temp,&
-                U_Window,V_Window,Syx_x,MASK,DX,uMA,vMA)
+                U_Window,V_Window,Syx_x,MASK,DX,uMA,vMA,etaMA_temp,etaMA)
 
 ! calculate mean for smagorinsky mixing and wave height
       USE PARAM
@@ -116,23 +116,27 @@ SUBROUTINE CALCULATE_MEAN(T_INTV_mean,T_INTV_UVmean,T_sum,T_sumUVmean,&
       REAL(SP),DIMENSION(M,N),INTENT(INOUT) :: ETAmean,ETAsum,ETA2,ETA2sum
       REAL(SP),DIMENSION(M,N) :: ETAvariance
       REAL(SP),DIMENSION(M,N),INTENT(INOUT) :: SigWaveHeight
-      !!! Chen, Salatin, Oct 2021, Radiation Stress Calculation
+      !!! Chen, Salatin, Oct 2021, Moving averages
       REAL(SP),DIMENSION(M,N),INTENT(IN) :: Depth
       INTEGER, INTENT(IN) :: MA_Window
       REAL(SP),INTENT(IN) :: T_MA_STEP,T_Mean_RadStr
       REAL(SP),INTENT(OUT) :: T_MA_Sum
+      ! moving average of current speed
       REAL(SP),DIMENSION(M,N) :: U_temp1,V_temp1
       REAL(SP),DIMENSION(M,N,MA_Window),INTENT(INOUT) :: U_Window,V_Window
       REAL(SP),DIMENSION(M,N) :: U_Window_Sum,V_Window_Sum
       REAL(SP),DIMENSION(M,N),INTENT(OUT) :: uMA,vMA
+      ! radiation shear stress (moving time averaged)
       REAL(SP),DIMENSION(M,N,MA_Window),INTENT(INOUT) :: Syx_temp
-      REAL(SP),DIMENSION(M,N) :: Syx_temp_sum
-      REAL(SP),DIMENSION(M,N) :: Syx
+      REAL(SP),DIMENSION(M,N) :: Syx_temp_sum,Syx
       REAL(SP),DIMENSION(M,N),INTENT(OUT) :: Syx_x
+      ! moving average of surface elevation
+      REAL(SP),DIMENSION(M,N,MA_Window),INTENT(INOUT) :: etaMA_temp
+      REAL(SP),DIMENSION(M,N),INTENT(OUT) :: etaMA
+      REAL(SP),DIMENSION(M,N) :: etaMA_Sum
+      !
       REAL(SP),DIMENSION(M,N),INTENT(IN) :: MASK
       REAL(SP),INTENT(IN) :: DX
-
-
 
       T_sum=T_sum+DT ! for wave height and MSL
       T_sumUVmean=T_sumUVmean+DT ! Chen, Salatin, for current and vortcty field
@@ -292,9 +296,13 @@ SUBROUTINE CALCULATE_MEAN(T_INTV_mean,T_INTV_UVmean,T_sum,T_sumUVmean,&
         Syx_temp(:,:,1) = RHO_WATER*U_temp1*V_temp1*(Depth+Eta)
         Syx_temp_sum = SUM(Syx_temp,3)
         Syx = Syx_temp_sum/MA_Window
-
         CALL DERIVATIVE_X(M,N,Ibeg,Iend,Jbeg,Jend,MASK,DX,Syx,Syx_x)
-
+        ! moving average of the surface elevation
+        etaMA_temp = CSHIFT(etaMA_temp,-1,3)
+        etaMA_temp(:,:,1) = ETA
+        etaMA_Sum = SUM(etaMA_temp,3)
+        etaMA = etaMA_Sum/MA_Window
+        ! go to next time step
         T_MA_Sum=T_MA_Sum-T_MA_STEP
       ENDIF
 

@@ -234,6 +234,11 @@ SUBROUTINE ALLOCATE_VARIABLES
       ALLOCATE(uMA(Mloc,Nloc),vMA(Mloc,Nloc))
         uMA=ZERO
         vMA=ZERO
+      ! Chen, Salatin, Nov 2021, Moving average of eta
+      ALLOCATE(etaMA_temp(Mloc,Nloc,MA_Window))
+        etaMA_temp=ZERO
+      ALLOCATE(etaMA(Mloc,Nloc))
+        etaMA=ZERO
 
 END SUBROUTINE ALLOCATE_VARIABLES
 

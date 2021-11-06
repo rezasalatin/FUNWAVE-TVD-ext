@@ -3640,6 +3640,8 @@ ENDIF ! endif WK_NEW_IRR
       CALL READ_LOGICAL(OUT_VOR,FILE_NAME,'VOR',ierr) ! Chen, Salatin
       CALL READ_LOGICAL(OUT_RadStr,FILE_NAME,'RadStr',ierr) ! Chen, Salatin
       CALL READ_LOGICAL(OUT_uvMA,FILE_NAME,'uvMA',ierr) ! Chen, Salatin
+      CALL READ_LOGICAL(OUT_etaMA,FILE_NAME,'etaMA',ierr) ! Chen, Salatin
+
 
 !ykchoi
 !	CALL READ_FLOAT(EtaBlowVal,FILE_NAME,'EtaBlowVal',ierr)
@@ -3697,6 +3699,8 @@ ENDIF ! endif WK_NEW_IRR
       WRITE(3,'(A15,L2)')'OUT_VOR',OUT_VOR ! Chen, Salatin
       WRITE(3,'(A15,L2)')'OUT_RadStr',OUT_RadStr ! Chen, Salatin
       WRITE(3,'(A15,L2)')'OUT_uvMA',OUT_uvMA ! Chen, Salatin
+      WRITE(3,'(A15,L2)')'OUT_etaMA',OUT_etaMA ! Chen, Salatin
+
 # if defined (PARALLEL)
       endif
 # endif
@@ -4309,6 +4313,11 @@ SUBROUTINE PREVIEW
        call PutFile(TMP_NAME,uMA)
        TMP_NAME = TRIM(FDIR)//'vMA_'//TRIM(FILE_NAME)
        call PutFile(TMP_NAME,vMA)
+     ENDIF
+     ! Chen, Salatin, output moving average of the surface elevation
+     IF(OUT_etaMA)THEN
+       TMP_NAME = TRIM(FDIR)//'etaMA_'//TRIM(FILE_NAME)
+       call PutFile(TMP_NAME,etaMA)
      ENDIF
 
 101   continue
