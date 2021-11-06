@@ -366,8 +366,7 @@ SUBROUTINE MAX_MIN_PROPERTY
       ENDIF ! max vorticity
 
 
-! Chen, Salatin
-    IF(OUT_VOR) THEN
+! Chen, Salatin, calculatin of vorticity
 # if defined (CARTESIAN)
    ! the vorticity has been calculated in dispersion.F
 # else
@@ -379,7 +378,6 @@ SUBROUTINE MAX_MIN_PROPERTY
       ENDDO
       ENDDO
 # endif
-    ENDIF
 
 # if defined (PARALLEL)
       IF(OUT_VORmax) THEN

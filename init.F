@@ -206,18 +206,16 @@ SUBROUTINE ALLOCATE_VARIABLES
       ENDIF
 
       ! Chen, Salatin
-      IF(OUT_VOR)THEN
-        ALLOCATE(Vor_Instant(Mloc,Nloc),Vor_Mean(Mloc,Nloc),&
-          Vor_Intensity(Mloc,Nloc),Vor2(Mloc,Nloc),Vor2sum(Mloc,Nloc),&
-          Vorsum(Mloc,Nloc),Vorsum2(Mloc,Nloc))
-          Vor_Instant=ZERO
-          Vor_Mean=ZERO
-          Vor_Intensity=ZERO
-          Vor2=ZERO
-          Vor2sum=ZERO
-          Vorsum=ZERO
-          Vorsum2=ZERO
-      ENDIF
+      ALLOCATE(Vor_Instant(Mloc,Nloc),Vor_Mean(Mloc,Nloc),&
+        Vor_Intensity(Mloc,Nloc),Vor2(Mloc,Nloc),Vor2sum(Mloc,Nloc),&
+        Vorsum(Mloc,Nloc),Vorsum2(Mloc,Nloc))
+        Vor_Instant=ZERO
+        Vor_Mean=ZERO
+        Vor_Intensity=ZERO
+        Vor2=ZERO
+        Vor2sum=ZERO
+        Vorsum=ZERO
+        Vorsum2=ZERO
 
       ! Chen, Salatin
       ALLOCATE(xmk_wk(Mloc),ymk_wk(Nloc))

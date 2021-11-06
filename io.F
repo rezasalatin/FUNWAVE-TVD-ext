@@ -4438,8 +4438,6 @@ SUBROUTINE PREVIEW_MEAN_UV
         IF(OUT_VOR)THEN
            TMP_NAME = TRIM(FDIR)//'VORmean_'//TRIM(FILE_NAME)
            call PutFile(TMP_NAME,Vor_Mean)
-        ENDIF
-        IF(OUT_VOR)THEN
            TMP_NAME = TRIM(FDIR)//'VORIntensity_'//TRIM(FILE_NAME)
            call PutFile(TMP_NAME,Vor_Intensity)
         ENDIF
