@@ -66,7 +66,7 @@ SUBROUTINE MIXING_STUFF
            Vor_Instant, Vor_Mean, Vor_Intensity, NumDT1, NumDT2,Vor2,&
            Vor2sum,Vorsum,&
            Depth,MA_Window,T_MA_Sum,T_MA_STEP,T_Mean_RadStr,Syx_temp,&
-           U_Window,V_Window,Syx_x,MASK,DX,uMA,vMA,eta_MA_temp,eta_MA)
+           U_Window,V_Window,Syx_x,MASK,DX,uMA,vMA,eta_MA_temp,eta_MA,Vor_MA)
 	ENDIF    !ykchoi
 
 END SUBROUTINE MIXING_STUFF
@@ -92,7 +92,8 @@ SUBROUTINE CALCULATE_MEAN(T_INTV_mean,T_INTV_UVmean,T_sum,T_sumUVmean,&
                 Vor_Instant, Vor_Mean, Vor_Intensity, NumDT1, NumDT2,Vor2, &
                 Vor2sum,Vorsum,&
                 Depth,MA_Window,T_MA_Sum,T_MA_STEP,T_Mean_RadStr,Syx_temp,&
-                U_Window,V_Window,Syx_x,MASK,DX,uMA,vMA,eta_MA_temp,eta_MA)
+                U_Window,V_Window,Syx_x,MASK,DX,uMA,vMA,eta_MA_temp,eta_MA,&
+                Vor_MA)
 
 ! calculate mean for smagorinsky mixing and wave height
       USE PARAM
@@ -134,6 +135,7 @@ SUBROUTINE CALCULATE_MEAN(T_INTV_mean,T_INTV_UVmean,T_sum,T_sumUVmean,&
       REAL(SP),DIMENSION(M,N,MA_Window),INTENT(INOUT) :: eta_MA_temp
       REAL(SP),DIMENSION(M,N),INTENT(OUT) :: eta_MA
       REAL(SP),DIMENSION(M,N) :: eta_MA_Sum
+      REAL(SP),DIMENSION(M,N),INTENT(OUT) :: Vor_MA
       !
       REAL(SP),DIMENSION(M,N),INTENT(IN) :: MASK
       REAL(SP),INTENT(IN) :: DX
@@ -302,6 +304,10 @@ SUBROUTINE CALCULATE_MEAN(T_INTV_mean,T_INTV_UVmean,T_sum,T_sumUVmean,&
         eta_MA_temp(:,:,1) = ETA
         eta_MA_Sum = SUM(eta_MA_temp,3)
         eta_MA = eta_MA_Sum/MA_Window
+        ! moving average of vorticity
+        CALL DERIVATIVE_X(M,N,Ibeg,Iend,Jbeg,Jend,MASK,DX,vMA,vMAx)
+        CALL DERIVATIVE_Y(M,N,Ibeg,Iend,Jbeg,Jend,MASK,DY,uMA,uMAy)
+        Vor_MA(I,J)=vMAx(I,J)-uMAy(I,J)
         ! go to next time step
         T_MA_Sum=T_MA_Sum-T_MA_STEP
       ENDIF

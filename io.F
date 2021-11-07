@@ -3641,6 +3641,7 @@ ENDIF ! endif WK_NEW_IRR
       CALL READ_LOGICAL(OUT_RadStr,FILE_NAME,'RadStr',ierr) ! Chen, Salatin
       CALL READ_LOGICAL(OUT_uvMA,FILE_NAME,'uvMA',ierr) ! Chen, Salatin
       CALL READ_LOGICAL(OUT_etaMA,FILE_NAME,'etaMA',ierr) ! Chen, Salatin
+      CALL READ_LOGICAL(OUT_VorMA,FILE_NAME,'VorMA',ierr) ! Chen, Salatin
 
 
 !ykchoi
@@ -3700,6 +3701,7 @@ ENDIF ! endif WK_NEW_IRR
       WRITE(3,'(A15,L2)')'OUT_RadStr',OUT_RadStr ! Chen, Salatin
       WRITE(3,'(A15,L2)')'OUT_uvMA',OUT_uvMA ! Chen, Salatin
       WRITE(3,'(A15,L2)')'OUT_etaMA',OUT_etaMA ! Chen, Salatin
+      WRITE(3,'(A15,L2)')'OUT_VorMA',OUT_VorMA ! Chen, Salatin
 
 # if defined (PARALLEL)
       endif
@@ -4160,7 +4162,7 @@ SUBROUTINE PREVIEW
      ENDIF
 
      IF(OUT_VORmax)THEN
-        TMP_NAME = TRIM(FDIR)//'VORmax_'//TRIM(FILE_NAME)
+        TMP_NAME = TRIM(FDIR)//'Vormax_'//TRIM(FILE_NAME)
         call PutFile(TMP_NAME,VorticityMax)
      ENDIF
 
@@ -4298,7 +4300,7 @@ SUBROUTINE PREVIEW
 
      ! Chen, Salatin
      IF(OUT_VOR)THEN
-        TMP_NAME = TRIM(FDIR)//'VORInstant_'//TRIM(FILE_NAME)
+        TMP_NAME = TRIM(FDIR)//'VorInstant_'//TRIM(FILE_NAME)
         call PutFile(TMP_NAME,Vor_Instant)
      ENDIF
 
@@ -4318,6 +4320,11 @@ SUBROUTINE PREVIEW
      IF(OUT_etaMA)THEN
        TMP_NAME = TRIM(FDIR)//'etaMA_'//TRIM(FILE_NAME)
        call PutFile(TMP_NAME,eta_MA)
+     ENDIF
+     ! Chen, Salatin, output moving average of the vorticity
+     IF(OUT_VorMA)THEN
+       TMP_NAME = TRIM(FDIR)//'VorMA_'//TRIM(FILE_NAME)
+       call PutFile(TMP_NAME,Vor_MA)
      ENDIF
 
 101   continue
@@ -4436,9 +4443,9 @@ SUBROUTINE PREVIEW_MEAN_UV
 
         ! Chen, Salatin
         IF(OUT_VOR)THEN
-           TMP_NAME = TRIM(FDIR)//'VORmean_'//TRIM(FILE_NAME)
+           TMP_NAME = TRIM(FDIR)//'Vormean_'//TRIM(FILE_NAME)
            call PutFile(TMP_NAME,Vor_Mean)
-           TMP_NAME = TRIM(FDIR)//'VORIntensity_'//TRIM(FILE_NAME)
+           TMP_NAME = TRIM(FDIR)//'VorIntensity_'//TRIM(FILE_NAME)
            call PutFile(TMP_NAME,Vor_Intensity)
         ENDIF
 

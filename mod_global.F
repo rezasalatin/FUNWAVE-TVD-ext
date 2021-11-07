@@ -295,11 +295,12 @@ MODULE GLOBAL
 ! Chen, Salatin, Oct 2021, Radiation Stress
       REAL(SP),DIMENSION(:,:),ALLOCATABLE :: Syx_x
       REAL(SP),DIMENSION(:,:,:),ALLOCATABLE :: Syx_temp
-! Chen, Salatin, Oct 2021, moving average of u, v, and eta
+! Chen, Salatin, Oct 2021, moving average of u, v, eta, and vorticity
       REAL(SP),DIMENSION(:,:),ALLOCATABLE :: uMA,vMA
       REAL(SP),DIMENSION(:,:,:),ALLOCATABLE :: U_Window, V_Window
       REAL(SP),DIMENSION(:,:),ALLOCATABLE :: eta_MA
       REAL(SP),DIMENSION(:,:,:),ALLOCATABLE :: eta_MA_temp
+      REAL(SP),DIMENSION(:,:),ALLOCATABLE :: Vor_MA
 
 ! smagorinsky and wave height
       REAL(SP),DIMENSION(:,:),ALLOCATABLE :: Umean,Vmean,&
@@ -387,6 +388,8 @@ MODULE GLOBAL
        LOGICAL :: OUT_uvMA=.FALSE.
        ! Chen, Salatin for moving average of eta
        LOGICAL :: OUT_etaMA=.FALSE.
+       ! Chen, Salatin for moving average of vorticity
+       LOGICAL :: OUT_VorMA=.FALSE.
 
 !# if defined (CARTESIAN)
 ! periodic boundary conditions
