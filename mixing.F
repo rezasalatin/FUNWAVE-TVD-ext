@@ -66,7 +66,8 @@ SUBROUTINE MIXING_STUFF
            Vor_Instant, Vor_Mean, Vor_Intensity, NumDT1, NumDT2,Vor2,&
            Vor2sum,Vorsum,&
            Depth,MA_Window,T_MA_Sum,T_MA_STEP,T_Mean_RadStr,Syx_temp,&
-           U_Window,V_Window,Syx_x,MASK,DX,uMA,vMA,eta_MA_temp,eta_MA,Vor_MA)
+           U_Window,V_Window,Syx_x,MASK,DX,uMA,vMA,eta_MA_temp,eta_MA,Vor_MA,&
+           OUT_uvMA,OUT_VorMA,OUT_RadStr,OUT_etaMA)
 	ENDIF    !ykchoi
 
 END SUBROUTINE MIXING_STUFF
@@ -93,7 +94,7 @@ SUBROUTINE CALCULATE_MEAN(T_INTV_mean,T_INTV_UVmean,T_sum,T_sumUVmean,&
                 Vor2sum,Vorsum,&
                 Depth,MA_Window,T_MA_Sum,T_MA_STEP,T_Mean_RadStr,Syx_temp,&
                 U_Window,V_Window,Syx_x,MASK,DX,uMA,vMA,eta_MA_temp,eta_MA,&
-                Vor_MA)
+                Vor_MA,OUT_uvMA,OUT_VorMA,OUT_RadStr,OUT_etaMA)
 
 ! calculate mean for smagorinsky mixing and wave height
       USE PARAM
