@@ -140,6 +140,7 @@ SUBROUTINE CALCULATE_MEAN(T_INTV_mean,T_INTV_UVmean,T_sum,T_sumUVmean,&
       !
       REAL(SP),DIMENSION(M,N),INTENT(IN) :: MASK
       REAL(SP),INTENT(IN) :: DX
+      LOGICAL :: OUT_uvMA,OUT_VorMA,OUT_RadStr,OUT_etaMA
 
       T_sum=T_sum+DT ! for wave height and MSL
       T_sumUVmean=T_sumUVmean+DT ! Chen, Salatin, for current and vortcty field
