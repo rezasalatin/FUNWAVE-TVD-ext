@@ -279,6 +279,7 @@ SUBROUTINE CALCULATE_MEAN(T_INTV_mean,T_INTV_UVmean,T_sum,T_sumUVmean,&
     IF(T_MA_Sum.GE.T_MA_STEP)THEN
         ! shift the window and make space for new variables
 
+      IF(OUT_uvMA.OR.OUT_RadStr.OR.OUT_VorMA)THEN
         U_Window = CSHIFT(U_Window,-1,3)
         V_Window = CSHIFT(V_Window,-1,3)
         ! replace oldest variable by the newest
@@ -293,23 +294,30 @@ SUBROUTINE CALCULATE_MEAN(T_INTV_mean,T_INTV_UVmean,T_sum,T_sumUVmean,&
         ! subtracting average velocity from the instant velocity
         U_temp1 = U - uMA
         V_temp1 = V - vMA
+      ENDIF
+      IF(OUT_RadStr)THEN
         ! Calculate the radiation shear stress
         Syx_temp = CSHIFT(Syx_temp,-1,3)
         Syx_temp(:,:,1) = RHO_WATER*U_temp1*V_temp1*(Depth+Eta)
         Syx_temp_sum = SUM(Syx_temp,3)
         Syx = Syx_temp_sum/MA_Window
         CALL DERIVATIVE_X(M,N,Ibeg,Iend,Jbeg,Jend,MASK,DX,Syx,Syx_x)
+      ENDIF
+      IF(OUT_VorMA)THEN
+        ! moving average of vorticity
+        CALL DERIVATIVE_X(M,N,Ibeg,Iend,Jbeg,Jend,MASK,DX,vMA,vMAx)
+        CALL DERIVATIVE_Y(M,N,Ibeg,Iend,Jbeg,Jend,MASK,DY,uMA,uMAy)
+        Vor_MA(I,J)=vMAx(I,J)-uMAy(I,J)
+      ENDIF
+      IF(OUT_etaMA)THEN
         ! moving average of the surface elevation
         eta_MA_temp = CSHIFT(eta_MA_temp,-1,3)
         eta_MA_temp(:,:,1) = ETA
         eta_MA_Sum = SUM(eta_MA_temp,3)
         eta_MA = eta_MA_Sum/MA_Window
-        ! moving average of vorticity
-        CALL DERIVATIVE_X(M,N,Ibeg,Iend,Jbeg,Jend,MASK,DX,vMA,vMAx)
-        CALL DERIVATIVE_Y(M,N,Ibeg,Iend,Jbeg,Jend,MASK,DY,uMA,uMAy)
-        Vor_MA(I,J)=vMAx(I,J)-uMAy(I,J)
+      ENDIF
         ! go to next time step
         T_MA_Sum=T_MA_Sum-T_MA_STEP
-      ENDIF
+    ENDIF
 
 END SUBROUTINE CALCULATE_MEAN
