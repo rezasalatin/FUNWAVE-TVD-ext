@@ -66,8 +66,8 @@ SUBROUTINE MIXING_STUFF
            Vor_Instant, Vor_Mean, Vor_Intensity, NumDT1, NumDT2,Vor2,&
            Vor2sum,Vorsum,&
            Depth,MA_Window,T_MA_Sum,T_MA_STEP,T_Mean_RadStr,Syx_temp,&
-           U_Window,V_Window,Syx_x,MASK,DX,uMA,vMA,eta_MA_temp,eta_MA,Vor_MA,&
-           OUT_uvMA,OUT_VorMA,OUT_RadStr,OUT_etaMA)
+           U_Window,V_Window,Syx_x,MASK,DX,DY,uMA,vMA,eta_MA_temp,eta_MA,&
+           Vor_MA,OUT_uvMA,OUT_VorMA,OUT_RadStr,OUT_etaMA)
 	ENDIF    !ykchoi
 
 END SUBROUTINE MIXING_STUFF
@@ -93,7 +93,7 @@ SUBROUTINE CALCULATE_MEAN(T_INTV_mean,T_INTV_UVmean,T_sum,T_sumUVmean,&
                 Vor_Instant, Vor_Mean, Vor_Intensity, NumDT1, NumDT2,Vor2, &
                 Vor2sum,Vorsum,&
                 Depth,MA_Window,T_MA_Sum,T_MA_STEP,T_Mean_RadStr,Syx_temp,&
-                U_Window,V_Window,Syx_x,MASK,DX,uMA,vMA,eta_MA_temp,eta_MA,&
+                U_Window,V_Window,Syx_x,MASK,DX,DY,uMA,vMA,eta_MA_temp,eta_MA,&
                 Vor_MA,OUT_uvMA,OUT_VorMA,OUT_RadStr,OUT_etaMA)
 
 ! calculate mean for smagorinsky mixing and wave height
@@ -128,6 +128,7 @@ SUBROUTINE CALCULATE_MEAN(T_INTV_mean,T_INTV_UVmean,T_sum,T_sumUVmean,&
       REAL(SP),DIMENSION(M,N,MA_Window),INTENT(INOUT) :: U_Window,V_Window
       REAL(SP),DIMENSION(M,N) :: U_Window_Sum,V_Window_Sum
       REAL(SP),DIMENSION(M,N),INTENT(OUT) :: uMA,vMA
+      REAL(SP),DIMENSION(M,N) :: uMAy,vMAx
       ! radiation shear stress (moving time averaged)
       REAL(SP),DIMENSION(M,N,MA_Window),INTENT(INOUT) :: Syx_temp
       REAL(SP),DIMENSION(M,N) :: Syx_temp_sum,Syx
@@ -139,7 +140,7 @@ SUBROUTINE CALCULATE_MEAN(T_INTV_mean,T_INTV_UVmean,T_sum,T_sumUVmean,&
       REAL(SP),DIMENSION(M,N),INTENT(OUT) :: Vor_MA
       !
       REAL(SP),DIMENSION(M,N),INTENT(IN) :: MASK
-      REAL(SP),INTENT(IN) :: DX
+      REAL(SP),INTENT(IN) :: DX,DY
       LOGICAL :: OUT_uvMA,OUT_VorMA,OUT_RadStr,OUT_etaMA
 
       T_sum=T_sum+DT ! for wave height and MSL
