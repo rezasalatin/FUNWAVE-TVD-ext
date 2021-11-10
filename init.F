@@ -237,6 +237,8 @@ SUBROUTINE ALLOCATE_VARIABLES
         eta_MA_temp=ZERO
       ALLOCATE(eta_MA(Mloc,Nloc))
         eta_MA=ZERO
+      ALLOCATE(Vor_MA(Mloc,Nloc))
+        Vor_MA=ZERO
 
 END SUBROUTINE ALLOCATE_VARIABLES
 
