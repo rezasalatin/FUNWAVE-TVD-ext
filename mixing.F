@@ -310,7 +310,7 @@ SUBROUTINE CALCULATE_MEAN(T_INTV_mean,T_INTV_UVmean,T_sum,T_sumUVmean,&
         ! moving average of vorticity
         CALL DERIVATIVE_X(M,N,Ibeg,Iend,Jbeg,Jend,MASK,DX,vMA,vMAx)
         CALL DERIVATIVE_Y(M,N,Ibeg,Iend,Jbeg,Jend,MASK,DY,uMA,uMAy)
-        Vor_MA(I,J)=vMAx(I,J)-uMAy(I,J)
+        Vor_MA=vMAx-uMAy
       ENDIF
       IF(OUT_etaMA)THEN
         ! moving average of the surface elevation
