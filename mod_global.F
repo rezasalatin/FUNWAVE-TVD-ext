@@ -308,8 +308,8 @@ MODULE GLOBAL
       REAL(SP)::T_INTV_mean = 20.0,T_sum=0.0,C_smg=0.25
       ! Chen, Salatin, Current and Vorticity field
       REAL(SP)::T_INTV_UVmean = 20.0,T_sumUVmean=0.0
-      ! Chen, Salatin, Oct 2021, Radiation Stress
-      REAL(SP)::T_MA_STEP=1.0,T_MA_Sum=0.0,T_Mean_RadStr=0.0
+      ! Chen, Salatin, Oct 2021, Moving Average
+      REAL(SP)::T_MA_STEP=1.0,T_MA_Sum=0.0
       INTEGER :: MA_Window=1
       !!
       REAL(SP),DIMENSION(:,:),ALLOCATABLE :: &

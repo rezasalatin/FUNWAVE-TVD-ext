@@ -64,11 +64,16 @@ SUBROUTINE MIXING_STUFF
            WaveHeightAve,Emax,Emin,Num_Zero_Up,Ibeg,Iend,Jbeg,Jend, &
            HrmsSum,HavgSum,ETA2,ETA2sum,SigWaveHeight,ETAvariance, &
            Vor_Instant, Vor_Mean, Vor_Intensity, NumDT1, NumDT2,Vor2,&
-           Vor2sum,Vorsum,&
-           Depth,MA_Window,T_MA_Sum,T_MA_STEP,T_Mean_RadStr,Syx_temp,&
-           U_Window,V_Window,Syx_x,MASK,DX,DY,uMA,vMA,eta_MA_temp,eta_MA,&
-           Vor_MA,OUT_uvMA,OUT_VorMA,OUT_RadStr,OUT_etaMA)
-	ENDIF    !ykchoi
+           Vor2sum,Vorsum)
+	     ENDIF    !ykchoi
+
+       ! Chen, Salatin, moving average of some properties (U,V,Eta,Vor,Syx)
+       CALL CALCULATE_MovingAverage(DT,Mloc,Nloc,U,V,ETA,MASK,DX,DY,Depth,&
+            Ibeg,Iend,Jbeg,Jend,&
+            OUT_uvMA,OUT_VorMA,OUT_RadStr,OUT_etaMA,&
+            MA_Window,T_MA_Sum,T_MA_STEP,&
+            Syx_temp,Syx_x,U_Window,V_Window,uMA,vMA,eta_MA_temp,eta_MA,Vor_MA)
+ 	     ENDIF
 
 END SUBROUTINE MIXING_STUFF
 
@@ -91,10 +96,7 @@ SUBROUTINE CALCULATE_MEAN(T_INTV_mean,T_INTV_UVmean,T_sum,T_sumUVmean,&
                 WaveHeightAve,Emax,Emin,Num_Zero_Up,Ibeg,Iend,Jbeg,Jend, &
                 HrmsSum,HavgSum,ETA2,ETA2sum,SigWaveHeight,ETAvariance, &
                 Vor_Instant, Vor_Mean, Vor_Intensity, NumDT1, NumDT2,Vor2, &
-                Vor2sum,Vorsum,&
-                Depth,MA_Window,T_MA_Sum,T_MA_STEP,T_Mean_RadStr,Syx_temp,&
-                U_Window,V_Window,Syx_x,MASK,DX,DY,uMA,vMA,eta_MA_temp,eta_MA,&
-                Vor_MA,OUT_uvMA,OUT_VorMA,OUT_RadStr,OUT_etaMA)
+                Vor2sum,Vorsum)
 
 ! calculate mean for smagorinsky mixing and wave height
       USE PARAM
@@ -118,34 +120,9 @@ SUBROUTINE CALCULATE_MEAN(T_INTV_mean,T_INTV_UVmean,T_sum,T_sumUVmean,&
       REAL(SP),DIMENSION(M,N),INTENT(INOUT) :: ETAmean,ETAsum,ETA2,ETA2sum
       REAL(SP),DIMENSION(M,N) :: ETAvariance
       REAL(SP),DIMENSION(M,N),INTENT(INOUT) :: SigWaveHeight
-      !!! Chen, Salatin, Oct 2021, Moving averages
-      REAL(SP),DIMENSION(M,N),INTENT(IN) :: Depth
-      INTEGER, INTENT(IN) :: MA_Window
-      REAL(SP),INTENT(IN) :: T_MA_STEP,T_Mean_RadStr
-      REAL(SP),INTENT(OUT) :: T_MA_Sum
-      ! moving average of current speed
-      REAL(SP),DIMENSION(M,N) :: U_temp1,V_temp1
-      REAL(SP),DIMENSION(M,N,MA_Window),INTENT(INOUT) :: U_Window,V_Window
-      REAL(SP),DIMENSION(M,N) :: U_Window_Sum,V_Window_Sum
-      REAL(SP),DIMENSION(M,N),INTENT(OUT) :: uMA,vMA
-      REAL(SP),DIMENSION(M,N) :: uMAy,vMAx
-      ! radiation shear stress (moving time averaged)
-      REAL(SP),DIMENSION(M,N,MA_Window),INTENT(INOUT) :: Syx_temp
-      REAL(SP),DIMENSION(M,N) :: Syx_temp_sum,Syx
-      REAL(SP),DIMENSION(M,N),INTENT(OUT) :: Syx_x
-      ! moving average of surface elevation
-      REAL(SP),DIMENSION(M,N,MA_Window),INTENT(INOUT) :: eta_MA_temp
-      REAL(SP),DIMENSION(M,N),INTENT(OUT) :: eta_MA
-      REAL(SP),DIMENSION(M,N) :: eta_MA_Sum
-      REAL(SP),DIMENSION(M,N),INTENT(OUT) :: Vor_MA
-      !
-      REAL(SP),DIMENSION(M,N),INTENT(IN) :: MASK
-      REAL(SP),INTENT(IN) :: DX,DY
-      LOGICAL :: OUT_uvMA,OUT_VorMA,OUT_RadStr,OUT_etaMA
 
       T_sum=T_sum+DT ! for wave height and MSL
       T_sumUVmean=T_sumUVmean+DT ! Chen, Salatin, for current and vortcty field
-      T_MA_Sum=T_MA_Sum+DT ! Chen, Salatin, Oct 2021, Radiation Stress
 
       IF(T_sum.GE.T_INTV_mean)THEN
         ! Significant Wave Height
@@ -270,57 +247,94 @@ SUBROUTINE CALCULATE_MEAN(T_INTV_mean,T_INTV_UVmean,T_sum,T_sumUVmean,&
         Vor2sum=Vor2+Vor2sum
       ENDIF
 
+END SUBROUTINE CALCULATE_MEAN
+
 !-------------------------------------------------------------------------------------
 !
-! Chen, Salatin, Oct 2021, Radiation Stress calculation
+! Chen, Salatin, Oct 2021, Moving Average of some properties
 ! a moving average is carried out on instant velocity
 ! the window size is 2Tp for regular waves or 5Tp for irregular waves
-! this window moves at each specified timestep (preferably 1.0 sec)
+! this window moves at each specified timestep
 !
-! Do the Moving Average to calculate Mean U and V
+! Moving average of U, V, Vorticity, Eta, Radiation Shear Stress
+!
 !-------------------------------------------------------------------------------------
-    IF(T_MA_Sum.GE.T_MA_STEP)THEN
-        ! shift the window and make space for new variables
+SUBROUTINE CALCULATE_MovingAverage(DT,M,N,U,V,ETA,MASK,DX,DY,Depth,&
+     Ibeg,Iend,Jbeg,Jend, &
+     OUT_uvMA,OUT_VorMA,OUT_RadStr,OUT_etaMA,&
+     MA_Window,T_MA_Sum,T_MA_STEP,&
+     Syx_temp,Syx_x,U_Window,V_Window,uMA,vMA,eta_MA_temp,eta_MA,Vor_MA)
 
-      IF(OUT_uvMA.OR.OUT_RadStr.OR.OUT_VorMA)THEN
-        U_Window = CSHIFT(U_Window,-1,3)
-        V_Window = CSHIFT(V_Window,-1,3)
-        ! replace oldest variable by the newest
-        U_Window(:,:,1) = U
-        V_Window(:,:,1) = V
-        ! only sum up the values within the window
-        U_Window_Sum = SUM(U_Window,3)
-        V_Window_Sum = SUM(V_Window,3)
-        ! do averaging
-        uMA = U_Window_Sum/MA_Window
-        vMA = V_Window_Sum/MA_Window
-        ! subtracting average velocity from the instant velocity
-        U_temp1 = U - uMA
-        V_temp1 = V - vMA
-      ENDIF
-      IF(OUT_RadStr)THEN
-        ! Calculate the radiation shear stress
-        Syx_temp = CSHIFT(Syx_temp,-1,3)
-        Syx_temp(:,:,1) = RHO_WATER*U_temp1*V_temp1*(Depth+Eta)
-        Syx_temp_sum = SUM(Syx_temp,3)
-        Syx = Syx_temp_sum/MA_Window
-        CALL DERIVATIVE_X(M,N,Ibeg,Iend,Jbeg,Jend,MASK,DX,Syx,Syx_x)
-      ENDIF
-      IF(OUT_VorMA)THEN
-        ! moving average of vorticity
-        CALL DERIVATIVE_X(M,N,Ibeg,Iend,Jbeg,Jend,MASK,DX,vMA,vMAx)
-        CALL DERIVATIVE_Y(M,N,Ibeg,Iend,Jbeg,Jend,MASK,DY,uMA,uMAy)
-        Vor_MA=vMAx-uMAy
-      ENDIF
-      IF(OUT_etaMA)THEN
-        ! moving average of the surface elevation
-        eta_MA_temp = CSHIFT(eta_MA_temp,-1,3)
-        eta_MA_temp(:,:,1) = ETA
-        eta_MA_Sum = SUM(eta_MA_temp,3)
-        eta_MA = eta_MA_Sum/MA_Window
-      ENDIF
-        ! go to next time step
-        T_MA_Sum=T_MA_Sum-T_MA_STEP
-    ENDIF
+     USE PARAM
+     IMPLICIT NONE
+     REAL(SP),INTENT(IN) :: DT
+     INTEGER, INTENT(IN) :: M,N,Ibeg,Iend,Jbeg,Jend
+     REAL(SP),DIMENSION(M,N),INTENT(IN)::U,V,ETA,Depth,MASK
+     REAL(SP),INTENT(IN) :: DX,DY
+     LOGICAL :: OUT_uvMA,OUT_VorMA,OUT_RadStr,OUT_etaMA
+     ! moving average, temporal properties
+     INTEGER, INTENT(IN) :: MA_Window
+     REAL(SP),INTENT(IN) :: T_MA_STEP
+     REAL(SP),INTENT(OUT) :: T_MA_Sum
+     ! moving average of current speed
+     REAL(SP),DIMENSION(M,N) :: U_temp1,V_temp1
+     REAL(SP),DIMENSION(M,N,MA_Window),INTENT(INOUT) :: U_Window,V_Window
+     REAL(SP),DIMENSION(M,N) :: U_Window_Sum,V_Window_Sum
+     REAL(SP),DIMENSION(M,N),INTENT(OUT) :: uMA,vMA
+     REAL(SP),DIMENSION(M,N) :: uMAy,vMAx
+     ! moving averaged of radiation shear stress
+     REAL(SP),DIMENSION(M,N,MA_Window),INTENT(INOUT) :: Syx_temp
+     REAL(SP),DIMENSION(M,N) :: Syx_temp_sum,Syx
+     REAL(SP),DIMENSION(M,N),INTENT(OUT) :: Syx_x
+     ! moving average of surface elevation
+     REAL(SP),DIMENSION(M,N,MA_Window),INTENT(INOUT) :: eta_MA_temp
+     REAL(SP),DIMENSION(M,N),INTENT(OUT) :: eta_MA
+     REAL(SP),DIMENSION(M,N) :: eta_MA_Sum
+     ! moving average of vorticity
+     REAL(SP),DIMENSION(M,N),INTENT(OUT) :: Vor_MA
 
-END SUBROUTINE CALCULATE_MEAN
+     T_MA_Sum=T_MA_Sum+DT
+
+     IF(T_MA_Sum.GE.T_MA_STEP)THEN
+       ! shift the window and make space for new variables
+       IF(OUT_uvMA.OR.OUT_RadStr.OR.OUT_VorMA)THEN
+         U_Window = CSHIFT(U_Window,-1,3)
+         V_Window = CSHIFT(V_Window,-1,3)
+         ! replace oldest variable by the newest
+         U_Window(:,:,1) = U
+         V_Window(:,:,1) = V
+         ! only sum up the values within the window
+         U_Window_Sum = SUM(U_Window,3)
+         V_Window_Sum = SUM(V_Window,3)
+         ! do averaging
+         uMA = U_Window_Sum/MA_Window
+         vMA = V_Window_Sum/MA_Window
+         ! subtracting average velocity from the instant velocity
+         U_temp1 = U - uMA
+         V_temp1 = V - vMA
+       ENDIF
+       IF(OUT_RadStr)THEN
+         ! Calculate the radiation shear stress
+         Syx_temp = CSHIFT(Syx_temp,-1,3)
+         Syx_temp(:,:,1) = RHO_WATER*U_temp1*V_temp1*(Depth+Eta)
+         Syx_temp_sum = SUM(Syx_temp,3)
+         Syx = Syx_temp_sum/MA_Window
+         CALL DERIVATIVE_X(M,N,Ibeg,Iend,Jbeg,Jend,MASK,DX,Syx,Syx_x)
+       ENDIF
+       IF(OUT_VorMA)THEN
+         ! moving average of vorticity
+         CALL DERIVATIVE_X(M,N,Ibeg,Iend,Jbeg,Jend,MASK,DX,vMA,vMAx)
+         CALL DERIVATIVE_Y(M,N,Ibeg,Iend,Jbeg,Jend,MASK,DY,uMA,uMAy)
+         Vor_MA=vMAx-uMAy
+       ENDIF
+       IF(OUT_etaMA)THEN
+         ! moving average of the surface elevation
+         eta_MA_temp = CSHIFT(eta_MA_temp,-1,3)
+         eta_MA_temp(:,:,1) = ETA
+         eta_MA_Sum = SUM(eta_MA_temp,3)
+         eta_MA = eta_MA_Sum/MA_Window
+       ENDIF
+         ! go to next time step
+         T_MA_Sum=T_MA_Sum-T_MA_STEP
+     ENDIF
+END SUBROUTINE CALCULATE_MovingAverage

@@ -3393,20 +3393,6 @@ ENDIF ! endif WK_NEW_IRR
 # endif
         ENDIF
 
-        CALL READ_FLOAT(T_Mean_RadStr,FILE_NAME,'T_Mean_RadStr',ierr)
-        IF(ierr==1)THEN
-          T_Mean_RadStr = LARGE
-# if defined (PARALLEL)
-          if (myid.eq.0) THEN
-           WRITE(*,'(A40)')'T_Mean_RadStr Default:  LARGE'
-           WRITE(3,'(A40)')'T_Mean_RadStr Default:  LARGE'
-         endif
-# else
-          WRITE(*,'(A40)')'T_Mean_RadStr Default:  LARGE'
-          WRITE(3,'(A40)')'T_Mean_RadStr Default:  LARGE'
-# endif
-        ENDIF
-
         CALL READ_INTEGER(MA_Window,FILE_NAME,'MA_Window',ierr)
         IF(ierr==1)THEN
           MA_Window = 10
@@ -3458,7 +3444,6 @@ ENDIF ! endif WK_NEW_IRR
       ! Chen, Salatin
       if (myid.eq.0) WRITE(3,'(A14,F12.6)')'T_INTV_UVmean =', T_INTV_UVmean
       if (myid.eq.0) WRITE(3,'(A14,F12.6)')'T_MA_STEP =', T_MA_STEP
-      if (myid.eq.0) WRITE(3,'(A14,F12.6)')'T_Mean_RadStr =', T_Mean_RadStr
       if (myid.eq.0) WRITE(3,'(A14,F12.6)')'MA_Window =', MA_Window
       !!
       if (myid.eq.0) WRITE(3,'(A14,F12.6)')'STEADY_TIME =', STEADY_TIME
@@ -3468,7 +3453,6 @@ ENDIF ! endif WK_NEW_IRR
       ! Chen, Salatin
       WRITE(3,'(A14,F12.6)')'T_INTV_UVmean =', T_INTV_UVmean
       WRITE(3,'(A14,F12.6)')'T_MA_STEP =', T_MA_STEP
-      WRITE(3,'(A14,F12.6)')'T_Mean_RadStr =', T_Mean_RadStr
       WRITE(3,'(A14,F12.6)')'MA_Window =', MA_Window
       !!
       WRITE(3,'(A14,F12.6)')'STEADY_TIME =', STEADY_TIME
