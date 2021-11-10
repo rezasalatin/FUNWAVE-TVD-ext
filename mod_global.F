@@ -300,7 +300,6 @@ MODULE GLOBAL
       REAL(SP),DIMENSION(:,:,:),ALLOCATABLE :: U_Window, V_Window
       REAL(SP),DIMENSION(:,:),ALLOCATABLE :: eta_MA
       REAL(SP),DIMENSION(:,:,:),ALLOCATABLE :: eta_MA_temp
-      REAL(SP),DIMENSION(:,:),ALLOCATABLE :: Vor_MA
 
 ! smagorinsky and wave height
       REAL(SP),DIMENSION(:,:),ALLOCATABLE :: Umean,Vmean,&
@@ -388,8 +387,6 @@ MODULE GLOBAL
        LOGICAL :: OUT_uvMA=.FALSE.
        ! Chen, Salatin for moving average of eta
        LOGICAL :: OUT_etaMA=.FALSE.
-       ! Chen, Salatin for moving average of vorticity
-       LOGICAL :: OUT_VorMA=.FALSE.
 
 !# if defined (CARTESIAN)
 ! periodic boundary conditions

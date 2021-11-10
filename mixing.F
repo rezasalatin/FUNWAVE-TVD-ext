@@ -67,7 +67,7 @@ SUBROUTINE MIXING_STUFF
            Vor2sum,Vorsum,&
            Depth,MA_Window,T_MA_Sum,T_MA_STEP,T_Mean_RadStr,Syx_temp,&
            U_Window,V_Window,Syx_x,MASK,DX,DY,uMA,vMA,eta_MA_temp,eta_MA,&
-           Vor_MA,OUT_uvMA,OUT_VorMA,OUT_RadStr,OUT_etaMA)
+           OUT_uvMA,OUT_RadStr,OUT_etaMA)
 	ENDIF    !ykchoi
 
 END SUBROUTINE MIXING_STUFF
@@ -94,7 +94,7 @@ SUBROUTINE CALCULATE_MEAN(T_INTV_mean,T_INTV_UVmean,T_sum,T_sumUVmean,&
                 Vor2sum,Vorsum,&
                 Depth,MA_Window,T_MA_Sum,T_MA_STEP,T_Mean_RadStr,Syx_temp,&
                 U_Window,V_Window,Syx_x,MASK,DX,DY,uMA,vMA,eta_MA_temp,eta_MA,&
-                Vor_MA,OUT_uvMA,OUT_VorMA,OUT_RadStr,OUT_etaMA)
+                OUT_uvMA,OUT_RadStr,OUT_etaMA)
 
 ! calculate mean for smagorinsky mixing and wave height
       USE PARAM
@@ -137,11 +137,10 @@ SUBROUTINE CALCULATE_MEAN(T_INTV_mean,T_INTV_UVmean,T_sum,T_sumUVmean,&
       REAL(SP),DIMENSION(M,N,MA_Window),INTENT(INOUT) :: eta_MA_temp
       REAL(SP),DIMENSION(M,N),INTENT(OUT) :: eta_MA
       REAL(SP),DIMENSION(M,N) :: eta_MA_Sum
-      REAL(SP),DIMENSION(M,N),INTENT(OUT) :: Vor_MA
       !
       REAL(SP),DIMENSION(M,N),INTENT(IN) :: MASK
       REAL(SP),INTENT(IN) :: DX,DY
-      LOGICAL :: OUT_uvMA,OUT_VorMA,OUT_RadStr,OUT_etaMA
+      LOGICAL :: OUT_uvMA,OUT_RadStr,OUT_etaMA
 
       T_sum=T_sum+DT ! for wave height and MSL
       T_sumUVmean=T_sumUVmean+DT ! Chen, Salatin, for current and vortcty field
@@ -282,7 +281,7 @@ SUBROUTINE CALCULATE_MEAN(T_INTV_mean,T_INTV_UVmean,T_sum,T_sumUVmean,&
     IF(T_MA_Sum.GE.T_MA_STEP)THEN
         ! shift the window and make space for new variables
 
-      IF(OUT_uvMA.OR.OUT_RadStr.OR.OUT_VorMA)THEN
+      IF(OUT_uvMA.OR.OUT_RadStr)THEN
         U_Window = CSHIFT(U_Window,-1,3)
         V_Window = CSHIFT(V_Window,-1,3)
         ! replace oldest variable by the newest
@@ -305,12 +304,6 @@ SUBROUTINE CALCULATE_MEAN(T_INTV_mean,T_INTV_UVmean,T_sum,T_sumUVmean,&
         Syx_temp_sum = SUM(Syx_temp,3)
         Syx = Syx_temp_sum/MA_Window
         CALL DERIVATIVE_X(M,N,Ibeg,Iend,Jbeg,Jend,MASK,DX,Syx,Syx_x)
-      ENDIF
-      IF(OUT_VorMA)THEN
-        ! moving average of vorticity
-        CALL DERIVATIVE_X(M,N,Ibeg,Iend,Jbeg,Jend,MASK,DX,vMA,vMAx)
-        CALL DERIVATIVE_Y(M,N,Ibeg,Iend,Jbeg,Jend,MASK,DY,uMA,uMAy)
-        Vor_MA(I,J)=vMAx(I,J)-uMAy(I,J)
       ENDIF
       IF(OUT_etaMA)THEN
         ! moving average of the surface elevation
