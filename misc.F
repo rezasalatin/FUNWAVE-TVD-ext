@@ -372,11 +372,7 @@ SUBROUTINE MAX_MIN_PROPERTY
 # else
       CALL DERIVATIVE_X(Mloc,Nloc,Ibeg,Iend,Jbeg,Jend,MASK9,DX,V,Vx)
       CALL DERIVATIVE_Y(Mloc,Nloc,Ibeg,Iend,Jbeg,Jend,MASK9,DY,U,Uy)
-      DO J=Jbeg,Jend
-      DO I=Ibeg,Iend
-        Vor_Instant(I,J)=Vx(I,J)-Uy(I,J)
-      ENDDO
-      ENDDO
+      Vor_Instant=Vx-Uy
 # endif
 
 # if defined (PARALLEL)
