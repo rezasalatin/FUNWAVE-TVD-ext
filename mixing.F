@@ -73,7 +73,7 @@ SUBROUTINE MIXING_STUFF
             OUT_uvMA,OUT_VorMA,OUT_RadStr,OUT_etaMA,&
             MA_Window,T_MA_Sum,T_MA_STEP,&
             Syx_temp,Syx_x,U_Window,V_Window,uMA,vMA,eta_MA_temp,eta_MA,Vor_MA)
-            
+
 END SUBROUTINE MIXING_STUFF
 
 
