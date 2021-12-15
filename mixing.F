@@ -319,6 +319,8 @@ SUBROUTINE CALCULATE_MovingAverage(DT,M,N,U,V,ETA,MASK,DX,DY,Depth,&
          Syx_temp_sum = SUM(Syx_temp,3)
          Syx = Syx_temp_sum/MA_Window
          CALL DERIVATIVE_X(M,N,Ibeg,Iend,Jbeg,Jend,MASK,DX,Syx,Syx_x)
+         ! delete this part; just wanna get the value here
+         Syx_x = RHO_WATER*U_temp1*V_temp1*(Depth+Eta)
        ENDIF
        IF(OUT_VorMA)THEN
          ! moving average of vorticity
