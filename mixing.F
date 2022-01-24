@@ -121,7 +121,7 @@ SUBROUTINE CALCULATE_MEAN(T_INTV_mean,T_INTV_UVmean,T_sum,T_sumUVmean,&
       !
       REAL(SP),DIMENSION(M,N),INTENT(IN) :: Syx_x_sum
       REAL(SP),DIMENSION(M,N),INTENT(OUT) :: Syx_x
-      REAL(SP),DIMENSION(M,N),INTENT(OUT) :: Syx_sum
+      REAL(SP),DIMENSION(M,N),INTENT(INOUT) :: Syx_sum
 
       T_sum=T_sum+DT ! for wave height and MSL
       T_sumUVmean=T_sumUVmean+DT ! Chen, Salatin, for current and vortcty field
@@ -291,7 +291,7 @@ SUBROUTINE CALCULATE_MovingAverage(DT,M,N,U,V,ETA,MASK,DX,DY,Depth,&
      REAL(SP),DIMENSION(M,N),INTENT(OUT) :: uMA,vMA
      REAL(SP),DIMENSION(M,N) :: uMAy,vMAx
      ! moving averaged of radiation shear stress
-     REAL(SP),DIMENSION(M,N),INTENT(IN) :: Syx_sum
+     REAL(SP),DIMENSION(M,N),INTENT(INOUT) :: Syx_sum
      REAL(SP),DIMENSION(M,N),INTENT(OUT) :: Syx_x_sum
      ! moving average of surface elevation
      REAL(SP),DIMENSION(M,N,MA_Window),INTENT(INOUT) :: eta_MA_temp
