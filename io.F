@@ -4376,6 +4376,8 @@ SUBROUTINE PREVIEW_MEAN
         IF(OUT_RadStr)THEN
           TMP_NAME = TRIM(FDIR)//'Syx_x_'//TRIM(FILE_NAME)
           call PutFile(TMP_NAME,Syx_x)
+          TMP_NAME = TRIM(FDIR)//'P_y_'//TRIM(FILE_NAME)
+          call PutFile(TMP_NAME,P_y)
         ENDIF
 
 END SUBROUTINE PREVIEW_MEAN

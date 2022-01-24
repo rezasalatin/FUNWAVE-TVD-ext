@@ -64,7 +64,7 @@ SUBROUTINE MIXING_STUFF
             WaveHeightAve,Emax,Emin,Num_Zero_Up,Ibeg,Iend,Jbeg,Jend, &
             HrmsSum,HavgSum,ETA2,ETA2sum,SigWaveHeight,ETAvariance, &
             Vor_Instant, Vor_Mean, Vor_Intensity, NumDT1, NumDT2,Vor2,&
-            Vor2sum,Vorsum,OUT_RadStr,Syx_sum,Syx_x)
+            Vor2sum,Vorsum,OUT_RadStr,Syx_sum,Syx_x,P_y)
        ! Chen, Salatin, moving average of some properties (U,V,Eta,Vor,Syx_x)
         CALL CALCULATE_MovingAverage(DT,Mloc,Nloc,U,V,ETA,MASK,DX,DY,Depth,&
             Ibeg,Iend,Jbeg,Jend,&
@@ -94,7 +94,7 @@ SUBROUTINE CALCULATE_MEAN(T_INTV_mean,T_INTV_UVmean,T_sum,T_sumUVmean,&
                 WaveHeightAve,Emax,Emin,Num_Zero_Up,Ibeg,Iend,Jbeg,Jend, &
                 HrmsSum,HavgSum,ETA2,ETA2sum,SigWaveHeight,ETAvariance, &
                 Vor_Instant, Vor_Mean, Vor_Intensity, NumDT1, NumDT2,Vor2, &
-                Vor2sum,Vorsum,OUT_RadStr,Syx_sum,Syx_x)
+                Vor2sum,Vorsum,OUT_RadStr,Syx_sum,Syx_x,P_y)
 
 ! calculate mean for smagorinsky mixing and wave height
       USE PARAM
@@ -121,8 +121,8 @@ SUBROUTINE CALCULATE_MEAN(T_INTV_mean,T_INTV_UVmean,T_sum,T_sumUVmean,&
       REAL(SP),DIMENSION(M,N) :: ETAvariance
       REAL(SP),DIMENSION(M,N),INTENT(INOUT) :: SigWaveHeight
       ! radiation shear stress
-      REAL(SP),DIMENSION(M,N) :: Syx
-      REAL(SP),DIMENSION(M,N),INTENT(OUT) :: Syx_x
+      REAL(SP),DIMENSION(M,N) :: Syx, Pressure_field
+      REAL(SP),DIMENSION(M,N),INTENT(OUT) :: Syx_x, P_y
       REAL(SP),DIMENSION(M,N),INTENT(INOUT) :: Syx_sum
       LOGICAL :: OUT_RadStr
 
@@ -148,6 +148,10 @@ SUBROUTINE CALCULATE_MEAN(T_INTV_mean,T_INTV_UVmean,T_sum,T_sumUVmean,&
           Syx = Syx_sum/T_sum
           CALL DERIVATIVE_X(M,N,Ibeg,Iend,Jbeg,Jend,MASK,DX,Syx,Syx_x)
           Syx_sum = ZERO
+
+          Pressure_field = RHO_WATER * 9.81 * ETAmean
+          CALL DERIVATIVE_Y(M,N,Ibeg,Iend,Jbeg,Jend,MASK,DY,Pressure_field,P_y)
+
         ENDIF
 
         ETAsum=ZERO
@@ -340,7 +344,7 @@ SUBROUTINE CALCULATE_MovingAverage(DT,M,N,U,V,ETA,MASK,DX,DY,Depth,&
          eta_MA_Sum = SUM(eta_MA_temp,3)
          eta_MA = eta_MA_Sum/MA_Window
        ENDIF
-         ! go to next time step
-         T_MA_Sum=T_MA_Sum-T_MA_STEP
+       ! go to next time step
+       T_MA_Sum=T_MA_Sum-T_MA_STEP
      ENDIF
 END SUBROUTINE CALCULATE_MovingAverage
