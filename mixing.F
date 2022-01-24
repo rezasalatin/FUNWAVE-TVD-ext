@@ -59,7 +59,7 @@ SUBROUTINE MIXING_STUFF
 	!I think Umean, Vmean is not using in other routine.
       IF( time >= STEADY_TIME )THEN
         CALL CALCULATE_MEAN(T_INTV_mean,T_INTV_UVmean,T_sum,T_sumUVmean,&
-            DT,Mloc,Nloc,U,V,ETA,ETA0,&
+            DT,Mloc,Nloc,U,V,ETA,ETA0,MASK,DX,DY&
             Umean,Vmean,ETAmean,Usum,Vsum,ETAsum,WaveHeightRMS, &
             WaveHeightAve,Emax,Emin,Num_Zero_Up,Ibeg,Iend,Jbeg,Jend, &
             HrmsSum,HavgSum,ETA2,ETA2sum,SigWaveHeight,ETAvariance, &
@@ -88,7 +88,7 @@ END SUBROUTINE MIXING_STUFF
 !
 !-------------------------------------------------------------------------------------
 SUBROUTINE CALCULATE_MEAN(T_INTV_mean,T_INTV_UVmean,T_sum,T_sumUVmean,&
-                DT,M,N,U,V,ETA,ETA0,&
+                DT,M,N,U,V,ETA,ETA0,MASK,DX,DY&
                 Umean,Vmean,ETAmean,Usum,Vsum,ETAsum,&
                 WaveHeightRMS, &
                 WaveHeightAve,Emax,Emin,Num_Zero_Up,Ibeg,Iend,Jbeg,Jend, &
@@ -102,6 +102,8 @@ SUBROUTINE CALCULATE_MEAN(T_INTV_mean,T_INTV_UVmean,T_sum,T_sumUVmean,&
       INTEGER, INTENT(IN) :: M,N,Ibeg,Iend,Jbeg,Jend
       REAL(SP),DIMENSION(M,N),INTENT(IN)::U,V,ETA,ETA0
       REAL(SP),INTENT(IN) :: T_INTV_mean,T_INTV_UVmean,DT
+      REAL(SP),DIMENSION(M,N),INTENT(IN)::MASK
+      REAL(SP),INTENT(IN) :: DX,DY
       REAL(SP),DIMENSION(M,N),INTENT(OUT) :: Umean,Vmean
       REAL(SP),DIMENSION(M,N),INTENT(OUT) :: WaveHeightRMS,WaveHeightAve
       REAL(SP),DIMENSION(M,N),INTENT(INOUT) :: Usum,Vsum
