@@ -64,13 +64,13 @@ SUBROUTINE MIXING_STUFF
             WaveHeightAve,Emax,Emin,Num_Zero_Up,Ibeg,Iend,Jbeg,Jend, &
             HrmsSum,HavgSum,ETA2,ETA2sum,SigWaveHeight,ETAvariance, &
             Vor_Instant, Vor_Mean, Vor_Intensity, NumDT1, NumDT2,Vor2,&
-            Vor2sum,Vorsum,OUT_RadStr,Syx_sum,Syx_x_sum,Syx_x)
+            Vor2sum,Vorsum,OUT_RadStr,Syx_sum,Syx_x)
        ! Chen, Salatin, moving average of some properties (U,V,Eta,Vor,Syx_x)
         CALL CALCULATE_MovingAverage(DT,Mloc,Nloc,U,V,ETA,MASK,DX,DY,Depth,&
             Ibeg,Iend,Jbeg,Jend,&
             OUT_uvMA,OUT_VorMA,OUT_RadStr,OUT_etaMA,&
             MA_Window,T_MA_Sum,T_MA_STEP,&
-            Syx_sum,Syx_x_sum,U_Window,V_Window,uMA,vMA,eta_MA_temp,eta_MA,Vor_MA)
+            Syx_sum,U_Window,V_Window,uMA,vMA,eta_MA_temp,eta_MA,Vor_MA)
       ENDIF
 
 END SUBROUTINE MIXING_STUFF
@@ -94,7 +94,7 @@ SUBROUTINE CALCULATE_MEAN(T_INTV_mean,T_INTV_UVmean,T_sum,T_sumUVmean,&
                 WaveHeightAve,Emax,Emin,Num_Zero_Up,Ibeg,Iend,Jbeg,Jend, &
                 HrmsSum,HavgSum,ETA2,ETA2sum,SigWaveHeight,ETAvariance, &
                 Vor_Instant, Vor_Mean, Vor_Intensity, NumDT1, NumDT2,Vor2, &
-                Vor2sum,Vorsum,OUT_RadStr,Syx_sum,Syx_x_sum,Syx_x)
+                Vor2sum,Vorsum,OUT_RadStr,Syx_sum,Syx_x)
 
 ! calculate mean for smagorinsky mixing and wave height
       USE PARAM
@@ -118,8 +118,8 @@ SUBROUTINE CALCULATE_MEAN(T_INTV_mean,T_INTV_UVmean,T_sum,T_sumUVmean,&
       REAL(SP),DIMENSION(M,N),INTENT(INOUT) :: ETAmean,ETAsum,ETA2,ETA2sum
       REAL(SP),DIMENSION(M,N) :: ETAvariance
       REAL(SP),DIMENSION(M,N),INTENT(INOUT) :: SigWaveHeight
-      !
-      REAL(SP),DIMENSION(M,N),INTENT(IN) :: Syx_x_sum
+      ! radiation shear stress
+      REAL(SP),DIMENSION(M,N) :: Syx
       REAL(SP),DIMENSION(M,N),INTENT(OUT) :: Syx_x
       REAL(SP),DIMENSION(M,N),INTENT(INOUT) :: Syx_sum
       LOGICAL :: OUT_RadStr
@@ -143,7 +143,8 @@ SUBROUTINE CALCULATE_MEAN(T_INTV_mean,T_INTV_UVmean,T_sum,T_sumUVmean,&
 
         IF(OUT_RadStr)THEN
           ! radiation shear stress
-          Syx_x = Syx_x_sum/T_sum
+          Syx = Syx_sum/T_sum
+          CALL DERIVATIVE_X(M,N,Ibeg,Iend,Jbeg,Jend,MASK,DX,Syx,Syx_x)
           Syx_sum = ZERO
         ENDIF
 
@@ -272,7 +273,7 @@ SUBROUTINE CALCULATE_MovingAverage(DT,M,N,U,V,ETA,MASK,DX,DY,Depth,&
      Ibeg,Iend,Jbeg,Jend, &
      OUT_uvMA,OUT_VorMA,OUT_RadStr,OUT_etaMA,&
      MA_Window,T_MA_Sum,T_MA_STEP,&
-     Syx_sum,Syx_x_sum,U_Window,V_Window,uMA,vMA,eta_MA_temp,eta_MA,Vor_MA)
+     Syx_sum,U_Window,V_Window,uMA,vMA,eta_MA_temp,eta_MA,Vor_MA)
 
      USE PARAM
      IMPLICIT NONE
@@ -293,7 +294,6 @@ SUBROUTINE CALCULATE_MovingAverage(DT,M,N,U,V,ETA,MASK,DX,DY,Depth,&
      REAL(SP),DIMENSION(M,N) :: uMAy,vMAx
      ! moving averaged of radiation shear stress
      REAL(SP),DIMENSION(M,N),INTENT(INOUT) :: Syx_sum
-     REAL(SP),DIMENSION(M,N),INTENT(OUT) :: Syx_x_sum
      ! moving average of surface elevation
      REAL(SP),DIMENSION(M,N,MA_Window),INTENT(INOUT) :: eta_MA_temp
      REAL(SP),DIMENSION(M,N),INTENT(OUT) :: eta_MA
@@ -323,8 +323,7 @@ SUBROUTINE CALCULATE_MovingAverage(DT,M,N,U,V,ETA,MASK,DX,DY,Depth,&
        ENDIF
        IF(OUT_RadStr)THEN
          ! Calculate the radiation shear stress
-         Syx_sum = Syx_sum + RHO_WATER*U_temp1*V_temp1*(Depth+Eta)
-         CALL DERIVATIVE_X(M,N,Ibeg,Iend,Jbeg,Jend,MASK,DX,Syx_sum,Syx_x_sum)
+         Syx_sum = Syx_sum + RHO_WATER*U_temp1*V_temp1*(Depth+Eta)*DT
        ENDIF
        IF(OUT_VorMA)THEN
          ! moving average of vorticity

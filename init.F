@@ -221,9 +221,8 @@ SUBROUTINE ALLOCATE_VARIABLES
       ALLOCATE(xmk_wk(Mloc),ymk_wk(Nloc))
 
       ! Chen, Salatin, Oct 2021, Radiation Stress
-      ALLOCATE(Syx_sum(Mloc,Nloc),Syx_x_sum(Mloc,Nloc),Syx_x(Mloc,Nloc))
+      ALLOCATE(Syx_sum(Mloc,Nloc),Syx_x(Mloc,Nloc))
         Syx_sum=ZERO
-        Syx_x_sum=ZERO
         Syx_x=ZERO
       ! Chen, Salatin, Nov 2021, Moving average of u and v
       ALLOCATE(U_Window(Mloc,Nloc,MA_Window),V_Window(Mloc,Nloc,MA_Window))
