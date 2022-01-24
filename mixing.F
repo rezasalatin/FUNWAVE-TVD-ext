@@ -59,7 +59,7 @@ SUBROUTINE MIXING_STUFF
 	!I think Umean, Vmean is not using in other routine.
       IF( time >= STEADY_TIME )THEN
         CALL CALCULATE_MEAN(T_INTV_mean,T_INTV_UVmean,T_sum,T_sumUVmean,&
-            DT,Mloc,Nloc,U,V,ETA,ETA0,MASK,DX,DY&
+            DT,Mloc,Nloc,U,V,ETA,ETA0,MASK,DX,DY,&
             Umean,Vmean,ETAmean,Usum,Vsum,ETAsum,WaveHeightRMS, &
             WaveHeightAve,Emax,Emin,Num_Zero_Up,Ibeg,Iend,Jbeg,Jend, &
             HrmsSum,HavgSum,ETA2,ETA2sum,SigWaveHeight,ETAvariance, &
@@ -88,7 +88,7 @@ END SUBROUTINE MIXING_STUFF
 !
 !-------------------------------------------------------------------------------------
 SUBROUTINE CALCULATE_MEAN(T_INTV_mean,T_INTV_UVmean,T_sum,T_sumUVmean,&
-                DT,M,N,U,V,ETA,ETA0,MASK,DX,DY&
+                DT,M,N,U,V,ETA,ETA0,MASK,DX,DY,&
                 Umean,Vmean,ETAmean,Usum,Vsum,ETAsum,&
                 WaveHeightRMS, &
                 WaveHeightAve,Emax,Emin,Num_Zero_Up,Ibeg,Iend,Jbeg,Jend, &
