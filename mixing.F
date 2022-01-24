@@ -148,10 +148,9 @@ SUBROUTINE CALCULATE_MEAN(T_INTV_mean,T_INTV_UVmean,T_sum,T_sumUVmean,&
           Syx = Syx_sum/T_sum
           CALL DERIVATIVE_X(M,N,Ibeg,Iend,Jbeg,Jend,MASK,DX,Syx,Syx_x)
           Syx_sum = ZERO
-
+          
           Pressure_field = RHO_WATER * 9.81 * ETAmean
           CALL DERIVATIVE_Y(M,N,Ibeg,Iend,Jbeg,Jend,MASK,DY,Pressure_field,P_y)
-
         ENDIF
 
         ETAsum=ZERO

@@ -221,7 +221,7 @@ SUBROUTINE ALLOCATE_VARIABLES
       ALLOCATE(xmk_wk(Mloc),ymk_wk(Nloc))
 
       ! Chen, Salatin, Oct 2021, Radiation Stress and pressure field
-      ALLOCATE(Syx_sum(Mloc,Nloc),Syx_x(Mloc,Nloc))
+      ALLOCATE(Syx_sum(Mloc,Nloc),Syx_x(Mloc,Nloc),P_y(Mloc,Nloc))
         Syx_sum=ZERO
         Syx_x=ZERO
         P_y = ZERO
