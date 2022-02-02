@@ -315,7 +315,8 @@ SUBROUTINE CALCULATE_MovingAverage(DT,M,N,U,V,ETA,MASK,DX,DY,Depth,&
      ! moving average of vorticity
      REAL(SP),DIMENSION(M,N),INTENT(OUT) :: Vor_MA
      ! Wave Number
-     REAL(SP),DIMENSION(M,N),INTENT(IN) :: k_ch, L_ch
+     REAL(SP),DIMENSION(M,N),INTENT(IN) :: k_ch
+     REAL(SP),DIMENSION(M,N) :: L_ch
 
      T_MA_Sum=T_MA_Sum+DT
 
