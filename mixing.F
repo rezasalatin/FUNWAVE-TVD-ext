@@ -122,7 +122,7 @@ SUBROUTINE CALCULATE_MEAN(T_INTV_mean,T_INTV_UVmean,T_sum,T_sumUVmean,&
       REAL(SP),DIMENSION(M,N) :: ETAvariance
       REAL(SP),DIMENSION(M,N),INTENT(INOUT) :: SigWaveHeight
       ! radiation shear stress
-      REAL(SP),DIMENSION(M,N) :: Mean_Pressure
+      REAL(SP),DIMENSION(M,N) :: Mean_Pressure,Syx,Sxx,Syy,P_y
       REAL(SP),DIMENSION(M,N),INTENT(INOUT) :: Syx_sum,Sxx_sum,Syy_sum
       LOGICAL :: OUT_RadStr
 
