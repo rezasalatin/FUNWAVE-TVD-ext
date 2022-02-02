@@ -64,7 +64,8 @@ SUBROUTINE MIXING_STUFF
             WaveHeightAve,Emax,Emin,Num_Zero_Up,Ibeg,Iend,Jbeg,Jend, &
             HrmsSum,HavgSum,ETA2,ETA2sum,SigWaveHeight,ETAvariance, &
             Vor_Instant, Vor_Mean, Vor_Intensity, NumDT1, NumDT2,Vor2,&
-            Vor2sum,Vorsum,OUT_RadStr,Sxx_sum,Syy_sum,Syx_sum,Syx,Sxx,Syy)
+            Vor2sum,Vorsum,OUT_RadStr,Sxx_sum,Syy_sum,Syx_sum, &
+            Syx,Sxx,Syy,P_y)
        ! Chen, Salatin, moving average of some properties
         CALL CALCULATE_MovingAverage(DT,Mloc,Nloc,U,V,ETA,MASK,DX,DY,Depth,&
             Ibeg,Iend,Jbeg,Jend,&
@@ -95,7 +96,8 @@ SUBROUTINE CALCULATE_MEAN(T_INTV_mean,T_INTV_UVmean,T_sum,T_sumUVmean,&
                 WaveHeightAve,Emax,Emin,Num_Zero_Up,Ibeg,Iend,Jbeg,Jend, &
                 HrmsSum,HavgSum,ETA2,ETA2sum,SigWaveHeight,ETAvariance, &
                 Vor_Instant, Vor_Mean, Vor_Intensity, NumDT1, NumDT2,Vor2, &
-                Vor2sum,Vorsum,OUT_RadStr,Sxx_sum,Syy_sum,Syx_sum,Syx,Sxx,Syy)
+                Vor2sum,Vorsum,OUT_RadStr,Sxx_sum,Syy_sum,Syx_sum, &
+                Syx,Sxx,Syy,P_y)
 
 ! calculate mean for smagorinsky mixing and wave height
       USE PARAM
@@ -122,9 +124,9 @@ SUBROUTINE CALCULATE_MEAN(T_INTV_mean,T_INTV_UVmean,T_sum,T_sumUVmean,&
       REAL(SP),DIMENSION(M,N) :: ETAvariance
       REAL(SP),DIMENSION(M,N),INTENT(INOUT) :: SigWaveHeight
       ! radiation shear stress
-      REAL(SP),DIMENSION(M,N) :: Mean_Pressure,Syx,Sxx,Syy,P_y
+      REAL(SP),DIMENSION(M,N) :: Mean_Pressure
       REAL(SP),DIMENSION(M,N),INTENT(INOUT) :: Syx_sum,Sxx_sum,Syy_sum
-      REAL(SP),DIMENSION(M,N),INTENT(OUT) :: Syx,Sxx,Syy
+      REAL(SP),DIMENSION(M,N),INTENT(OUT) :: Syx,Sxx,Syy,P_y
       LOGICAL :: OUT_RadStr
 
       T_sum=T_sum+DT ! for wave height and MSL
