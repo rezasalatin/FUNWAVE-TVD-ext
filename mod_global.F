@@ -294,6 +294,7 @@ MODULE GLOBAL
 
 ! Chen, Salatin, Oct 2021, Radiation Stress
       REAL(SP),DIMENSION(:,:),ALLOCATABLE :: Syx_x,P_y,k_ch,L_ch
+      REAL(SP),DIMENSION(:,:),ALLOCATABLE :: Syx_sum,Sxx_sum,Syy_sum
 ! Chen, Salatin, Oct 2021, moving average of u, v, eta, and vorticity
       REAL(SP),DIMENSION(:,:),ALLOCATABLE :: uMA,vMA
       REAL(SP),DIMENSION(:,:,:),ALLOCATABLE :: U_Window, V_Window
