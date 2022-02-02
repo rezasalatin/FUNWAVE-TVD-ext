@@ -315,7 +315,7 @@ SUBROUTINE CALCULATE_MovingAverage(DT,M,N,U,V,ETA,MASK,DX,DY,Depth,&
      ! moving average of vorticity
      REAL(SP),DIMENSION(M,N),INTENT(OUT) :: Vor_MA
      ! Wave Number
-     REAL(SP),DIMENSION(M,N),INTENT(IN) :: k_ch, L_ch
+     !REAL(SP),DIMENSION(M,N),INTENT(INOUT) :: k_ch, L_ch
 
      T_MA_Sum=T_MA_Sum+DT
 
@@ -372,14 +372,13 @@ END SUBROUTINE CALCULATE_MovingAverage
 ! Chen, Salatin, Feb 2022, Wave number all over the domain
 !
 !-------------------------------------------------------------------------------------
-SUBROUTINE CALCULATE_WaveNumber(M, N, k_ch, L_ch)
+SUBROUTINE CALCULATE_WaveNumber(M, N)
 
     USE GLOBAL
     IMPLICIT NONE
 
     REAL(SP) :: Char_Period
     REAL(SP),DIMENSION(M,N) :: kh_0, kh_ch
-    REAL(SP),DIMENSION(M,N),INTENT(OUT) :: k_ch, L_ch
     INTEGER, INTENT(IN) :: M,N
 
 
