@@ -336,15 +336,13 @@ SUBROUTINE CALCULATE_MovingAverage(DT,M,N,U,V,ETA,MASK,DX,DY,Depth,&
        ENDIF
        IF(OUT_RadStr)THEN
          ! Calculate the radiation stresses
-         Syx_sum = Syx_sum + (RHO_WATER*U_temp1*V_temp1)*(Depth+Eta)*DT
-         !!!
-         CALL CALCULATE_WaveNumber(M, N)
-         Pressure_integ = RHO_WATER * GRAV &
-          *(Eta*sinh(k_ch*(2*Depth+Eta))/k_ch/cosh(k_ch*Depth) - Eta*Eta/2)
-         Sxx_sum = Sxx_sum + Pressure_integ*DT + (RHO_WATER*U_temp1*U_temp1)&
-          *(Depth+Eta)*DT
-         Syy_sum = Syy_sum + Pressure_integ*DT + (RHO_WATER*V_temp1*V_temp1)&
-          *(Depth+Eta)*DT
+         Syx_sum = Syx_sum + (RHO_WATER*U_temp1*V_temp1*(Depth+Eta))*DT
+         !
+         Pressure_integ = RHO_WATER*GRAV*(0.5*Eta*Eta+Eta*Depth)
+         Sxx_sum = Sxx_sum + (Pressure_integ + RHO_WATER*U_temp1*U_temp1 &
+          *(Depth+Eta))*DT
+         Syy_sum = Syy_sum + (Pressure_integ + RHO_WATER*V_temp1*V_temp1 &
+          *(Depth+Eta))*DT
        ENDIF
        IF(OUT_VorMA)THEN
          ! moving average of vorticity
@@ -377,9 +375,6 @@ SUBROUTINE CALCULATE_WaveNumber(M, N)
     REAL(SP) :: Char_Period
     INTEGER, INTENT(IN) :: M,N
     REAL(SP),DIMENSION(M,N) :: kh_0, kh_ch
-
-
-
 
     IF(WAVEMAKER(1:6)=='WK_REG')THEN
         Char_Period = Tperiod
