@@ -65,7 +65,7 @@ SUBROUTINE MIXING_STUFF
             HrmsSum,HavgSum,ETA2,ETA2sum,SigWaveHeight,ETAvariance, &
             Vor_Instant, Vor_Mean, Vor_Intensity, NumDT1, NumDT2,Vor2,&
             Vor2sum,Vorsum,OUT_RadStr,P_y,Sxx_sum,Syy_sum,Syx_sum)
-       ! Chen, Salatin, moving average of some properties (U,V,Eta,Vor,Syx_x)
+       ! Chen, Salatin, moving average of some properties
         CALL CALCULATE_MovingAverage(DT,Mloc,Nloc,U,V,ETA,MASK,DX,DY,Depth,&
             Ibeg,Iend,Jbeg,Jend,&
             OUT_uvMA,OUT_VorMA,OUT_RadStr,OUT_etaMA,&

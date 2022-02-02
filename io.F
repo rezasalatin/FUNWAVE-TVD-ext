@@ -3722,7 +3722,7 @@ SUBROUTINE STATIONS
 
      INTEGER :: iunit
      REAL(SP) :: dum1,dum2
-     REAL(SP) :: eta_sta,u_sta,v_sta,vor_sta,Syx_x_sta ! Chen, Salatin
+     REAL(SP) :: eta_sta,u_sta,v_sta,vor_sta ! Chen, Salatin
      CHARACTER(LEN=80)::FILE_NAME=' '
      CHARACTER(LEN=80)::TMP_NAME=' '
      CHARACTER(LEN=80)::FDIR=' '
@@ -3803,16 +3803,14 @@ SUBROUTINE STATIONS
              u_sta=ZERO
              v_sta=ZERO
              vor_sta=ZERO
-             Syx_x_sta=ZERO
            ELSE  ! to avoid topography on nested water surface
              eta_sta=eta(ista(i),jsta(i))
              u_sta=u(ista(i),jsta(i))
              v_sta=v(ista(i),jsta(i))
              vor_sta=Vor_Instant(ista(i),jsta(i))
-             Syx_x_sta=Syx_x(ista(i),jsta(i))
            ENDIF
-            write (iunit,'(6E16.5E4)') &
-              time, eta_sta,u_sta,v_sta,vor_sta,Syx_x_sta
+            write (iunit,'(5E16.5E4)') &
+              time, eta_sta,u_sta,v_sta,vor_sta
        endif
      enddo
 
@@ -3847,7 +3845,7 @@ SUBROUTINE STATIONS_SPHERICAL_IJ
 
      INTEGER :: iunit
      REAL(SP) :: dum1,dum2
-     REAL(SP) :: eta_sta,u_sta,v_sta,vor_sta,Syx_x_sta
+     REAL(SP) :: eta_sta,u_sta,v_sta,vor_sta
      CHARACTER(LEN=80)::FILE_NAME=' '
      CHARACTER(LEN=80)::TMP_NAME=' '
      CHARACTER(LEN=80)::FDIR=' '
@@ -3912,16 +3910,14 @@ SUBROUTINE STATIONS_SPHERICAL_IJ
             u_sta=ZERO
             v_sta=ZERO
             vor_sta=ZERO
-            Syx_x_sta=ZERO
           ELSE  ! to avoid topography on nested water surface
             eta_sta=eta(ista(i),jsta(i))
             u_sta=u(ista(i),jsta(i))
             v_sta=v(ista(i),jsta(i))
             vor_sta=Vor_Instant(ista(i),jsta(i))
-            Syx_x_sta=Syx_x(ista(i),jsta(i))
           ENDIF
           write (iunit,'(6E16.5E4)') time, eta_sta,&
-                          u_sta,v_sta,vor_sta,Syx_x_sta
+                          u_sta,v_sta,vor_sta
        endif
      enddo
 
@@ -3951,7 +3947,7 @@ SUBROUTINE STATIONS
 
      INTEGER :: iunit
      REAL(SP) :: dum1,dum2
-     REAL(SP) :: eta_sta,u_sta,v_sta,vor_sta,Syx_x_sta
+     REAL(SP) :: eta_sta,u_sta,v_sta,vor_sta
      CHARACTER(LEN=80)::FILE_NAME=' '
      CHARACTER(LEN=80)::TMP_NAME=' '
      CHARACTER(LEN=80)::FDIR=' '
@@ -4021,17 +4017,15 @@ SUBROUTINE STATIONS
             u_sta=ZERO
             v_sta=ZERO
             vor_sta=ZERO
-            Syx_x_sta=ZERO
           ELSE  ! to avoid topography on nested water surface
             eta_sta=eta(ista(i),jsta(i))
             u_sta=u(ista(i),jsta(i))
             v_sta=v(ista(i),jsta(i))
             vor_sta=Vor_Instant(ista(i),jsta(i))
-            Syx_x_sta=Syx_x(ista(i),jsta(i))
           ENDIF
 
-          write (iunit,'(6E16.5E4)') time, eta_sta,&
-                          u_sta,v_sta,vor_sta,Syx_x_sta
+          write (iunit,'(5E16.5E4)') time, eta_sta,&
+                          u_sta,v_sta,vor_sta
 
 !          write (iunit,*) time, eta(ista(i),jsta(i)),u(ista(i),jsta(i)),&
 !                                v(ista(i),jsta(i))
