@@ -315,7 +315,7 @@ SUBROUTINE CALCULATE_MovingAverage(DT,M,N,U,V,ETA,MASK,DX,DY,Depth,&
      ! moving average of vorticity
      REAL(SP),DIMENSION(M,N),INTENT(OUT) :: Vor_MA
      ! Wave Number
-     REAL(SP),DIMENSION(M,N),INTENT(IN) :: k_ch
+     REAL(SP),DIMENSION(M,N),INTENT(IN) :: k_ch, L_ch
 
      T_MA_Sum=T_MA_Sum+DT
 
@@ -341,7 +341,8 @@ SUBROUTINE CALCULATE_MovingAverage(DT,M,N,U,V,ETA,MASK,DX,DY,Depth,&
          ! Calculate the radiation stresses
          Syx_sum = Syx_sum + (RHO_WATER*U_temp1*V_temp1)*(Depth+Eta)*DT
          !!!
-         CALL CALCULATE_WaveNumber(k_ch)
+         CALL CALCULATE_WaveNumber(k_ch, L_ch)
+         L_ch = 2.0*pi/k_ch
          Pressure_integ = RHO_WATER * GRAV &
           *(Eta*sinh(k_ch*(2*Depth+Eta))/k_ch/cosh(k_ch*Depth) - Eta*Eta/2)
          Sxx_sum = Sxx_sum + Pressure_integ*DT + (RHO_WATER*U_temp1*U_temp1)&
@@ -372,14 +373,14 @@ END SUBROUTINE CALCULATE_MovingAverage
 ! Chen, Salatin, Feb 2022, Wave number all over the domain
 !
 !-------------------------------------------------------------------------------------
-SUBROUTINE CALCULATE_WaveNumber(k_ch)
+SUBROUTINE CALCULATE_WaveNumber(k_ch, L_ch)
 
     USE GLOBAL
     IMPLICIT NONE
 
     REAL(SP) :: Char_Period
     REAL(SP),DIMENSION(M,N) :: kh_0, kh_ch
-    REAL(SP),DIMENSION(M,N),INTENT(OUT) :: k_ch
+    REAL(SP),DIMENSION(M,N),INTENT(OUT) :: k_ch, L_ch
 
 
     IF(WAVEMAKER(1:6)=='WK_REG')THEN
@@ -397,5 +398,6 @@ SUBROUTINE CALCULATE_WaveNumber(k_ch)
     kh_ch = kh_0*(1.0 + kh_0*exp(-1.0*(1.835 + 1.225*kh_0**1.35)))&
      /SQRT(TANH(kh_0));
     k_ch = kh_ch/Depth
+    L_ch = 2.0*pi/k_ch
 
 END SUBROUTINE CALCULATE_WaveNumber
