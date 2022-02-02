@@ -315,8 +315,7 @@ SUBROUTINE CALCULATE_MovingAverage(DT,M,N,U,V,ETA,MASK,DX,DY,Depth,&
      ! moving average of vorticity
      REAL(SP),DIMENSION(M,N),INTENT(OUT) :: Vor_MA
      ! Wave Number
-     REAL(SP),DIMENSION(M,N),INTENT(IN) :: k_ch
-     REAL(SP),DIMENSION(M,N) :: L_ch
+     REAL(SP),DIMENSION(M,N),INTENT(IN) :: k_ch, L_ch
 
      T_MA_Sum=T_MA_Sum+DT
 
@@ -343,7 +342,6 @@ SUBROUTINE CALCULATE_MovingAverage(DT,M,N,U,V,ETA,MASK,DX,DY,Depth,&
          Syx_sum = Syx_sum + (RHO_WATER*U_temp1*V_temp1)*(Depth+Eta)*DT
          !!!
          CALL CALCULATE_WaveNumber(k_ch, L_ch)
-         L_ch = 2.0*pi/k_ch
          Pressure_integ = RHO_WATER * GRAV &
           *(Eta*sinh(k_ch*(2*Depth+Eta))/k_ch/cosh(k_ch*Depth) - Eta*Eta/2)
          Sxx_sum = Sxx_sum + Pressure_integ*DT + (RHO_WATER*U_temp1*U_temp1)&
