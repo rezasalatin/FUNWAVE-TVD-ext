@@ -64,13 +64,14 @@ SUBROUTINE MIXING_STUFF
             WaveHeightAve,Emax,Emin,Num_Zero_Up,Ibeg,Iend,Jbeg,Jend, &
             HrmsSum,HavgSum,ETA2,ETA2sum,SigWaveHeight,ETAvariance, &
             Vor_Instant, Vor_Mean, Vor_Intensity, NumDT1, NumDT2,Vor2,&
-            Vor2sum,Vorsum,OUT_RadStr,Syx_sum,Syx_x,P_y)
+            Vor2sum,Vorsum,OUT_RadStr,Syx_sum,Syx_x,P_y,Sxx_sum,Syy_sum)
        ! Chen, Salatin, moving average of some properties (U,V,Eta,Vor,Syx_x)
         CALL CALCULATE_MovingAverage(DT,Mloc,Nloc,U,V,ETA,MASK,DX,DY,Depth,&
             Ibeg,Iend,Jbeg,Jend,&
             OUT_uvMA,OUT_VorMA,OUT_RadStr,OUT_etaMA,&
             MA_Window,T_MA_Sum,T_MA_STEP,&
-            Syx_sum,U_Window,V_Window,uMA,vMA,eta_MA_temp,eta_MA,Vor_MA)
+            Syx_sum,U_Window,V_Window,uMA,vMA,eta_MA_temp,eta_MA,Vor_MA,&
+            Sxx_sum,Syy_sum)
       ENDIF
 
 END SUBROUTINE MIXING_STUFF
@@ -94,7 +95,7 @@ SUBROUTINE CALCULATE_MEAN(T_INTV_mean,T_INTV_UVmean,T_sum,T_sumUVmean,&
                 WaveHeightAve,Emax,Emin,Num_Zero_Up,Ibeg,Iend,Jbeg,Jend, &
                 HrmsSum,HavgSum,ETA2,ETA2sum,SigWaveHeight,ETAvariance, &
                 Vor_Instant, Vor_Mean, Vor_Intensity, NumDT1, NumDT2,Vor2, &
-                Vor2sum,Vorsum,OUT_RadStr,Syx_sum,Syx_x,P_y)
+                Vor2sum,Vorsum,OUT_RadStr,Syx_sum,Syx_x,P_y,Sxx_sum,Syy_sum)
 
 ! calculate mean for smagorinsky mixing and wave height
       USE PARAM
@@ -121,9 +122,10 @@ SUBROUTINE CALCULATE_MEAN(T_INTV_mean,T_INTV_UVmean,T_sum,T_sumUVmean,&
       REAL(SP),DIMENSION(M,N) :: ETAvariance
       REAL(SP),DIMENSION(M,N),INTENT(INOUT) :: SigWaveHeight
       ! radiation shear stress
-      REAL(SP),DIMENSION(M,N) :: Syx, Pressure_field
+      REAL(SP),DIMENSION(M,N) :: Mean_Pressure
+      REAL(SP),DIMENSION(M,N) :: Syx, Sxx, Syy
       REAL(SP),DIMENSION(M,N),INTENT(OUT) :: Syx_x, P_y
-      REAL(SP),DIMENSION(M,N),INTENT(INOUT) :: Syx_sum
+      REAL(SP),DIMENSION(M,N),INTENT(INOUT) :: Syx_sum,Sxx_sum,Syy_sum
       LOGICAL :: OUT_RadStr
 
       T_sum=T_sum+DT ! for wave height and MSL
@@ -144,13 +146,18 @@ SUBROUTINE CALCULATE_MEAN(T_INTV_mean,T_INTV_UVmean,T_sum,T_sumUVmean,&
         SigWaveHeight = 4.0*SQRT(ETAvariance)
 
         IF(OUT_RadStr)THEN
-          ! radiation shear stress
+          ! radiation stress
           Syx = Syx_sum/T_sum
           CALL DERIVATIVE_X(M,N,Ibeg,Iend,Jbeg,Jend,MASK,DX,Syx,Syx_x)
+          Sxx = Sxx_sum/T_sum
+          Syy = Syy_sum/T_sum
+
           Syx_sum = ZERO
-          
-          Pressure_field = RHO_WATER * 9.81 * ETAmean
-          CALL DERIVATIVE_Y(M,N,Ibeg,Iend,Jbeg,Jend,MASK,DY,Pressure_field,P_y)
+          Sxx_sum = ZERO
+          Syy_sum = ZERO
+
+          Mean_Pressure = RHO_WATER * GRAV * ETAmean
+          CALL DERIVATIVE_Y(M,N,Ibeg,Iend,Jbeg,Jend,MASK,DY,Mean_Pressure,P_y)
         ENDIF
 
         ETAsum=ZERO
@@ -278,7 +285,8 @@ SUBROUTINE CALCULATE_MovingAverage(DT,M,N,U,V,ETA,MASK,DX,DY,Depth,&
      Ibeg,Iend,Jbeg,Jend, &
      OUT_uvMA,OUT_VorMA,OUT_RadStr,OUT_etaMA,&
      MA_Window,T_MA_Sum,T_MA_STEP,&
-     Syx_sum,U_Window,V_Window,uMA,vMA,eta_MA_temp,eta_MA,Vor_MA)
+     Syx_sum,U_Window,V_Window,uMA,vMA,eta_MA_temp,eta_MA,Vor_MA,&
+     Sxx_sum,Syy_sum)
 
      USE PARAM
      IMPLICIT NONE
@@ -298,13 +306,16 @@ SUBROUTINE CALCULATE_MovingAverage(DT,M,N,U,V,ETA,MASK,DX,DY,Depth,&
      REAL(SP),DIMENSION(M,N),INTENT(OUT) :: uMA,vMA
      REAL(SP),DIMENSION(M,N) :: uMAy,vMAx
      ! moving averaged of radiation shear stress
-     REAL(SP),DIMENSION(M,N),INTENT(INOUT) :: Syx_sum
+     REAL(SP),DIMENSION(M,N),INTENT(INOUT) :: Syx_sum,Sxx_sum,Syy_sum
+     REAL(SP),DIMENSION(M,N) :: Pressure_integ
      ! moving average of surface elevation
      REAL(SP),DIMENSION(M,N,MA_Window),INTENT(INOUT) :: eta_MA_temp
      REAL(SP),DIMENSION(M,N),INTENT(OUT) :: eta_MA
      REAL(SP),DIMENSION(M,N) :: eta_MA_Sum
      ! moving average of vorticity
      REAL(SP),DIMENSION(M,N),INTENT(OUT) :: Vor_MA
+     ! Wave Number
+     REAL(SP),DIMENSION(M,N),INTENT(IN) :: k_ch
 
      T_MA_Sum=T_MA_Sum+DT
 
@@ -327,8 +338,16 @@ SUBROUTINE CALCULATE_MovingAverage(DT,M,N,U,V,ETA,MASK,DX,DY,Depth,&
          V_temp1 = V - vMA
        ENDIF
        IF(OUT_RadStr)THEN
-         ! Calculate the radiation shear stress
-         Syx_sum = Syx_sum + RHO_WATER*U_temp1*V_temp1*(Depth+Eta)*DT
+         ! Calculate the radiation stresses
+         Syx_sum = Syx_sum + (RHO_WATER*U_temp1*V_temp1)*(Depth+Eta)*DT
+         !!!
+         CALL CALCULATE_WaveNumber(k_ch)
+         Pressure_integ = RHO_WATER * GRAV &
+          *(Eta*sinh(k_ch*(2*Depth+Eta))/k_ch/cosh(k_ch*Depth) - Eta*Eta/2)
+         Sxx_sum = Sxx_sum + Pressure_integ*DT + (RHO_WATER*U_temp1*U_temp1)&
+          *(Depth+Eta)*DT
+         Syy_sum = Syy_sum + Pressure_integ*DT + (RHO_WATER*V_temp1*V_temp1)&
+          *(Depth+Eta)*DT
        ENDIF
        IF(OUT_VorMA)THEN
          ! moving average of vorticity
@@ -347,3 +366,36 @@ SUBROUTINE CALCULATE_MovingAverage(DT,M,N,U,V,ETA,MASK,DX,DY,Depth,&
        T_MA_Sum=T_MA_Sum-T_MA_STEP
      ENDIF
 END SUBROUTINE CALCULATE_MovingAverage
+
+!-------------------------------------------------------------------------------------
+!
+! Chen, Salatin, Feb 2022, Wave number all over the domain
+!
+!-------------------------------------------------------------------------------------
+SUBROUTINE CALCULATE_WaveNumber(k_ch)
+
+    USE GLOBAL
+    IMPLICIT NONE
+
+    REAL(SP) :: Char_Period
+    REAL(SP),DIMENSION(M,N) :: kh_0, kh_ch
+    REAL(SP),DIMENSION(M,N),INTENT(OUT) :: k_ch
+
+
+    IF(WAVEMAKER(1:6)=='WK_REG')THEN
+        Char_Period = Tperiod
+    ELSEIF(WaveMaker(1:6)=='WK_IRR'.OR.WaveMaker(1:6)=='TMA_1D'  &
+     .OR.WaveMaker(1:6)=='JON_1D'.OR.WaveMaker(1:6)=='JON_2D' &
+     .OR.WaveMaker(1:10)=='WK_NEW_IRR'.OR.WAVEMAKER(1:9)=='WK_DATA2D' &
+     .OR.WAVEMAKER(1:13)=='WK_NEW_DATA2D')THEN
+       Char_Period = 1.0/FreqPeak
+    ELSEIF(WAVEMAKER(1:7)=='WK_TIME')THEN
+       Char_Period = PeakPeriod
+    ENDIF
+    ! Characteristic wave number (wave number of peak period waves)
+    kh_0 = 4.0*pi*pi*Depth/(GRAV*Char_Period*Char_Period);
+    kh_ch = kh_0*(1.0 + kh_0*exp(-1.0*(1.835 + 1.225*kh_0**1.35)))&
+     /SQRT(TANH(kh_0));
+    k_ch = kh_ch/Depth
+
+END SUBROUTINE CALCULATE_WaveNumber

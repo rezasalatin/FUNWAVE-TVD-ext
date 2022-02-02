@@ -189,7 +189,7 @@ SUBROUTINE WAVEMAKER_INITIALIZATION
     ENDIF ! end theta .ne.zero
 
        CALL WK_WAVEMAKER_REGULAR_WAVE &
-               (Tperiod,AMP_WK,Theta_WK,DEP_WK,Delta_WK,D_gen,rlamda,beta_gen,Width_WK)
+        (Tperiod,AMP_WK,Theta_WK,DEP_WK,Delta_WK,D_gen,rlamda,beta_gen,Width_WK)
 
      ENDIF
 

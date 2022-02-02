@@ -4374,6 +4374,10 @@ SUBROUTINE PREVIEW_MEAN
 
         ! Chen, Salatin, output cross-shore gradient of radiation shear stress
         IF(OUT_RadStr)THEN
+          L_P = 2.0*pi/k_ch
+          TMP_NAME = TRIM(FDIR)//'L_P_'//TRIM(FILE_NAME)
+          call PutFile(TMP_NAME,L_P)
+
           TMP_NAME = TRIM(FDIR)//'Syx_x_'//TRIM(FILE_NAME)
           call PutFile(TMP_NAME,Syx_x)
           TMP_NAME = TRIM(FDIR)//'P_y_'//TRIM(FILE_NAME)
