@@ -378,8 +378,9 @@ SUBROUTINE CALCULATE_WaveNumber
     IMPLICIT NONE
 
     REAL(SP) :: Char_Period
-    REAL(SP),DIMENSION(M,N) :: kh_0, kh_ch
     INTEGER :: M,N
+    REAL(SP),DIMENSION(M,N) :: kh_0, kh_ch
+
 
 
     IF(WAVEMAKER(1:6)=='WK_REG')THEN
