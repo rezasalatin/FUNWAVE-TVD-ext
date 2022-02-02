@@ -380,6 +380,7 @@ SUBROUTINE CALCULATE_WaveNumber(k_ch, L_ch)
     REAL(SP) :: Char_Period
     REAL(SP),DIMENSION(M,N) :: kh_0, kh_ch
     REAL(SP),DIMENSION(M,N),INTENT(OUT) :: k_ch, L_ch
+    INTEGER, INTENT(IN) :: M,N
 
 
     IF(WAVEMAKER(1:6)=='WK_REG')THEN
