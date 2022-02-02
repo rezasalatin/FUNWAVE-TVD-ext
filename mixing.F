@@ -341,7 +341,7 @@ SUBROUTINE CALCULATE_MovingAverage(DT,M,N,U,V,ETA,MASK,DX,DY,Depth,&
          ! Calculate the radiation stresses
          Syx_sum = Syx_sum + (RHO_WATER*U_temp1*V_temp1)*(Depth+Eta)*DT
          !!!
-         CALL CALCULATE_WaveNumber(M, N, k_ch, L_ch)
+         CALL CALCULATE_WaveNumber
          Pressure_integ = RHO_WATER * GRAV &
           *(Eta*sinh(k_ch*(2*Depth+Eta))/k_ch/cosh(k_ch*Depth) - Eta*Eta/2)
          Sxx_sum = Sxx_sum + Pressure_integ*DT + (RHO_WATER*U_temp1*U_temp1)&
@@ -372,14 +372,14 @@ END SUBROUTINE CALCULATE_MovingAverage
 ! Chen, Salatin, Feb 2022, Wave number all over the domain
 !
 !-------------------------------------------------------------------------------------
-SUBROUTINE CALCULATE_WaveNumber(M, N)
+SUBROUTINE CALCULATE_WaveNumber
 
     USE GLOBAL
     IMPLICIT NONE
 
     REAL(SP) :: Char_Period
     REAL(SP),DIMENSION(M,N) :: kh_0, kh_ch
-    INTEGER, INTENT(IN) :: M,N
+    INTEGER :: M,N
 
 
     IF(WAVEMAKER(1:6)=='WK_REG')THEN
