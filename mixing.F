@@ -71,7 +71,7 @@ SUBROUTINE MIXING_STUFF
             OUT_uvMA,OUT_VorMA,OUT_RadStr,OUT_etaMA,&
             MA_Window,T_MA_Sum,T_MA_STEP,&
             Syx_sum,U_Window,V_Window,uMA,vMA,eta_MA_temp,eta_MA,Vor_MA,&
-            Sxx_sum,Syy_sum)
+            Sxx_sum,Syy_sum,k_ch,L_ch)
       ENDIF
 
 END SUBROUTINE MIXING_STUFF
@@ -286,7 +286,7 @@ SUBROUTINE CALCULATE_MovingAverage(DT,M,N,U,V,ETA,MASK,DX,DY,Depth,&
      OUT_uvMA,OUT_VorMA,OUT_RadStr,OUT_etaMA,&
      MA_Window,T_MA_Sum,T_MA_STEP,&
      Syx_sum,U_Window,V_Window,uMA,vMA,eta_MA_temp,eta_MA,Vor_MA,&
-     Sxx_sum,Syy_sum)
+     Sxx_sum,Syy_sum,k_ch,L_ch)
 
      USE PARAM
      IMPLICIT NONE
@@ -315,7 +315,7 @@ SUBROUTINE CALCULATE_MovingAverage(DT,M,N,U,V,ETA,MASK,DX,DY,Depth,&
      ! moving average of vorticity
      REAL(SP),DIMENSION(M,N),INTENT(OUT) :: Vor_MA
      ! Wave Number
-     !REAL(SP),DIMENSION(M,N),INTENT(INOUT) :: k_ch, L_ch
+     REAL(SP),DIMENSION(M,N),INTENT(INOUT) :: k_ch, L_ch
 
      T_MA_Sum=T_MA_Sum+DT
 
@@ -380,6 +380,7 @@ SUBROUTINE CALCULATE_WaveNumber(M, N)
     REAL(SP) :: Char_Period
     INTEGER, INTENT(IN) :: M,N
     REAL(SP),DIMENSION(M,N) :: kh_0, kh_ch
+
 
 
 
