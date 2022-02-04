@@ -337,27 +337,27 @@ SUBROUTINE CALCULATE_MovingAverage(DT,M,N,U,V,ETA,MASK,DX,DY,Depth,&
          U_temp1 = U - uMA
          V_temp1 = V - vMA
        ENDIF
-       IF(OUT_RadStr)THEN
-         ! Calculate the radiation stresses
-         Syx_sum = Syx_sum + (RHO_WATER*U_temp1*V_temp1*(Depth+Eta))*DT
-         Pressure_integ = RHO_WATER*GRAV*(0.5*Eta*Eta+Eta*Depth)
-         Sxx_sum = Sxx_sum + (Pressure_integ + RHO_WATER*U_temp1*U_temp1 &
-          *(Depth+Eta))*DT
-         Syy_sum = Syy_sum + (Pressure_integ + RHO_WATER*V_temp1*V_temp1 &
-          *(Depth+Eta))*DT
-       ENDIF
        IF(OUT_VorMA)THEN
          ! moving average of vorticity
          CALL DERIVATIVE_X(M,N,Ibeg,Iend,Jbeg,Jend,MASK,DX,vMA,vMAx)
          CALL DERIVATIVE_Y(M,N,Ibeg,Iend,Jbeg,Jend,MASK,DY,uMA,uMAy)
          Vor_MA=vMAx-uMAy
        ENDIF
-       IF(OUT_etaMA)THEN
+       IF(OUT_etaMA.OR.OUT_RadStr)THEN
          ! moving average of the surface elevation
          eta_MA_temp = CSHIFT(eta_MA_temp,-1,3)
          eta_MA_temp(:,:,1) = ETA
          eta_MA_Sum = SUM(eta_MA_temp,3)
          eta_MA = eta_MA_Sum/MA_Window
+       ENDIF
+       IF(OUT_RadStr)THEN
+         ! Calculate the radiation stresses
+         Syx_sum = Syx_sum + (RHO_WATER*U_temp1*V_temp1*(Depth+eta_MA))*T_MA_STEP
+         Pressure_integ = RHO_WATER*GRAV*(0.5*eta_MA*eta_MA+eta_MA*Depth)
+         Sxx_sum = Sxx_sum + (Pressure_integ + RHO_WATER*U_temp1*U_temp1 &
+          *(Depth+eta_MA))*T_MA_STEP
+         Syy_sum = Syy_sum + (Pressure_integ + RHO_WATER*V_temp1*V_temp1 &
+          *(Depth+eta_MA))*T_MA_STEP
        ENDIF
        ! go to next time step
        T_MA_Sum=T_MA_Sum-T_MA_STEP
