@@ -316,12 +316,14 @@ SUBROUTINE CALCULATE_MovingAverage(DT,M,N,U,V,ETA,MASK,DX,DY,Depth,&
      REAL(SP),DIMENSION(M,N),INTENT(OUT) :: Vor_MA
      ! Wave Number
      REAL(SP),DIMENSION(M,N),INTENT(INOUT) :: k_ch, L_ch
+     !
+     REAL(SP),DIMENSION(M,N) :: eta_temp
 
      T_MA_Sum=T_MA_Sum+DT
 
      IF(T_MA_Sum.GE.T_MA_STEP)THEN
        ! shift the window and make space for new variables
-       IF(OUT_uvMA.OR.OUT_VorMA)THEN
+       IF(OUT_uvMA.OR.OUT_VorMA.OR.OUT_RadStr)THEN
          U_Window = CSHIFT(U_Window,-1,3)
          V_Window = CSHIFT(V_Window,-1,3)
          ! replace oldest variable by the newest
@@ -351,13 +353,15 @@ SUBROUTINE CALCULATE_MovingAverage(DT,M,N,U,V,ETA,MASK,DX,DY,Depth,&
          eta_MA = eta_MA_Sum/MA_Window
        ENDIF
        IF(OUT_RadStr)THEN
+         eta_temp = eta_MA
          ! Calculate the radiation stresses
-         Syx_sum = Syx_sum + (RHO_WATER*U*V*(Depth+Eta))*T_MA_STEP
-         Pressure_integ = RHO_WATER*GRAV*(0.5*Eta*Eta+Eta*Depth)
-         Sxx_sum = Sxx_sum + (Pressure_integ + RHO_WATER*U*U &
-          *(Depth+Eta))*T_MA_STEP
-         Syy_sum = Syy_sum + (Pressure_integ + RHO_WATER*V*V &
-          *(Depth+Eta))*T_MA_STEP
+         Syx_sum = Syx_sum + (RHO_WATER*U_temp1*V_temp1*(Depth+eta_temp)) &
+          *T_MA_STEP
+         Pressure_integ = RHO_WATER*GRAV*(0.5*eta_temp*eta_temp+eta_temp*Depth)
+         Sxx_sum = Sxx_sum + (Pressure_integ + RHO_WATER*U_temp1*U_temp1 &
+          *(Depth+eta_temp))*T_MA_STEP
+         Syy_sum = Syy_sum + (Pressure_integ + RHO_WATER*V_temp1*V_temp1 &
+          *(Depth+eta_temp))*T_MA_STEP
        ENDIF
        ! go to next time step
        T_MA_Sum=T_MA_Sum-T_MA_STEP
