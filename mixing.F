@@ -321,7 +321,7 @@ SUBROUTINE CALCULATE_MovingAverage(DT,M,N,U,V,ETA,MASK,DX,DY,Depth,&
 
      IF(T_MA_Sum.GE.T_MA_STEP)THEN
        ! shift the window and make space for new variables
-       IF(OUT_uvMA.OR.OUT_RadStr.OR.OUT_VorMA)THEN
+       IF(OUT_uvMA.OR.OUT_VorMA)THEN
          U_Window = CSHIFT(U_Window,-1,3)
          V_Window = CSHIFT(V_Window,-1,3)
          ! replace oldest variable by the newest
@@ -343,7 +343,7 @@ SUBROUTINE CALCULATE_MovingAverage(DT,M,N,U,V,ETA,MASK,DX,DY,Depth,&
          CALL DERIVATIVE_Y(M,N,Ibeg,Iend,Jbeg,Jend,MASK,DY,uMA,uMAy)
          Vor_MA=vMAx-uMAy
        ENDIF
-       IF(OUT_etaMA.OR.OUT_RadStr)THEN
+       IF(OUT_etaMA)THEN
          ! moving average of the surface elevation
          eta_MA_temp = CSHIFT(eta_MA_temp,-1,3)
          eta_MA_temp(:,:,1) = ETA
@@ -352,12 +352,12 @@ SUBROUTINE CALCULATE_MovingAverage(DT,M,N,U,V,ETA,MASK,DX,DY,Depth,&
        ENDIF
        IF(OUT_RadStr)THEN
          ! Calculate the radiation stresses
-         Syx_sum = Syx_sum + (RHO_WATER*U_temp1*V_temp1*(Depth+eta_MA))*T_MA_STEP
-         Pressure_integ = RHO_WATER*GRAV*(0.5*eta_MA*eta_MA+eta_MA*Depth)
-         Sxx_sum = Sxx_sum + (Pressure_integ + RHO_WATER*U_temp1*U_temp1 &
-          *(Depth+eta_MA))*T_MA_STEP
-         Syy_sum = Syy_sum + (Pressure_integ + RHO_WATER*V_temp1*V_temp1 &
-          *(Depth+eta_MA))*T_MA_STEP
+         Syx_sum = Syx_sum + (RHO_WATER*U*V*(Depth+Eta))*T_MA_STEP
+         Pressure_integ = RHO_WATER*GRAV*(0.5*Eta*Eta+Eta*Depth)
+         Sxx_sum = Sxx_sum + (Pressure_integ + RHO_WATER*U*U &
+          *(Depth+Eta))*T_MA_STEP
+         Syy_sum = Syy_sum + (Pressure_integ + RHO_WATER*V*V &
+          *(Depth+Eta))*T_MA_STEP
        ENDIF
        ! go to next time step
        T_MA_Sum=T_MA_Sum-T_MA_STEP
