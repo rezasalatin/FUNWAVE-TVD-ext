@@ -353,7 +353,7 @@ SUBROUTINE CALCULATE_MovingAverage(DT,M,N,U,V,ETA,MASK,DX,DY,Depth,&
          eta_MA = eta_MA_Sum/MA_Window
        ENDIF
        IF(OUT_RadStr)THEN
-         eta_temp = eta_MA
+         eta_temp = ETA
          ! Calculate the radiation stresses
          Syx_sum = Syx_sum + (RHO_WATER*U_temp1*V_temp1*(Depth+eta_temp)) &
           *T_MA_STEP
