@@ -2344,13 +2344,15 @@ SUBROUTINE WK_WAVEMAKER_IRREGULAR_WAVE &
        ENDIF
 
 # if defined (PARALLEL)
-           if(myid==0)then
-             WRITE(3,'(A40)') 'For periodic bc, Freq, Dir, New Dir'
-             WRITE(3,'(3F12.3)')  Freq(kf),theta*180./pi,tmp3*180./pi
-           endif
+          if(myid==0)then
+            WRITE(3,'(A40)') 'For periodic bc, Freq, Dir, New Dir, Hmo'
+            WRITE(3,'(3F12.5)')  Freq(kf),theta*180./pi,tmp3*180./pi,&
+            Hmo_each
+          endif
 # else
-             WRITE(3,'(A40)') 'For periodic bc, Freq, Dir, New Dir'
-             WRITE(3,'(3F12.3)')  Freq(kf),theta*180./pi,tmp3*180./pi
+            WRITE(3,'(A40)') 'For periodic bc, Freq, Dir, New Dir, Hmo'
+            WRITE(3,'(3F12.5)')  Freq(kf),theta*180./pi,tmp3*180./pi,&
+            Hmo_each
 # endif
 
        Theta = tmp3
