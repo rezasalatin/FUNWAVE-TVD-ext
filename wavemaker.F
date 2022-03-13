@@ -2176,7 +2176,7 @@ SUBROUTINE WK_WAVEMAKER_IRREGULAR_WAVE &
 ! -- it seems theres an inaccuracy caused by 100 freq if mfreq<100
 !    should change to mfreq 29/10/2012
 
-         Ef100=Ef/REAL(mfreq+1) !?
+         Ef100=Ef/REAL(mfreq) !?
 
         kb=0
 
