@@ -2150,7 +2150,7 @@ SUBROUTINE WK_WAVEMAKER_IRREGULAR_WAVE &
 
         do kf=1,10000
 
-        fre=fmin+(fmax-fmin)/10000.0_SP*(kf-1.0_SP)
+        fre=fmin+(fmax-fmin)/9999.0_SP*(kf-1.0_SP)
         omiga_spec=2.0_SP*pi*fre*SQRT(h_gen/grav)
         phi=1.0_SP-0.5_SP*(2.0_SP-omiga_spec)**2
         if(omiga_spec.le.1.0_SP) phi=0.5_SP*omiga_spec**2
@@ -2167,7 +2167,7 @@ SUBROUTINE WK_WAVEMAKER_IRREGULAR_WAVE &
          *exp(-5.0_SP/4.0_SP*(fre/fm)**(-4)) &
          *gamma_spec**(exp(-(fre/fm-1.0_SP)**2/(2.0_SP*sigma_spec**2)))
 
-        Ef=Ef+Etma*(fmax-fmin)/10000.0_SP
+        Ef=Ef+Etma*(fmax-fmin)/9999.0_SP
         Ef10000(kf)=Etma
 
         enddo
@@ -2176,7 +2176,7 @@ SUBROUTINE WK_WAVEMAKER_IRREGULAR_WAVE &
 ! -- it seems theres an inaccuracy caused by 100 freq if mfreq<100
 !    should change to mfreq 29/10/2012
 
-         Ef100=Ef/REAL(mfreq+1)
+         Ef100=Ef/REAL(mfreq+1) !?
 
         kb=0
 
@@ -2185,10 +2185,10 @@ SUBROUTINE WK_WAVEMAKER_IRREGULAR_WAVE &
         Ef_add=0.0_SP
         do k=kb+1,10000
 
-          Ef_add=Ef_add+Ef10000(k)*(fmax-fmin)/10000.0_SP
+          Ef_add=Ef_add+Ef10000(k)*(fmax-fmin)/9999.0_SP
           if(Ef_add.ge.Ef100.or.k.eq.10000) then
 
-            Freq(kff)=fmin+(fmax-fmin)/10000.0_SP*(k-(k-kb)/2)
+            Freq(kff)=fmin+(fmax-fmin)/9999.0_SP*(k-(k-kb)/2)
 
              kb=k
             goto 100
