@@ -2255,7 +2255,6 @@ SUBROUTINE WK_WAVEMAKER_IRREGULAR_WAVE &
 ! ---  wave generation parameter
 
         do kf=1,mfreq
-
         do ktheta=1,mtheta
 
 ! here should convert Hmo to Hrms
@@ -2347,12 +2346,12 @@ SUBROUTINE WK_WAVEMAKER_IRREGULAR_WAVE &
           if(myid==0)then
             WRITE(3,'(A40)') 'For periodic bc, Freq, Dir, New Dir, Hmo'
             WRITE(3,'(3F12.5)')  Freq(kf),theta*180./pi,tmp3*180./pi,&
-            Hmo_each
+            Hmo_each(ktheta)
           endif
 # else
             WRITE(3,'(A40)') 'For periodic bc, Freq, Dir, New Dir, Hmo'
             WRITE(3,'(3F12.5)')  Freq(kf),theta*180./pi,tmp3*180./pi,&
-            Hmo_each
+            Hmo_each(ktheta)
 # endif
 
        Theta = tmp3
