@@ -388,12 +388,12 @@ ENDIF
                    nu_smg(I+1,J)*0.5_SP/DY*(P(I+1,J+1)-P(I+1,J-1)) &
                   -nu_smg(I-1,J)*0.5_SP/DY*(P(I-1,J+1)-P(I-1,J-1))  )
 
-        IF(I.eq.20.AND.J.eq.20) then
-          print *, 'nu_smg(20,20)'
-          print *,  nu_smg(I,J)
-        ENDIF
-
 # endif
+
+IF(I.eq.20.AND.J.eq.20) then
+  print *, 'nu_smg', nu_smg(I,J)
+  print *, 'SourceX', SourceX(I,J)
+ENDIF
 
 ! eddy viscosity breaking
    ! ykchoi(08.18.2015)
