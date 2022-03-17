@@ -322,8 +322,6 @@ SUBROUTINE CALCULATE_MovingAverage(DT,M,N,U,V,ETA,MASK,DX,DY,Depth,&
 
          ! Sub-grid-scale Turbulence
          ! Eddy viscosity
-         print *, 'C_smg'
-         print *, C_smg
          temp_smg = SQRT(2.0_SP*uMAx*uMAx+2.0_SP*vMAy*vMAy+(uMAy+vMAx)*(uMAy+vMAx))
          nu_smg = C_smg*C_smg*DX*DY*temp_smg
 
