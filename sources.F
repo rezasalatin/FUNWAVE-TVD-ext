@@ -393,11 +393,6 @@ ENDIF
 
 # endif
 
-IF(Ibeg.lt.10.AND.Jbeg.lt.10.AND.I.eq.20.AND.J.eq.20) then
-  print *, 'nu_smg', nu_smg(I,J)
-  print *, 'tempX', tempX
-ENDIF
-
 ! eddy viscosity breaking
    ! ykchoi(08.18.2015)
    ! new variable :: WAVEMAKER_VIS
