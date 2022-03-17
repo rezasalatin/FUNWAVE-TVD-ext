@@ -72,7 +72,9 @@ SUBROUTINE MIXING_STUFF
             Ibeg,Iend,Jbeg,Jend,&
             OUT_uvMA,OUT_VorMA,OUT_RadStr,OUT_etaMA,&
             MA_Window,T_MA_Sum,T_MA_STEP,&
-            Syx_temp,Syx_x,U_Window,V_Window,uMA,vMA,eta_MA_temp,eta_MA,Vor_MA)
+            Syx_temp,Syx_x,U_Window,V_Window,uMA,vMA,eta_MA_temp,eta_MA,Vor_MA,&
+            ! Smagorinsky subgrid scale turbulence calculated here
+            C_smg,nu_smg)
 
 END SUBROUTINE MIXING_STUFF
 
@@ -262,7 +264,8 @@ SUBROUTINE CALCULATE_MovingAverage(DT,M,N,U,V,ETA,MASK,DX,DY,Depth,&
      Ibeg,Iend,Jbeg,Jend, &
      OUT_uvMA,OUT_VorMA,OUT_RadStr,OUT_etaMA,&
      MA_Window,T_MA_Sum,T_MA_STEP,&
-     Syx_temp,Syx_x,U_Window,V_Window,uMA,vMA,eta_MA_temp,eta_MA,Vor_MA)
+     Syx_temp,Syx_x,U_Window,V_Window,uMA,vMA,eta_MA_temp,eta_MA,Vor_MA,&
+     C_smg,nu_smg)
 
      USE PARAM
      IMPLICIT NONE
@@ -280,7 +283,7 @@ SUBROUTINE CALCULATE_MovingAverage(DT,M,N,U,V,ETA,MASK,DX,DY,Depth,&
      REAL(SP),DIMENSION(M,N,MA_Window),INTENT(INOUT) :: U_Window,V_Window
      REAL(SP),DIMENSION(M,N) :: U_Window_Sum,V_Window_Sum
      REAL(SP),DIMENSION(M,N),INTENT(OUT) :: uMA,vMA
-     REAL(SP),DIMENSION(M,N) :: uMAy,vMAx
+     REAL(SP),DIMENSION(M,N) :: uMAx, uMAy, vMAx, vMAy
      ! moving averaged of radiation shear stress
      REAL(SP),DIMENSION(M,N,MA_Window),INTENT(INOUT) :: Syx_temp
      REAL(SP),DIMENSION(M,N) :: Syx_temp_sum,Syx
@@ -291,6 +294,10 @@ SUBROUTINE CALCULATE_MovingAverage(DT,M,N,U,V,ETA,MASK,DX,DY,Depth,&
      REAL(SP),DIMENSION(M,N) :: eta_MA_Sum
      ! moving average of vorticity
      REAL(SP),DIMENSION(M,N),INTENT(OUT) :: Vor_MA
+     ! Smagorinsky
+     REAL(SP),DIMENSION(M,N) :: temp_smg
+     REAL(SP),DIMENSION(M,N),INTENT(IN) :: C_smg
+     REAL(SP),DIMENSION(M,N),INTENT(OUT) :: nu_smg
 
      T_MA_Sum=T_MA_Sum+DT
 
@@ -308,6 +315,10 @@ SUBROUTINE CALCULATE_MovingAverage(DT,M,N,U,V,ETA,MASK,DX,DY,Depth,&
          ! do averaging
          uMA = U_Window_Sum/MA_Window
          vMA = V_Window_Sum/MA_Window
+         CALL DERIVATIVE_X(M,N,Ibeg,Iend,Jbeg,Jend,MASK,DX,vMA,vMAx)
+         CALL DERIVATIVE_Y(M,N,Ibeg,Iend,Jbeg,Jend,MASK,DY,vMA,vMAy)
+         CALL DERIVATIVE_X(M,N,Ibeg,Iend,Jbeg,Jend,MASK,DX,uMA,uMAx)
+         CALL DERIVATIVE_Y(M,N,Ibeg,Iend,Jbeg,Jend,MASK,DY,uMA,uMAy)
          ! subtracting average velocity from the instant velocity
          U_temp1 = U - uMA
          V_temp1 = V - vMA
@@ -322,8 +333,6 @@ SUBROUTINE CALCULATE_MovingAverage(DT,M,N,U,V,ETA,MASK,DX,DY,Depth,&
        ENDIF
        IF(OUT_VorMA)THEN
          ! moving average of vorticity
-         CALL DERIVATIVE_X(M,N,Ibeg,Iend,Jbeg,Jend,MASK,DX,vMA,vMAx)
-         CALL DERIVATIVE_Y(M,N,Ibeg,Iend,Jbeg,Jend,MASK,DY,uMA,uMAy)
          Vor_MA=vMAx-uMAy
        ENDIF
        IF(OUT_etaMA)THEN
@@ -336,4 +345,9 @@ SUBROUTINE CALCULATE_MovingAverage(DT,M,N,U,V,ETA,MASK,DX,DY,Depth,&
          ! go to next time step
          T_MA_Sum=T_MA_Sum-T_MA_STEP
      ENDIF
+
+     ! Sub-grid-scale Turbulence
+     ! Eddy viscosity
+     temp_smg = SQRT(2.0_SP*uMAx*uMAx+2.0_SP*vMAy*vMAy+(uMAy+vMAx)*(uMAy+vMAx))
+     nu_smg = C_smg*C_smg*DX*DY*temp_smg
 END SUBROUTINE CALCULATE_MovingAverage
