@@ -367,14 +367,10 @@ ENDIF
 # endif
 
 
+print *, 'C_smagorinsky, Reza Salatin before'
 # if defined (MIXING)
 
-       print *, 'C_smg'
-       print *, C_smg
-       print *, 'nu_smg(1,1)'
-       print *, nu_smg(1,1)
-       print *, 'nu_smg(10,10)'
-       print *, nu_smg(10,10)
+       print *, 'C_smagorinsky, Reza Salatin after'
 
        SourceX(I,J) = SourceX(I,J) + 1.0_SP/DX*( &
                    0.5_SP*(nu_smg(I,J)+nu_smg(I+1,J))*1.0_SP/DX*(P(I+1,J)-P(I,J))  &
