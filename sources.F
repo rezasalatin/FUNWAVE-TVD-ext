@@ -71,6 +71,8 @@ SUBROUTINE SourceTerms
      REAL(SP), DIMENSION(Nfreq) :: BB,CC     ! for WK_IRR (optimized)
      REAL(SP), DIMENSION(NumWaveComp,1) :: BB1 ! for WK_TIME (optimized)
      REAL(SP), DIMENSION(NumFreq) :: BB2,CC2 ! for WK_DATA (optimized)
+     INTEGER, INTENT(IN) :: M,N
+     REAL(SP),DIMENSION(M,N) :: tempX, tempY
 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
@@ -368,7 +370,7 @@ ENDIF
 
 # if defined (MIXING)
 
-       SourceX(I,J) = SourceX(I,J) + 1.0_SP/DX*( &
+       tempX(I,J) = 1.0_SP/DX*( &
                    0.5_SP*(nu_smg(I,J)+nu_smg(I+1,J))*1.0_SP/DX*(P(I+1,J)-P(I,J))  &
                  - 0.5_SP*(nu_smg(I,J)+nu_smg(I-1,J))*1.0_SP/DX*(P(I,J)-P(I-1,J)) ) &
                + 0.5_SP/DY*( &
@@ -377,8 +379,9 @@ ENDIF
                + 1.0_SP/DY*( &
                    nu_smg(I,J+1)*0.5_SP/DX*(Q(I+1,J+1)-Q(I-1,J+1)) &
                   -nu_smg(I,J-1)*0.5_SP/DX*(Q(I+1,J-1)-Q(I-1,J-1))  )
+       SourceX(I,J) = SourceX(I,J) + tempX(I,J)
 
-       SourceY(I,J) = SourceY(I,J) + 1.0_SP/DY*( &
+       tempY(I,J) = 1.0_SP/DY*( &
                    0.5_SP*(nu_smg(I,J)+nu_smg(I,J+1))*1.0_SP/DY*(Q(I,J+1)-Q(I,J))  &
                  - 0.5_SP*(nu_smg(I,J)+nu_smg(I,J-1))*1.0_SP/DY*(Q(I,J)-Q(I,J-1)) ) &
                + 0.5_SP/DX*( &
@@ -387,12 +390,13 @@ ENDIF
                + 1.0_SP/DX*( &
                    nu_smg(I+1,J)*0.5_SP/DY*(P(I+1,J+1)-P(I+1,J-1)) &
                   -nu_smg(I-1,J)*0.5_SP/DY*(P(I-1,J+1)-P(I-1,J-1))  )
+       SourceY(I,J) = SourceY(I,J) + tempY(I,J)
 
 # endif
 
 IF(I.eq.20.AND.J.eq.20) then
   print *, 'nu_smg', nu_smg(I,J)
-  print *, 'SourceX', SourceX(I,J)
+  print *, 'tempX', tempX(I,J)
 ENDIF
 
 ! eddy viscosity breaking
