@@ -296,7 +296,7 @@ SUBROUTINE CALCULATE_MovingAverage(DT,M,N,U,V,ETA,MASK,DX,DY,Depth,&
      REAL(SP),DIMENSION(M,N),INTENT(OUT) :: Vor_MA
      ! Smagorinsky
      REAL(SP),DIMENSION(M,N) :: temp_smg
-     REAL(SP),DIMENSION(M,N),INTENT(IN) :: C_smg
+     REAL(SP),INTENT(IN) :: C_smg
      REAL(SP),DIMENSION(M,N),INTENT(OUT) :: nu_smg
 
      T_MA_Sum=T_MA_Sum+DT
