@@ -397,6 +397,7 @@ ENDIF
         IF(I.eq.100.AND.J.eq.100) then
           print *, 'SourceX(100,100)'
           SourceX(I,J)
+        ENDIF
 
 # endif
 
