@@ -394,8 +394,8 @@ ENDIF
                    nu_smg(I+1,J)*0.5_SP/DY*(P(I+1,J+1)-P(I+1,J-1)) &
                   -nu_smg(I-1,J)*0.5_SP/DY*(P(I-1,J+1)-P(I-1,J-1))  )
 
-        IF(I.eq.100.AND.J.eq.100) then
-          print *, 'SourceX(100,100)'
+        IF(I.eq.20.AND.J.eq.20) then
+          print *, 'SourceX(20,20)'
           print *,  SourceX(I,J)
         ENDIF
 
