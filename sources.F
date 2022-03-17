@@ -368,11 +368,6 @@ ENDIF
 
 # if defined (MIXING)
 
-       print *, 'C_smg'
-       print *, C_smg
-       print *, 'nu_smg'
-       print *, nu_smg(100,100)
-
        SourceX(I,J) = SourceX(I,J) + 1.0_SP/DX*( &
                    0.5_SP*(nu_smg(I,J)+nu_smg(I+1,J))*1.0_SP/DX*(P(I+1,J)-P(I,J))  &
                  - 0.5_SP*(nu_smg(I,J)+nu_smg(I-1,J))*1.0_SP/DX*(P(I,J)-P(I-1,J)) ) &
