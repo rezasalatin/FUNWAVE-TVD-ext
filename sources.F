@@ -393,6 +393,7 @@ ENDIF
 
 # endif
 
+print *, Ibeg,Iend,Jbeg,Jend
 IF(I.eq.20.AND.J.eq.20) then
   print *, 'nu_smg', nu_smg(I,J)
   print *, 'tempX', tempX
