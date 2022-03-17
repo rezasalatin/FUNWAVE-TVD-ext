@@ -319,6 +319,12 @@ SUBROUTINE CALCULATE_MovingAverage(DT,M,N,U,V,ETA,MASK,DX,DY,Depth,&
          CALL DERIVATIVE_Y(M,N,Ibeg,Iend,Jbeg,Jend,MASK,DY,vMA,vMAy)
          CALL DERIVATIVE_X(M,N,Ibeg,Iend,Jbeg,Jend,MASK,DX,uMA,uMAx)
          CALL DERIVATIVE_Y(M,N,Ibeg,Iend,Jbeg,Jend,MASK,DY,uMA,uMAy)
+
+         ! Sub-grid-scale Turbulence
+         ! Eddy viscosity
+         temp_smg = SQRT(2.0_SP*uMAx*uMAx+2.0_SP*vMAy*vMAy+(uMAy+vMAx)*(uMAy+vMAx))
+         nu_smg = C_smg*C_smg*DX*DY*temp_smg
+
          ! subtracting average velocity from the instant velocity
          U_temp1 = U - uMA
          V_temp1 = V - vMA
@@ -345,9 +351,4 @@ SUBROUTINE CALCULATE_MovingAverage(DT,M,N,U,V,ETA,MASK,DX,DY,Depth,&
          ! go to next time step
          T_MA_Sum=T_MA_Sum-T_MA_STEP
      ENDIF
-
-     ! Sub-grid-scale Turbulence
-     ! Eddy viscosity
-     temp_smg = SQRT(2.0_SP*uMAx*uMAx+2.0_SP*vMAy*vMAy+(uMAy+vMAx)*(uMAy+vMAx))
-     nu_smg = C_smg*C_smg*DX*DY*temp_smg
 END SUBROUTINE CALCULATE_MovingAverage

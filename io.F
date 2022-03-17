@@ -4317,6 +4317,11 @@ SUBROUTINE PREVIEW
        TMP_NAME = TRIM(FDIR)//'VorMA_'//TRIM(FILE_NAME)
        call PutFile(TMP_NAME,Vor_MA)
      ENDIF
+     ! Chen, Salatin, output Smagorinsky eddy viscosity
+     IF(OUT_uvMA)THEN
+       TMP_NAME = TRIM(FDIR)//'nu_smg_'//TRIM(FILE_NAME)
+       call PutFile(TMP_NAME,nu_smg)
+     ENDIF
 
 101   continue
 
