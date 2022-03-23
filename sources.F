@@ -369,6 +369,12 @@ ENDIF
 
 # if defined (MIXING)
 
+       !nu_smg(I,J) = 0.0_SP
+       !nu_smg(I-1,J) = 0.0_SP
+       !nu_smg(I+1,J) = 0.0_SP
+       !nu_smg(I,J-1) = 0.0_SP
+       !nu_smg(I,J+1) = 0.0_SP
+
        tempX = 1.0_SP/DX*( &
                    0.5_SP*(nu_smg(I,J)+nu_smg(I+1,J))*1.0_SP/DX*(P(I+1,J)-P(I,J))  &
                  - 0.5_SP*(nu_smg(I,J)+nu_smg(I-1,J))*1.0_SP/DX*(P(I,J)-P(I-1,J)) ) &
@@ -378,7 +384,7 @@ ENDIF
                + 1.0_SP/DY*( &
                    nu_smg(I,J+1)*0.5_SP/DX*(Q(I+1,J+1)-Q(I-1,J+1)) &
                   -nu_smg(I,J-1)*0.5_SP/DX*(Q(I+1,J-1)-Q(I-1,J-1))  )
-       SourceX(I,J) = SourceX(I,J) ! + tempX
+       SourceX(I,J) = SourceX(I,J) + tempX
 
        tempY = 1.0_SP/DY*( &
                    0.5_SP*(nu_smg(I,J)+nu_smg(I,J+1))*1.0_SP/DY*(Q(I,J+1)-Q(I,J))  &
@@ -389,7 +395,7 @@ ENDIF
                + 1.0_SP/DX*( &
                    nu_smg(I+1,J)*0.5_SP/DY*(P(I+1,J+1)-P(I+1,J-1)) &
                   -nu_smg(I-1,J)*0.5_SP/DY*(P(I-1,J+1)-P(I-1,J-1))  )
-       SourceY(I,J) = SourceY(I,J) ! + tempY
+       SourceY(I,J) = SourceY(I,J) + tempY
 
 # endif
 
