@@ -74,7 +74,7 @@ SUBROUTINE MIXING_STUFF
             MA_Window,T_MA_Sum,T_MA_STEP,&
             Syx_temp,Syx_x,U_Window,V_Window,uMA,vMA,eta_MA_temp,eta_MA,Vor_MA,&
             ! Smagorinsky subgrid scale turbulence calculated here
-            C_smg,nu_sm,PERIODIC)
+            C_smg,nu_smg,PERIODIC)
 
 END SUBROUTINE MIXING_STUFF
 
