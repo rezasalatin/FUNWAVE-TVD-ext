@@ -74,7 +74,7 @@ SUBROUTINE MIXING_STUFF
             MA_Window,T_MA_Sum,T_MA_STEP,&
             Syx_temp,Syx_x,U_Window,V_Window,uMA,vMA,eta_MA_temp,eta_MA,Vor_MA,&
             ! Smagorinsky subgrid scale turbulence calculated here
-            C_smg,nu_smg)
+            C_smg,nu_sm,PERIODIC)
 
 END SUBROUTINE MIXING_STUFF
 
@@ -265,7 +265,7 @@ SUBROUTINE CALCULATE_MovingAverage(DT,M,N,U,V,ETA,MASK,DX,DY,Depth,&
      OUT_uvMA,OUT_VorMA,OUT_RadStr,OUT_etaMA,&
      MA_Window,T_MA_Sum,T_MA_STEP,&
      Syx_temp,Syx_x,U_Window,V_Window,uMA,vMA,eta_MA_temp,eta_MA,Vor_MA,&
-     C_smg,nu_smg)
+     C_smg,nu_smg,PERIODIC)
 
      USE PARAM
      IMPLICIT NONE
@@ -321,12 +321,12 @@ SUBROUTINE CALCULATE_MovingAverage(DT,M,N,U,V,ETA,MASK,DX,DY,Depth,&
          CALL DERIVATIVE_X(M,N,Ibeg,Iend,Jbeg,Jend,MASK,DX,uMA,uMAx)
          CALL DERIVATIVE_Y(M,N,Ibeg,Iend,Jbeg,Jend,MASK,DY,uMA,uMAy)
          VTYPE=1  !in both directions
-         CALL PHI_COLL(Mloc,Nloc,Ibeg,Iend,Jbeg,Jend,Nghost,uMAx,VTYPE,PERIODIC)
-         CALL PHI_COLL(Mloc,Nloc,Ibeg,Iend,Jbeg,Jend,Nghost,vMAy,VTYPE,PERIODIC)
+         CALL PHI_COLL(M,N,Ibeg,Iend,Jbeg,Jend,Nghost,uMAx,VTYPE,PERIODIC)
+         CALL PHI_COLL(M,N,Ibeg,Iend,Jbeg,Jend,Nghost,vMAy,VTYPE,PERIODIC)
          VTYPE=3  !like v
-         CALL PHI_COLL(Mloc,Nloc,Ibeg,Iend,Jbeg,Jend,Nghost,uMAy,VTYPE,PERIODIC)
+         CALL PHI_COLL(M,N,Ibeg,Iend,Jbeg,Jend,Nghost,uMAy,VTYPE,PERIODIC)
          Vtype=2  !like u
-         CALL PHI_COLL(Mloc,Nloc,Ibeg,Iend,Jbeg,Jend,Nghost,vMAx,VTYPE,PERIODIC)
+         CALL PHI_COLL(M,N,Ibeg,Iend,Jbeg,Jend,Nghost,vMAx,VTYPE,PERIODIC)
 
          ! Sub-grid-scale Turbulence
          ! Eddy viscosity
