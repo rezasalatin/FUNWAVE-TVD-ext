@@ -298,6 +298,7 @@ SUBROUTINE CALCULATE_MovingAverage(DT,M,N,U,V,ETA,MASK,DX,DY,Depth,&
      REAL(SP),DIMENSION(M,N) :: temp_smg
      REAL(SP),INTENT(IN) :: C_smg
      REAL(SP),DIMENSION(M,N),INTENT(OUT) :: nu_smg
+     INTEGER :: VTYPE
 
      T_MA_Sum=T_MA_Sum+DT
 
@@ -319,6 +320,13 @@ SUBROUTINE CALCULATE_MovingAverage(DT,M,N,U,V,ETA,MASK,DX,DY,Depth,&
          CALL DERIVATIVE_Y(M,N,Ibeg,Iend,Jbeg,Jend,MASK,DY,vMA,vMAy)
          CALL DERIVATIVE_X(M,N,Ibeg,Iend,Jbeg,Jend,MASK,DX,uMA,uMAx)
          CALL DERIVATIVE_Y(M,N,Ibeg,Iend,Jbeg,Jend,MASK,DY,uMA,uMAy)
+         VTYPE=1  !in both directions
+         CALL PHI_COLL(Mloc,Nloc,Ibeg,Iend,Jbeg,Jend,Nghost,uMAx,VTYPE,PERIODIC)
+         CALL PHI_COLL(Mloc,Nloc,Ibeg,Iend,Jbeg,Jend,Nghost,vMAy,VTYPE,PERIODIC)
+         VTYPE=3  !like v
+         CALL PHI_COLL(Mloc,Nloc,Ibeg,Iend,Jbeg,Jend,Nghost,uMAy,VTYPE,PERIODIC)
+         Vtype=2  !like u
+         CALL PHI_COLL(Mloc,Nloc,Ibeg,Iend,Jbeg,Jend,Nghost,vMAx,VTYPE,PERIODIC)
 
          ! Sub-grid-scale Turbulence
          ! Eddy viscosity
