@@ -325,6 +325,12 @@ SUBROUTINE CALCULATE_MovingAverage(DT,M,N,U,V,ETA,MASK,DX,DY,Depth,&
          temp_smg = SQRT(2.0_SP*uMAx*uMAx+2.0_SP*vMAy*vMAy+(uMAy+vMAx)*(uMAy+vMAx))
          nu_smg = C_smg*C_smg*DX*DY*temp_smg
 
+         DO J=1,N
+         DO I=1,M
+           IF(isnan(nu_smg(I,J))) nu_smg(I,J) = 0.0_SP
+         ENDDO
+         ENDDO
+
          ! subtracting average velocity from the instant velocity
          U_temp1 = U - uMA
          V_temp1 = V - vMA
