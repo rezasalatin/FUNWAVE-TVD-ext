@@ -74,7 +74,7 @@ SUBROUTINE MIXING_STUFF
             MA_Window,T_MA_Sum,T_MA_STEP,&
             Syx_temp,Syx_x,U_Window,V_Window,uMA,vMA,eta_MA_temp,eta_MA,Vor_MA,&
             ! Smagorinsky subgrid scale turbulence calculated here
-            C_smg,nu_smg,PERIODIC)
+            C_smg,nu_smg,PERIODIC,Nghost)
 
 END SUBROUTINE MIXING_STUFF
 
@@ -265,7 +265,7 @@ SUBROUTINE CALCULATE_MovingAverage(DT,M,N,U,V,ETA,MASK,DX,DY,Depth,&
      OUT_uvMA,OUT_VorMA,OUT_RadStr,OUT_etaMA,&
      MA_Window,T_MA_Sum,T_MA_STEP,&
      Syx_temp,Syx_x,U_Window,V_Window,uMA,vMA,eta_MA_temp,eta_MA,Vor_MA,&
-     C_smg,nu_smg,PERIODIC)
+     C_smg,nu_smg,PERIODIC,Nghost)
 
      USE PARAM
      IMPLICIT NONE
@@ -298,7 +298,7 @@ SUBROUTINE CALCULATE_MovingAverage(DT,M,N,U,V,ETA,MASK,DX,DY,Depth,&
      REAL(SP),DIMENSION(M,N) :: temp_smg
      REAL(SP),INTENT(IN) :: C_smg
      REAL(SP),DIMENSION(M,N),INTENT(OUT) :: nu_smg
-     INTEGER :: VTYPE
+     INTEGER :: VTYPE,Nghost
      LOGICAL :: PERIODIC
 
      T_MA_Sum=T_MA_Sum+DT
