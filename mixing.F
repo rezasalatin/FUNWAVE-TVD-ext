@@ -299,6 +299,7 @@ SUBROUTINE CALCULATE_MovingAverage(DT,M,N,U,V,ETA,MASK,DX,DY,Depth,&
      REAL(SP),INTENT(IN) :: C_smg
      REAL(SP),DIMENSION(M,N),INTENT(OUT) :: nu_smg
      INTEGER :: VTYPE
+     LOGICAL :: PERIODIC
 
      T_MA_Sum=T_MA_Sum+DT
 
