@@ -4321,6 +4321,11 @@ SUBROUTINE PREVIEW
      IF(OUT_uvMA)THEN
        TMP_NAME = TRIM(FDIR)//'nu_smg_'//TRIM(FILE_NAME)
        call PutFile(TMP_NAME,nu_smg)
+
+       TMP_NAME = TRIM(FDIR)//'ratioX_'//TRIM(FILE_NAME)
+       call PutFile(TMP_NAME,ratioX)
+       TMP_NAME = TRIM(FDIR)//'ratioY_'//TRIM(FILE_NAME)
+       call PutFile(TMP_NAME,ratioY)
      ENDIF
 
 101   continue
