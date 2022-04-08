@@ -229,7 +229,7 @@ MODULE GLOBAL
           Fx,Fy,U,V,HU,HV,&
           Gx,Gy,P,Q,SourceX,SourceY,Int2Flo, &
           tmp4preview,HeightMax,HeightMin,VelocityMax,&
-          MomentumFluxMax,VorticityMax
+          MomentumFluxMax,VorticityMax,ratioX,ratioY
 # if defined (ITERATION)
        REAL(SP),DIMENSION(:,:),ALLOCATABLE :: Ui,Vi,ETAi,&
                         UbarOld,VbarOld,EtaOld
