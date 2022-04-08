@@ -98,7 +98,7 @@ SUBROUTINE ALLOCATE_VARIABLES
               P(Mloc1,Nloc),Q(Mloc,Nloc1), &
               SxL(Mloc1,Nloc),SxR(Mloc1,Nloc), &
               SyL(Mloc,Nloc1),SyR(Mloc,Nloc1),SourceX(Mloc,Nloc), &
-              SourceY(Mloc,Nloc),ratioX(Mloc,Nloc),ratioY(Mloc,Nloc), &
+              SourceY(Mloc,Nloc), &
 ! others
               Umean(Mloc,Nloc),Vmean(Mloc,Nloc),ETAmean(Mloc,Nloc),&
               Usum(Mloc,Nloc),Vsum(Mloc,Nloc),ETAsum(Mloc,Nloc), &
@@ -486,8 +486,6 @@ SUBROUTINE INITIALIZATION
      Eta=0.0_SP
      SourceX=0.0_SP
      SourceY=0.0_SP
-     ratioX = 0.0_SP
-     ratioY = 0.0_SP
      PLOT_COUNT=0.0_SP
      PLOT_COUNT_STATION=0.0_SP
      HOTSTART_COUNT=ZERO

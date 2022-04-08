@@ -380,8 +380,6 @@ ENDIF
                   -nu_smg(I,J-1)*0.5_SP/DX*(Q(I+1,J-1)-Q(I-1,J-1))  )
        SourceX(I,J) = SourceX(I,J) + tempX
 
-       ratioX(I,J) = tempX/SourceX(I,J)
-
        tempY = 1.0_SP/DY*( &
                    0.5_SP*(nu_smg(I,J)+nu_smg(I,J+1))*1.0_SP/DY*(Q(I,J+1)-Q(I,J))  &
                  - 0.5_SP*(nu_smg(I,J)+nu_smg(I,J-1))*1.0_SP/DY*(Q(I,J)-Q(I,J-1)) ) &
@@ -392,8 +390,6 @@ ENDIF
                    nu_smg(I+1,J)*0.5_SP/DY*(P(I+1,J+1)-P(I+1,J-1)) &
                   -nu_smg(I-1,J)*0.5_SP/DY*(P(I-1,J+1)-P(I-1,J-1))  )
        SourceY(I,J) = SourceY(I,J) + tempY
-
-       ratioY(I,J) = tempY/SourceY(I,J)
 
 # endif
 
