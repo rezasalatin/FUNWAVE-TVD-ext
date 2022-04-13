@@ -74,7 +74,7 @@ SUBROUTINE MIXING_STUFF
             MA_Window,T_MA_Sum,T_MA_STEP,&
             Syx_temp,Syx_x,U_Window,V_Window,uMA,vMA,eta_MA_temp,eta_MA,Vor_MA,&
             ! Smagorinsky subgrid scale turbulence calculated here
-            C_smg,nu_smg,PERIODIC,Nghost)
+            C_smg,nu_smg,PERIODIC,Nghost,nu_vis_v_x,nu_vis_v_y,nu_vis_v_r)
 
 END SUBROUTINE MIXING_STUFF
 
@@ -265,7 +265,7 @@ SUBROUTINE CALCULATE_MovingAverage(DT,M,N,U,V,ETA,MASK,DX,DY,Depth,&
      OUT_uvMA,OUT_VorMA,OUT_RadStr,OUT_etaMA,&
      MA_Window,T_MA_Sum,T_MA_STEP,&
      Syx_temp,Syx_x,U_Window,V_Window,uMA,vMA,eta_MA_temp,eta_MA,Vor_MA,&
-     C_smg,nu_smg,PERIODIC,Nghost)
+     C_smg,nu_smg,PERIODIC,Nghost,nu_vis_v_x,nu_vis_v_y,nu_vis_v_r)
 
      USE PARAM
      IMPLICIT NONE
@@ -298,6 +298,7 @@ SUBROUTINE CALCULATE_MovingAverage(DT,M,N,U,V,ETA,MASK,DX,DY,Depth,&
      REAL(SP),DIMENSION(M,N) :: temp_smg
      REAL(SP),INTENT(IN) :: C_smg
      REAL(SP),DIMENSION(M,N),INTENT(OUT) :: nu_smg
+     REAL(SP),DIMENSION(M,N),INTENT(OUT) :: nu_vis_v_x,nu_vis_v_y,nu_vis_v_r
      INTEGER :: VTYPE,Nghost
      LOGICAL :: PERIODIC
 
@@ -334,9 +335,13 @@ SUBROUTINE CALCULATE_MovingAverage(DT,M,N,U,V,ETA,MASK,DX,DY,Depth,&
          temp_smg = SQRT(2.0_SP*uMAx*uMAx+2.0_SP*vMAy*vMAy+(uMAy+vMAx)*(uMAy+vMAx))
          nu_smg = C_smg*C_smg*DX*DY*temp_smg
          ! Vertical Eddy Viscosity
+         ! if you want to use orbital velocity (wave+current)
          nu_vis_v_x = 0.005*(Depth+Eta)*SQRT(U*SQRT(U*U+V*V))
          nu_vis_v_y = 0.005*(Depth+Eta)*SQRT(V*SQRT(U*U+V*V))
-
+         ! if you want to use current speed
+         !nu_vis_v_x = 0.005*Depth*SQRT(uMA*SQRT(uMA*uMA+vMA*vMA))
+         !nu_vis_v_y = 0.005*Depth*SQRT(vMA*SQRT(uMA*uMA+vMA*vMA))
+         nu_vis_v_r = SQRT(nu_vis_v_x**2+nu_vis_v_y**2)
 
          ! subtracting average velocity from the instant velocity
          U_temp1 = U - uMA

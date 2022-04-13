@@ -305,6 +305,7 @@ MODULE GLOBAL
 ! smagorinsky and wave height
       REAL(SP),DIMENSION(:,:),ALLOCATABLE :: Umean,Vmean,&
                   ETAmean,Usum,Vsum,ETAsum, nu_smg
+      REAL(SP),DIMENSION(:,:),ALLOCATABLE :: nu_vis_v_x,nu_vis_v_y,nu_vis_v_r
       REAL(SP)::T_INTV_mean = 20.0,T_sum=0.0,C_smg=0.25
       ! Chen, Salatin, Current and Vorticity field
       REAL(SP)::T_INTV_UVmean = 20.0,T_sumUVmean=0.0

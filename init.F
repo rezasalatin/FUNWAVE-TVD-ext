@@ -102,7 +102,9 @@ SUBROUTINE ALLOCATE_VARIABLES
 ! others
               Umean(Mloc,Nloc),Vmean(Mloc,Nloc),ETAmean(Mloc,Nloc),&
               Usum(Mloc,Nloc),Vsum(Mloc,Nloc),ETAsum(Mloc,Nloc), &
-              nu_smg(Mloc,Nloc), &
+              nu_vis_v_x(Mloc,Nloc), &
+              nu_vis_v_y(Mloc,Nloc), &
+              nu_vis_v_r(Mloc,Nloc), &
               Num_Zero_Up(Mloc,Nloc), &
               WaveHeightRMS(Mloc,Nloc),  &
               WaveHeightAve(Mloc,Nloc),  &
