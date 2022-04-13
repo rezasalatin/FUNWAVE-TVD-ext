@@ -330,9 +330,13 @@ SUBROUTINE CALCULATE_MovingAverage(DT,M,N,U,V,ETA,MASK,DX,DY,Depth,&
          CALL PHI_COLL(M,N,Ibeg,Iend,Jbeg,Jend,Nghost,vMAx,VTYPE,PERIODIC)
 
          ! Sub-grid-scale Turbulence
-         ! Eddy viscosity
+         ! Horizontal Eddy viscosity
          temp_smg = SQRT(2.0_SP*uMAx*uMAx+2.0_SP*vMAy*vMAy+(uMAy+vMAx)*(uMAy+vMAx))
          nu_smg = C_smg*C_smg*DX*DY*temp_smg
+         ! Vertical Eddy Viscosity
+         nu_vis_v_x = 0.005*(Depth+Eta)*SQRT(U*SQRT(U*U+V*V))
+         nu_vis_v_y = 0.005*(Depth+Eta)*SQRT(V*SQRT(U*U+V*V))
+
 
          ! subtracting average velocity from the instant velocity
          U_temp1 = U - uMA
