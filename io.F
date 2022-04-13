@@ -4328,6 +4328,7 @@ SUBROUTINE PREVIEW
        call PutFile(TMP_NAME,nu_vis_v_y)
        TMP_NAME = TRIM(FDIR)//'nu_verr_'//TRIM(FILE_NAME)
        call PutFile(TMP_NAME,nu_vis_v_r)
+     ENDIF
 
 101   continue
 
