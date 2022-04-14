@@ -337,13 +337,12 @@ SUBROUTINE CALCULATE_MovingAverage(DT,M,N,U,V,ETA,MASK,DX,DY,Depth,&
          nu_smg = C_smg*C_smg*DX*DY*temp_smg
          ! Vertical Eddy Viscosity
          ! if you want to use orbital velocity (wave+current)
-         nu_vis_v_x = 0.4/6.0*(Depth+Eta)*SQRT(Cd*abs(U)*SQRT(U*U+V*V))
-         nu_vis_v_y = 0.4/6.0*(Depth+Eta)*SQRT(Cd*abs(V)*SQRT(U*U+V*V))
+         !nu_vis_v_x = 0.4/6.0*(Depth+Eta)*SQRT(Cd*abs(U)*SQRT(U*U+V*V))
+         !nu_vis_v_y = 0.4/6.0*(Depth+Eta)*SQRT(Cd*abs(V)*SQRT(U*U+V*V))
          ! if you want to use current speed
-         !nu_vis_v_x = 0.4/6.0*Depth*SQRT(Cd*abs(uMA)*SQRT(uMA*uMA+vMA*vMA))
-         !nu_vis_v_y = 0.4/6.0*Depth*SQRT(Cd*abs(vMA)*SQRT(uMA*uMA+vMA*vMA))
+         nu_vis_v_x = 0.4/6.0*Depth*SQRT(Cd*abs(uMA)*SQRT(uMA*uMA+vMA*vMA))
+         nu_vis_v_y = 0.4/6.0*Depth*SQRT(Cd*abs(vMA)*SQRT(uMA*uMA+vMA*vMA))
          nu_vis_v_r = SQRT(nu_vis_v_x**2+nu_vis_v_y**2)
-
          ! subtracting average velocity from the instant velocity
          U_temp1 = U - uMA
          V_temp1 = V - vMA
