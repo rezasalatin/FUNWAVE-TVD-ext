@@ -4322,6 +4322,11 @@ SUBROUTINE PREVIEW
        TMP_NAME = TRIM(FDIR)//'nu_smg_'//TRIM(FILE_NAME)
        call PutFile(TMP_NAME,nu_smg)
 
+       TMP_NAME = TRIM(FDIR)//'efx_'//TRIM(FILE_NAME)
+       call PutFile(TMP_NAME,nu_smg_effectx)
+       TMP_NAME = TRIM(FDIR)//'efy_'//TRIM(FILE_NAME)
+       call PutFile(TMP_NAME,nu_smg_effecty)
+
        TMP_NAME = TRIM(FDIR)//'nu_verx_'//TRIM(FILE_NAME)
        call PutFile(TMP_NAME,nu_vis_v_x)
        TMP_NAME = TRIM(FDIR)//'nu_very_'//TRIM(FILE_NAME)
