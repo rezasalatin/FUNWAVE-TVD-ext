@@ -102,6 +102,7 @@ SUBROUTINE ALLOCATE_VARIABLES
 ! others
               Umean(Mloc,Nloc),Vmean(Mloc,Nloc),ETAmean(Mloc,Nloc),&
               Usum(Mloc,Nloc),Vsum(Mloc,Nloc),ETAsum(Mloc,Nloc), &
+              nu_smg(Mloc,Nloc), &
               nu_vis_v_x(Mloc,Nloc), &
               nu_vis_v_y(Mloc,Nloc), &
               nu_vis_v_r(Mloc,Nloc), &
@@ -372,6 +373,9 @@ SUBROUTINE INITIALIZATION
      Vmean = ZERO
      ETAmean = ZERO
      nu_smg = ZERO
+     nu_vis_v_x = ZERO
+     nu_vis_v_y = ZERO
+     nu_vis_v_r = ZERO
      Num_Zero_Up = 0
      WaveHeightRMS = ZERO
      WaveHeightAve =ZERO
