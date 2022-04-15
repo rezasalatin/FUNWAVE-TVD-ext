@@ -210,7 +210,7 @@ IF(WAVEMAKER(1:13)=='WK_NEW_DATA2D')THEN
 ENDIF
 
 
-! ----
+! ------------------------------------------------------------------------------
 
      nu_vis=ZERO
 	! ykchoi(08.18.2015)
@@ -219,29 +219,13 @@ ENDIF
 
       !IF(VISCOSITY_BREAKING)THEN
       IF(VISCOSITY_BREAKING .OR. WAVEMAKER_VIS)THEN
-
         nu_vis = nu_break
-
-!       DO J=Jbeg,Jend
-!       DO I=Ibeg,Iend
-!         nu_vis(I,J)=nu_break(I,J)
-!       ENDDO
-!       ENDDO
-
       ENDIF
 
 
      IF(DIFFUSION_SPONGE)THEN
 !    should include ghost cells 02/28/2017, fyshi
-
        nu_vis = nu_vis + nu_sponge
-
-!       DO J=Jbeg,Jend
-!       DO I=Ibeg,Iend
-!         nu_vis(I,J)=nu_vis(I,J)+nu_sponge(I,J)
-!       ENDDO
-!       ENDDO
-
      ENDIF
 
 107  format(500f12.6)
