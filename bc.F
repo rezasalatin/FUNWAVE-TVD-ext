@@ -5,7 +5,7 @@
 !      This file is part of the FUNWAVE-TVD program under the Simplified BSD license
 !
 !-------------------------------------------------------------------------------------
-! 
+!
 !    Copyright (c) 2016, FUNWAVE Development Team
 !
 !    (See http://www.udel.edu/kirby/programs/funwave/funwave.html
@@ -36,16 +36,16 @@
 !    ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 !    (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 !    SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
-!  
+!
 !    The views and conclusions contained in the software and documentation are those
 !    of the authors and should not be interpreted as representing official policies,
 !    either expressed or implied, of the FreeBSD Project.
-!  
+!
 !-------------------------------------------------------------------------------------
 !
 !    BOUNDARY_CONDITION is subroutine to provide boundary conditions at edges of domain
 !
-!    HISTORY: 
+!    HISTORY:
 !      05/06/2010 Fengyan Shi
 !      04/05/2011  Jeff Harris, corrected bugs in do-loop
 !
@@ -91,7 +91,7 @@ SUBROUTINE BOUNDARY_CONDITION
       Gx(Ibeg,J)=ZERO
       ENDDO
    ENDIF ! left bc wavemaker
-# endif 
+# endif
 
 # if defined (PARALLEL)
       endif
@@ -127,7 +127,7 @@ SUBROUTINE BOUNDARY_CONDITION
       Fx(Iend1,J)=0.5_SP*GRAV*(Xi*Xi*Gamma3+2.0_SP*Xi*Deps)
       Gx(Iend1,J)=ZERO
      ENDDO
-# endif 
+# endif
 
 # if defined (PARALLEL)
       endif
@@ -169,7 +169,7 @@ SUBROUTINE BOUNDARY_CONDITION
       Deps=Depthy(I,Jbeg)
       Gy(I,Jbeg)=0.5_SP*GRAV*(Xi*Xi*Gamma3+2.0_SP*Xi*Deps)
       ENDDO
-# endif  
+# endif
 
 # if defined (PARALLEL)
       endif
@@ -202,7 +202,7 @@ SUBROUTINE BOUNDARY_CONDITION
       Deps=Depthy(I,Jend1)
       Gy(I,Jend1)=0.5_SP*GRAV*(Xi*Xi*Gamma3+2.0_SP*Xi*Deps)
      ENDDO
-# endif 
+# endif
 # if defined (PARALLEL)
      endif
 # endif
@@ -216,7 +216,7 @@ SUBROUTINE BOUNDARY_CONDITION
 ! The problem is that the fluxes on the inter-processor boundaries may be
 !modified if the point next to the boundary (e.g., in the ghost cells,
 !managed by a different processor) is land, but as is the routine doesnt
-!check for this. 
+!check for this.
 
      DO j=Jbeg-1,Jend+1
      DO i=Ibeg-1,Iend+1
@@ -297,7 +297,7 @@ END SUBROUTINE BOUNDARY_CONDITION
 
 !-------------------------------------------------------------------
 !
-!   This subroutine is used to collect data into ghost cells                                                         
+!   This subroutine is used to collect data into ghost cells
 !
 !   HISTORY:
 !   07/09/2010 Fengyan Shi, use dummy variables 2) add vtype=3
@@ -330,7 +330,7 @@ SUBROUTINE EXCHANGE_DISPERSION
         VTYPE=2  ! like u
         CALL PHI_COLL(Mloc,Nloc,Ibeg,Iend,Jbeg,Jend,Nghost,ETATx,VTYPE,PERIODIC)
         VTYPE=3  ! like v
-        CALL PHI_COLL(Mloc,Nloc,Ibeg,Iend,Jbeg,Jend,Nghost,ETATy,VTYPE,PERIODIC) 
+        CALL PHI_COLL(Mloc,Nloc,Ibeg,Iend,Jbeg,Jend,Nghost,ETATy,VTYPE,PERIODIC)
       ELSE
         VTYPE=2
         CALL PHI_COLL(Mloc,Nloc,Ibeg,Iend,Jbeg,Jend,Nghost,Ut,VTYPE,PERIODIC)
@@ -348,8 +348,8 @@ SUBROUTINE EXCHANGE_DISPERSION
         CALL PHI_COLL(Mloc,Nloc,Ibeg,Iend,Jbeg,Jend,Nghost,Vtyy,VTYPE,PERIODIC)
 
         VTYPE=1
-        CALL PHI_COLL(Mloc,Nloc,Ibeg,Iend,Jbeg,Jend,Nghost,Utxy,VTYPE,PERIODIC) 
-        CALL PHI_COLL(Mloc,Nloc,Ibeg,Iend,Jbeg,Jend,Nghost,Vtxy,VTYPE,PERIODIC) 
+        CALL PHI_COLL(Mloc,Nloc,Ibeg,Iend,Jbeg,Jend,Nghost,Utxy,VTYPE,PERIODIC)
+        CALL PHI_COLL(Mloc,Nloc,Ibeg,Iend,Jbeg,Jend,Nghost,Vtxy,VTYPE,PERIODIC)
 
         VTYPE=2
         CALL PHI_COLL(Mloc,Nloc,Ibeg,Iend,Jbeg,Jend,Nghost,DUtxx,VTYPE,PERIODIC)
@@ -357,9 +357,9 @@ SUBROUTINE EXCHANGE_DISPERSION
         CALL PHI_COLL(Mloc,Nloc,Ibeg,Iend,Jbeg,Jend,Nghost,DVtyy,VTYPE,PERIODIC)
 
         VTYPE=1
-        CALL PHI_COLL(Mloc,Nloc,Ibeg,Iend,Jbeg,Jend,Nghost,DUtxy,VTYPE,PERIODIC) 
-        CALL PHI_COLL(Mloc,Nloc,Ibeg,Iend,Jbeg,Jend,Nghost,DVtxy,VTYPE,PERIODIC) 
-    
+        CALL PHI_COLL(Mloc,Nloc,Ibeg,Iend,Jbeg,Jend,Nghost,DUtxy,VTYPE,PERIODIC)
+        CALL PHI_COLL(Mloc,Nloc,Ibeg,Iend,Jbeg,Jend,Nghost,DVtxy,VTYPE,PERIODIC)
+
       ENDIF
 
       VTYPE=1  ! symetric in both direction
@@ -376,7 +376,7 @@ SUBROUTINE EXCHANGE_DISPERSION
       VTYPE=2  ! like u
       CALL PHI_COLL(Mloc,Nloc,Ibeg,Iend,Jbeg,Jend,Nghost,ETAx,VTYPE,PERIODIC)
       VTYPE=3  ! like v
-      CALL PHI_COLL(Mloc,Nloc,Ibeg,Iend,Jbeg,Jend,Nghost,ETAy,VTYPE,PERIODIC)   
+      CALL PHI_COLL(Mloc,Nloc,Ibeg,Iend,Jbeg,Jend,Nghost,ETAy,VTYPE,PERIODIC)
 
     ENDIF
 # else
@@ -407,20 +407,20 @@ SUBROUTINE EXCHANGE_DISPERSION
       VTYPE=2  ! like u
       CALL PHI_COLL(Mloc,Nloc,Ibeg,Iend,Jbeg,Jend,Nghost,ETAx,VTYPE)
       VTYPE=3  ! like v
-      CALL PHI_COLL(Mloc,Nloc,Ibeg,Iend,Jbeg,Jend,Nghost,ETAy,VTYPE)   
+      CALL PHI_COLL(Mloc,Nloc,Ibeg,Iend,Jbeg,Jend,Nghost,ETAy,VTYPE)
 # endif
-   
-    
+
+
 END SUBROUTINE EXCHANGE_DISPERSION
 
 !---------------------------------------------------------------------------------------
 !
-!   EXCHANGE subroutine is used to collect data into ghost cells                                                         
+!   EXCHANGE subroutine is used to collect data into ghost cells
 !
 !   HISTORY:
-!   07/09/2010 Fengyan Shi 
+!   07/09/2010 Fengyan Shi
 !     1) use dummy variables 2) add vtype=3
-!   08/19/2015 Choi, corrected segmentation fault, maybe memory leaking                                       
+!   08/19/2015 Choi, corrected segmentation fault, maybe memory leaking
 !
 !---------------------------------------------------------------------------------------
 SUBROUTINE EXCHANGE
@@ -438,8 +438,8 @@ SUBROUTINE EXCHANGE
     IF(VISCOSITY_BREAKING) THEN
 	CALL PHI_COLL(Mloc,Nloc,Ibeg,Iend,Jbeg,Jend,Nghost,AGE_BREAKING,VTYPE,PERIODIC)
     ENDIF
-    
-    !ykchoi (08.19.2015) :: new variable (WAVEMAKER_VIS) 	
+
+    !ykchoi (08.19.2015) :: new variable (WAVEMAKER_VIS)
     IF(VISCOSITY_BREAKING .OR. WAVEMAKER_VIS) THEN
 	CALL PHI_COLL(Mloc,Nloc,Ibeg,Iend,Jbeg,Jend,Nghost,nu_break,VTYPE,PERIODIC)
     ENDIF
@@ -450,8 +450,8 @@ SUBROUTINE EXCHANGE
     ENDIF
 
     rMASK = MASK ! for periodic boundary condition
-    CALL PHI_COLL(Mloc,Nloc,Ibeg,Iend,Jbeg,Jend,Nghost,rMASK,VTYPE,PERIODIC)  
-    MASK = rMASK  
+    CALL PHI_COLL(Mloc,Nloc,Ibeg,Iend,Jbeg,Jend,Nghost,rMASK,VTYPE,PERIODIC)
+    MASK = rMASK
 
     VTYPE=2
     CALL PHI_COLL(Mloc,Nloc,Ibeg,Iend,Jbeg,Jend,Nghost,U,VTYPE,PERIODIC)
@@ -480,7 +480,7 @@ SUBROUTINE EXCHANGE
     HV=HV*MASK
 
 # if defined (FILTERING)
-     filter_count = filter_count + 1 
+     filter_count = filter_count + 1
 # if defined (CARTESIAN)
      IF (filter_count > filter_interval) THEN
        filter_count =0
@@ -500,7 +500,7 @@ SUBROUTINE EXCHANGE
     H=Eta*Gamma3+Depth
 
      DO J=Jbeg,Jend
-     DO I=Ibeg,Iend   
+     DO I=Ibeg,Iend
        IF(MASK(I,J)==1)THEN
         HU(I,J)=Max(H(I,J),MinDepthFrc)*U(I,J)
         HV(I,J)=Max(H(I,J),MinDepthFrc)*V(I,J)
@@ -511,15 +511,15 @@ SUBROUTINE EXCHANGE
      ENDIF ! end filter_count
 # endif
 # endif
-    
+
 END SUBROUTINE EXCHANGE
 
 !-----------------------------------------------------------------------------------
 !
-!   PHI_COLL_VARIABLE_LENGTH subroutine is used to collect data into ghost cells                                                         
+!   PHI_COLL_VARIABLE_LENGTH subroutine is used to collect data into ghost cells
 !
 !   HISTORY:
-!   07/09/2010 Fengyan Shi                                      
+!   07/09/2010 Fengyan Shi
 !
 !-----------------------------------------------------------------------------------
 SUBROUTINE PHI_COLL_VARIABLE_LENGTH(Mloc,Nloc,Ibeg,Iend,Jbeg,Jend,Nghost,PHI,VTYPE)
@@ -544,7 +544,7 @@ SUBROUTINE PHI_COLL_VARIABLE_LENGTH(Mloc,Nloc,Ibeg,Iend,Jbeg,Jend,Nghost,PHI,VTY
     IF(WaveMaker(1:11)=='LEFT_BC_IRR')THEN
       ! do nothing
     ELSE
-      DO J=Jbeg,Jend  
+      DO J=Jbeg,Jend
       DO K=1,Nghost
         PHI(K,J)=PHI(Ibeg+Nghost-K,J)
       ENDDO
@@ -559,7 +559,7 @@ SUBROUTINE PHI_COLL_VARIABLE_LENGTH(Mloc,Nloc,Ibeg,Iend,Jbeg,Jend,Nghost,PHI,VTY
     if ( n_east .eq. MPI_PROC_NULL ) then
 # endif
 
-      DO J=Jbeg,Jend  
+      DO J=Jbeg,Jend
       DO K=1,Nghost
         PHI(Iend+K,J)=PHI(Iend-K+1,J)
       ENDDO
@@ -618,30 +618,37 @@ SUBROUTINE PHI_COLL(Mloc,Nloc,Ibeg,Iend,Jbeg,Jend,Nghost,PHI,VTYPE,PERIODIC)
 # else
 SUBROUTINE PHI_COLL(Mloc,Nloc,Ibeg,Iend,Jbeg,Jend,Nghost,PHI,VTYPE)
 # endif
+
     USE PARAM
     USE GLOBAL,ONLY : WaveMaker
+
 # if defined (COUPLING)
-    USE GLOBAL,ONLY : IN_DOMAIN_WEST,IN_DOMAIN_EAST,IN_DOMAIN_SOUTH,IN_DOMAIN_NORTH
+    USE GLOBAL,ONLY : IN_DOMAIN_WEST,IN_DOMAIN_EAST, &
+        IN_DOMAIN_SOUTH,IN_DOMAIN_NORTH
 # endif
+
 # if defined (PARALLEL)
 # if defined (COUPLING)
-    USE GLOBAL, ONLY : n_east,n_west,n_suth,n_nrth,&
-                     comm2d, ier,myid,PX,PY,&
-                       NumberProcessor,ProcessorID, &
+    USE GLOBAL, ONLY : n_east,n_west,n_suth,n_nrth, &
+        comm2d, ier,myid,PX,PY,&
+        NumberProcessor,ProcessorID, &
         IN_DOMAIN_WEST,IN_DOMAIN_EAST,IN_DOMAIN_SOUTH,IN_DOMAIN_NORTH
 # else
     USE GLOBAL, ONLY : n_east,n_west,n_suth,n_nrth, &
-                     comm2d, ier,myid,PX,PY,&
-                       NumberProcessor,ProcessorID
+        comm2d, ier,myid,PX,PY,&
+        NumberProcessor,ProcessorID
 # endif
 # endif
+
     IMPLICIT NONE
     INTEGER,INTENT(IN) :: VTYPE
     INTEGER,INTENT(IN) :: Mloc,Nloc,Ibeg,Iend,Jbeg,Jend,Nghost
     REAL(SP),INTENT(INOUT) :: PHI(Mloc,Nloc)
+
 # if defined (CARTESIAN)
     LOGICAL :: PERIODIC
 # endif
+
 # if defined (PARALLEL)
     INTEGER,DIMENSION(1) :: req
     INTEGER :: nreq,len,ll,l,II,JJ
@@ -652,610 +659,609 @@ SUBROUTINE PHI_COLL(Mloc,Nloc,Ibeg,Iend,Jbeg,Jend,Nghost,PHI,VTYPE)
 
 ! periodic first because it is not related to VTYPE
 # if defined (CARTESIAN)
-      IF(PERIODIC)THEN
+    IF(PERIODIC)THEN
 # if defined (PARALLEL)
-!   _____________________________ exchange
-    IF (PY>1)THEN
+! _____________________________ exchange
+        IF (PY>1)THEN
+            len=Mloc*Nghost
+            ! south
+            DO II = 1,PX
+                if(myid==ProcessorID(II,1)) then
+                    DO I = 1,Mloc
+                    DO J = 1,Nghost
+                        send2d(I,J)=PHI(I,J+Nghost)
+                    ENDDO
+                    ENDDO
+                    ! send from master
+                    call MPI_SEND(send2d,len,MPI_SP,ProcessorID(II,PY),0,MPI_COMM_WORLD,ier)
+                endif ! end myid
 
-      len=Mloc*Nghost
-! south
-    DO II = 1,PX
+                if(myid==ProcessorID(II,PY))then
+                    call MPI_IRECV(xx,len,MPI_SP,ProcessorID(II,1),0,MPI_COMM_WORLD,req(1),ier)
+                    call MPI_WAITALL(1,req,status,ier)
+                    DO I=1,Mloc
+                    DO J=1,Nghost
+                        PHI(I,Jend+J)=xx(I,J)
+                    ENDDO
+                    ENDDO
+                endif
 
-    if(myid==ProcessorID(II,1)) then
-      DO I = 1,Mloc
-      DO J = 1,Nghost
-        send2d(I,J)=PHI(I,J+Nghost)
-      ENDDO
-      ENDDO
+                ! north
+                if(myid==ProcessorID(II,PY)) then
+                    DO I = 1,Mloc
+                    DO J = 1,Nghost
+                        send2d(I,J)=PHI(I,Jend-Nghost+J)
+                    ENDDO
+                    ENDDO
+                    ! send from master
+                    call MPI_SEND(send2d,len,MPI_SP,ProcessorID(II,1),0,MPI_COMM_WORLD,ier)
+                endif ! end myid
 
-! send from master
-        call MPI_SEND(send2d,len,MPI_SP,ProcessorID(II,PY),0,MPI_COMM_WORLD,ier)
+                if(myid==ProcessorID(II,1))then
+                    call MPI_IRECV(xx,len,MPI_SP,ProcessorID(II,PY),0,MPI_COMM_WORLD,req(1),ier)
+                    call MPI_WAITALL(1,req,status,ier)
+                    DO I=1,Mloc
+                    DO J=1,Nghost
+                        PHI(I,J)=xx(I,J)
+                    ENDDO
+                    ENDDO
+                endif
+            ENDDO  ! end PX
 
-    endif ! end myid
-
-        if(myid==ProcessorID(II,PY))then
-        call MPI_IRECV(xx,len,MPI_SP,ProcessorID(II,1),0,MPI_COMM_WORLD,req(1),ier)
-        call MPI_WAITALL(1,req,status,ier)
-          DO I=1,Mloc
-          DO J=1,Nghost
-            PHI(I,Jend+J)=xx(I,J)
-          ENDDO
-          ENDDO
-        endif
-
-! north
-    if(myid==ProcessorID(II,PY)) then
-      DO I = 1,Mloc
-      DO J = 1,Nghost
-        send2d(I,J)=PHI(I,Jend-Nghost+J)
-      ENDDO
-      ENDDO
-! send from master
-        call MPI_SEND(send2d,len,MPI_SP,ProcessorID(II,1),0,MPI_COMM_WORLD,ier)
-    endif ! end myid
-
-        if(myid==ProcessorID(II,1))then
-        call MPI_IRECV(xx,len,MPI_SP,ProcessorID(II,PY),0,MPI_COMM_WORLD,req(1),ier)
-        call MPI_WAITALL(1,req,status,ier)
-          DO I=1,Mloc
-          DO J=1,Nghost
-            PHI(I,J)=xx(I,J)
-          ENDDO
-          ENDDO
-        endif
- 
-    ENDDO  ! end PX
-
-    ELSE  ! PY = 1
-      DO I = Ibeg,Iend
-      DO J = 1,Nghost
-       PHI(I,J) = PHI(I,Jend-Nghost+J)
-       PHI(I,Jend+J) = PHI(I,J+Nghost)
-      ENDDO
-      ENDDO
-    ENDIF
+        ELSE  ! PY = 1
+            DO I = Ibeg,Iend
+            DO J = 1,Nghost
+                PHI(I,J) = PHI(I,Jend-Nghost+J)
+                PHI(I,Jend+J) = PHI(I,J+Nghost)
+            ENDDO
+            ENDDO
+        ENDIF
 
 !   ----------------------------- end exchange
-# else 
+# else
+
 !    not parallel
         DO I=1,Mloc
         DO K=1,Nghost
-          PHI(I,K)=PHI(I,Jend-Nghost+K)
-          PHI(I,Jend+K)=PHI(I,Nghost+K)
+            PHI(I,K)=PHI(I,Jend-Nghost+K)
+            PHI(I,Jend+K)=PHI(I,Nghost+K)
         ENDDO
-        ENDDO        
-# endif 
+        ENDDO
+
+# endif
 ! end parallel
 
-    ENDIF ! end periodic 
+    ENDIF ! end periodic
 
-# endif 
+# endif
 ! end cartesian
 
-! I added coupling condition 10/14/2012
-!   add left_bc wavemaker 09/13/2017
+    ! I added coupling condition 10/14/2012
+    !   add left_bc wavemaker 09/13/2017
 
-! for Eta
+! ---------------------------- VTYPE = 1 -------------------------------
+    ! for Eta
     IF(VTYPE==1) THEN  ! for eta
-      ! x-direction
+
+        ! x-direction WEST
 # if defined (PARALLEL)
-    if ( n_west .eq. MPI_PROC_NULL ) then
-# endif
-
-# if defined (COUPLING)
-    IF(.NOT.IN_DOMAIN_WEST)THEN
-# endif
-
-    IF(WaveMaker(1:11)=='LEFT_BC_IRR')THEN
-      ! do nothing
-    ELSE
-      DO J=Jbeg,Jend  
-      DO K=1,Nghost
-        PHI(K,J)=PHI(Ibeg+Nghost-K,J)
-      ENDDO
-      ENDDO
-    ENDIF  ! end left bc wavemaker
-
-# if defined (COUPLING)
-    ENDIF
-# endif
-
-# if defined (PARALLEL)
-    endif
-# endif
-
-# if defined (PARALLEL)
-    if ( n_east .eq. MPI_PROC_NULL ) then
+        if ( n_west .eq. MPI_PROC_NULL ) then
 # endif
 # if defined (COUPLING)
-    IF(.NOT.IN_DOMAIN_EAST)THEN
+            IF(.NOT.IN_DOMAIN_WEST)THEN
 # endif
-      DO J=Jbeg,Jend  
-      DO K=1,Nghost
-        PHI(Iend+K,J)=PHI(Iend-K+1,J)
-      ENDDO
-      ENDDO
+                IF(WaveMaker(1:11)=='LEFT_BC_IRR')THEN
+                    ! do nothing
+                ELSE
+                    DO J=Jbeg,Jend
+                    DO K=1,Nghost
+                        PHI(K,J)=PHI(Ibeg+Nghost-K,J)
+                    ENDDO
+                    ENDDO
+                ENDIF  ! end left bc wavemaker
 # if defined (COUPLING)
-    ENDIF
+            ENDIF
 # endif
 # if defined (PARALLEL)
-    endif
+        endif
 # endif
 
-
-      ! y-direction and corners
-# if defined (CARTESIAN)
-      IF(.NOT.PERIODIC)THEN
-# endif 
+        ! x-direction EAST
 # if defined (PARALLEL)
-    if ( n_suth .eq. MPI_PROC_NULL ) then
+        if ( n_east .eq. MPI_PROC_NULL ) then
 # endif
 # if defined (COUPLING)
-    IF(.NOT.IN_DOMAIN_SOUTH)THEN
+            IF(.NOT.IN_DOMAIN_EAST)THEN
 # endif
-      DO I=1,Mloc
-      DO K=1,Nghost
-        PHI(I,K)=PHI(I,Jbeg+Nghost-K)
-      ENDDO
-      ENDDO
+                DO J=Jbeg,Jend
+                DO K=1,Nghost
+                  PHI(Iend+K,J)=PHI(Iend-K+1,J)
+                ENDDO
+                ENDDO
 # if defined (COUPLING)
-    ENDIF
+            ENDIF
 # endif
 # if defined (PARALLEL)
-    endif
+        endif
 # endif
 
-# if defined (PARALLEL)
-    if ( n_nrth .eq. MPI_PROC_NULL ) then
-# endif
-# if defined (COUPLING)
-    IF(.NOT.IN_DOMAIN_NORTH)THEN
-# endif
-      DO I=1,Mloc
-      DO K=1,Nghost
-        PHI(I,Jend+K)=PHI(I,Jend-K+1)
-      ENDDO
-      ENDDO
-# if defined (COUPLING)
-    ENDIF
-# endif
-# if defined (PARALLEL)
-    endif
-# endif
 
 # if defined (CARTESIAN)
-      ENDIF
+        IF(.NOT.PERIODIC)THEN
+# endif
+            ! y-direction and corners SOUTH
+# if defined (PARALLEL)
+            if ( n_suth .eq. MPI_PROC_NULL ) then
+# endif
+# if defined (COUPLING)
+                IF(.NOT.IN_DOMAIN_SOUTH)THEN
+# endif
+                    DO I=1,Mloc
+                    DO K=1,Nghost
+                        PHI(I,K)=PHI(I,Jbeg+Nghost-K)
+                    ENDDO
+                    ENDDO
+# if defined (COUPLING)
+                ENDIF
+# endif
+# if defined (PARALLEL)
+            endif
 # endif
 
-     ENDIF ! end vtype=1
+            ! y-direction and corners NORTH
+# if defined (PARALLEL)
+            if ( n_nrth .eq. MPI_PROC_NULL ) then
+# endif
+# if defined (COUPLING)
+                IF(.NOT.IN_DOMAIN_NORTH)THEN
+# endif
+                    DO I=1,Mloc
+                    DO K=1,Nghost
+                        PHI(I,Jend+K)=PHI(I,Jend-K+1)
+                    ENDDO
+                    ENDDO
+# if defined (COUPLING)
+                ENDIF
+# endif
+# if defined (PARALLEL)
+            endif
+# endif
 
-! for u
+# if defined (CARTESIAN)
+        ENDIF
+# endif
+
+    ENDIF ! end vtype=1
+
+! ---------------------------- VTYPE = 2 -------------------------------
+
+    ! for u
     IF(VTYPE==2) THEN  ! for u (x-mirror condition)
-      ! x-direction
+        ! x-direction
 # if defined (PARALLEL)
-    if ( n_west .eq. MPI_PROC_NULL ) then
+        if ( n_west .eq. MPI_PROC_NULL ) then
 # endif
 # if defined (COUPLING)
-    IF(.NOT.IN_DOMAIN_WEST)THEN
+            IF(.NOT.IN_DOMAIN_WEST)THEN
 # endif
-
-    IF(WaveMaker(1:11)=='LEFT_BC_IRR')THEN
-      ! do nothing
-    ELSE
-      DO J=Jbeg,Jend
-      DO K=1,Nghost
-        PHI(K,J)=-PHI(Ibeg+Nghost-K,J)
-      ENDDO
-      ENDDO
-    ENDIF ! end left_bc wavemaker
-
+                IF(WaveMaker(1:11)=='LEFT_BC_IRR')THEN
+                    ! do nothing
+                ELSE
+                    DO J=Jbeg,Jend
+                    DO K=1,Nghost
+                        PHI(K,J)=-PHI(Ibeg+Nghost-K,J)
+                    ENDDO
+                    ENDDO
+                ENDIF ! end left_bc wavemaker
 # if defined (COUPLING)
-    ENDIF
+            ENDIF
 # endif
 # if defined (PARALLEL)
-    endif
+        endif
 # endif
 
 # if defined (PARALLEL)
-    if ( n_east .eq. MPI_PROC_NULL ) then
+        if ( n_east .eq. MPI_PROC_NULL ) then
 # endif
 # if defined (COUPLING)
-    IF(.NOT.IN_DOMAIN_EAST)THEN
+            IF(.NOT.IN_DOMAIN_EAST)THEN
 # endif
-      DO J=Jbeg,Jend
-      DO K=1,Nghost
-        PHI(Iend+K,J)=-PHI(Iend-K+1,J)
-      ENDDO
-      ENDDO
+                DO J=Jbeg,Jend
+                DO K=1,Nghost
+                    PHI(Iend+K,J)=-PHI(Iend-K+1,J)
+                ENDDO
+                ENDDO
 # if defined (COUPLING)
-    ENDIF
+            ENDIF
 # endif
 # if defined (PARALLEL)
-    endif
+        endif
 # endif
 
 
       ! y-direction and corners
 # if defined (CARTESIAN)
-      IF(.NOT.PERIODIC)THEN
-# endif 
+        IF(.NOT.PERIODIC)THEN
+# endif
+# if defined (PARALLEL)
+            if ( n_suth .eq. MPI_PROC_NULL ) then
+# endif
+# if defined (COUPLING)
+                IF(.NOT.IN_DOMAIN_SOUTH)THEN
+# endif
+                    DO I=1,Mloc
+                    DO K=1,Nghost
+                        PHI(I,K)=PHI(I,Jbeg+Nghost-K)
+                    ENDDO
+                    ENDDO
+# if defined (COUPLING)
+                ENDIF
+# endif
+# if defined (PARALLEL)
+            endif
+# endif
 
 # if defined (PARALLEL)
-    if ( n_suth .eq. MPI_PROC_NULL ) then
+            if ( n_nrth .eq. MPI_PROC_NULL ) then
 # endif
 # if defined (COUPLING)
-    IF(.NOT.IN_DOMAIN_SOUTH)THEN
+                IF(.NOT.IN_DOMAIN_NORTH)THEN
 # endif
-      DO I=1,Mloc
-      DO K=1,Nghost
-        PHI(I,K)=PHI(I,Jbeg+Nghost-K)
-      ENDDO
-      ENDDO
+                    DO I=1,Mloc
+                    DO K=1,Nghost
+                        PHI(I,Jend+K)=PHI(I,Jend-K+1)
+                    ENDDO
+                    ENDDO
 # if defined (COUPLING)
-    ENDIF
+                ENDIF
 # endif
 # if defined (PARALLEL)
-    endif
-# endif
-
-# if defined (PARALLEL)
-    if ( n_nrth .eq. MPI_PROC_NULL ) then
-# endif
-# if defined (COUPLING)
-    IF(.NOT.IN_DOMAIN_NORTH)THEN
-# endif
-      DO I=1,Mloc
-      DO K=1,Nghost
-        PHI(I,Jend+K)=PHI(I,Jend-K+1)
-      ENDDO
-      ENDDO
-# if defined (COUPLING)
-    ENDIF
-# endif
-# if defined (PARALLEL)
-    endif
+            endif
 # endif
 
 # if defined (CARTESIAN)
-      ENDIF
+        ENDIF
 # endif
 
-     ENDIF ! end vtype=2
+    ENDIF ! end vtype=2
 
+! ---------------------------- VTYPE = 3 -------------------------------
     IF(VTYPE==3) THEN ! for v (y-mirror condition)
-! for v
-      ! x-direction
+        ! for v
+        ! x-direction
 # if defined (PARALLEL)
-    if ( n_west .eq. MPI_PROC_NULL ) then
+        if ( n_west .eq. MPI_PROC_NULL ) then
 # endif
 # if defined (COUPLING)
-    IF(.NOT.IN_DOMAIN_WEST)THEN
+            IF(.NOT.IN_DOMAIN_WEST)THEN
 # endif
 
-    IF(WaveMaker(1:11)=='LEFT_BC_IRR')THEN
-      ! do nothing
-    ELSE
-      DO J=Jbeg,Jend
-      DO K=1,Nghost
-        PHI(K,J)=PHI(Ibeg+Nghost-K,J)
-      ENDDO
-      ENDDO
-    ENDIF ! end left_bc wavemaker
+                IF(WaveMaker(1:11)=='LEFT_BC_IRR')THEN
+                    ! do nothing
+                ELSE
+                    DO J=Jbeg,Jend
+                    DO K=1,Nghost
+                      PHI(K,J)=PHI(Ibeg+Nghost-K,J)
+                    ENDDO
+                    ENDDO
+                ENDIF ! end left_bc wavemaker
 
 # if defined (COUPLING)
-    ENDIF
+            ENDIF
 # endif
 # if defined (PARALLEL)
-    endif
+        endif
 # endif
 
 # if defined (PARALLEL)
-    if ( n_east .eq. MPI_PROC_NULL ) then
+        if ( n_east .eq. MPI_PROC_NULL ) then
 # endif
 # if defined (COUPLING)
-    IF(.NOT.IN_DOMAIN_EAST)THEN
+            IF(.NOT.IN_DOMAIN_EAST)THEN
 # endif
-      DO J=Jbeg,Jend
-      DO K=1,Nghost
-        PHI(Iend+K,J)=PHI(Iend-K+1,J)
-      ENDDO
-      ENDDO
+                DO J=Jbeg,Jend
+                DO K=1,Nghost
+                    PHI(Iend+K,J)=PHI(Iend-K+1,J)
+                ENDDO
+                ENDDO
 # if defined (COUPLING)
-    ENDIF
+            ENDIF
 # endif
 # if defined (PARALLEL)
-    endif
+        endif
 # endif
-
 
       ! y-direction and corners
 # if defined (CARTESIAN)
-      IF(.NOT.PERIODIC)THEN
-# endif 
+        IF(.NOT.PERIODIC)THEN
+# endif
   ! end cartesian
 # if defined (PARALLEL)
-    if ( n_suth .eq. MPI_PROC_NULL ) then
+            if ( n_suth .eq. MPI_PROC_NULL ) then
 # endif
 # if defined (COUPLING)
-    IF(.NOT.IN_DOMAIN_SOUTH)THEN
+                IF(.NOT.IN_DOMAIN_SOUTH)THEN
 # endif
-      DO I=1,Mloc
-      DO K=1,Nghost
-        PHI(I,K)=-PHI(I,Jbeg+Nghost-K)
-      ENDDO
-      ENDDO
+                    DO I=1,Mloc
+                    DO K=1,Nghost
+                        PHI(I,K)=-PHI(I,Jbeg+Nghost-K)
+                    ENDDO
+                    ENDDO
 # if defined (COUPLING)
-    ENDIF
+                ENDIF
 # endif
 # if defined (PARALLEL)
-    endif
+            endif
 # endif
 
 # if defined (PARALLEL)
-    if ( n_nrth .eq. MPI_PROC_NULL ) then
+            if ( n_nrth .eq. MPI_PROC_NULL ) then
 # endif
 # if defined (COUPLING)
-    IF(.NOT.IN_DOMAIN_NORTH)THEN
+                IF(.NOT.IN_DOMAIN_NORTH)THEN
 # endif
-      DO I=1,Mloc
-      DO K=1,Nghost
-        PHI(I,Jend+K)=-PHI(I,Jend-K+1)
-      ENDDO
-      ENDDO
+                    DO I=1,Mloc
+                    DO K=1,Nghost
+                        PHI(I,Jend+K)=-PHI(I,Jend-K+1)
+                    ENDDO
+                    ENDDO
 # if defined (COUPLING)
-    ENDIF
+                ENDIF
 # endif
 # if defined (PARALLEL)
-    endif
+            endif
 # endif
 # if defined (CARTESIAN)
-      ENDIF
+        ENDIF
 # endif
 
-     ENDIF ! end vtype=3
+    ENDIF ! end vtype=3
+
+! ---------------------------- VTYPE = 4 -------------------------------
 
 ! for cross-derivatives
     IF(VTYPE==4) THEN ! VTYPE==4 for u and v cross-mirror
-     ! x-direction
+        ! x-direction
 # if defined (PARALLEL)
-    if ( n_west .eq. MPI_PROC_NULL ) then
+        if ( n_west .eq. MPI_PROC_NULL ) then
 # endif
 # if defined (COUPLING)
-    IF(.NOT.IN_DOMAIN_WEST)THEN
+            IF(.NOT.IN_DOMAIN_WEST)THEN
 # endif
-      DO J=Jbeg,Jend
-      DO K=1,Nghost
-        PHI(K,J)=ZERO
-      ENDDO
-      ENDDO
+                DO J=Jbeg,Jend
+                DO K=1,Nghost
+                    PHI(K,J)=ZERO
+                ENDDO
+                ENDDO
 # if defined (COUPLING)
-    ENDIF
+            ENDIF
 # endif
 # if defined (PARALLEL)
-    endif
+        endif
 # endif
 
 # if defined (PARALLEL)
-    if ( n_east .eq. MPI_PROC_NULL ) then
+        if ( n_east .eq. MPI_PROC_NULL ) then
 # endif
 # if defined (COUPLING)
-    IF(.NOT.IN_DOMAIN_EAST)THEN
+            IF(.NOT.IN_DOMAIN_EAST)THEN
 # endif
-      DO J=Jbeg,Jend
-      DO K=1,Nghost
-        PHI(Iend+K,J)=ZERO
-      ENDDO
-      ENDDO
+                DO J=Jbeg,Jend
+                DO K=1,Nghost
+                    PHI(Iend+K,J)=ZERO
+                ENDDO
+                ENDDO
 # if defined (COUPLING)
-    ENDIF
+            ENDIF
 # endif
 # if defined (PARALLEL)
-    endif
+        endif
 # endif
 
       ! y-direction and corners, this one is not an exact solution
 # if defined (PARALLEL)
-    if ( n_suth .eq. MPI_PROC_NULL ) then
+        if ( n_suth .eq. MPI_PROC_NULL ) then
 # endif
 # if defined (COUPLING)
-    IF(.NOT.IN_DOMAIN_SOUTH)THEN
+            IF(.NOT.IN_DOMAIN_SOUTH)THEN
 # endif
-      DO I=1,Mloc
-      DO K=1,Nghost
-        PHI(I,K)=ZERO
-      ENDDO
-      ENDDO
+                DO I=1,Mloc
+                DO K=1,Nghost
+                    PHI(I,K)=ZERO
+                ENDDO
+                ENDDO
 # if defined (COUPLING)
-    ENDIF
+            ENDIF
 # endif
 # if defined (PARALLEL)
-    endif
+        endif
 # endif
 
 # if defined (PARALLEL)
-    if ( n_nrth .eq. MPI_PROC_NULL ) then
+        if ( n_nrth .eq. MPI_PROC_NULL ) then
 # endif
 # if defined (COUPLING)
-    IF(.NOT.IN_DOMAIN_NORTH)THEN
+            IF(.NOT.IN_DOMAIN_NORTH)THEN
 # endif
-      DO I=1,Mloc
-      DO K=1,Nghost
-        PHI(I,Jend+K)=ZERO
-      ENDDO
-      ENDDO
+                DO I=1,Mloc
+                DO K=1,Nghost
+                    PHI(I,Jend+K)=ZERO
+                ENDDO
+                ENDDO
 # if defined (COUPLING)
-    ENDIF
+            ENDIF
 # endif
 # if defined (PARALLEL)
-    endif
+        endif
 # endif
 
+    ENDIF ! end vtype=4
 
-     ENDIF ! end vtype=4
+! ---------------------------- VTYPE = 5 -------------------------------
 
-! for symmetric
+    ! for symmetric
     IF(VTYPE==5)THEN
-      ! x-direction
+        ! x-direction
 # if defined (PARALLEL)
-    if ( n_west .eq. MPI_PROC_NULL ) then
+        if ( n_west .eq. MPI_PROC_NULL ) then
 # endif
 # if defined (COUPLING)
-    IF(.NOT.IN_DOMAIN_WEST)THEN
+            IF(.NOT.IN_DOMAIN_WEST)THEN
 # endif
-      DO J=Jbeg,Jend
-      DO K=1,Nghost
-        PHI(K,J)=PHI(Ibeg+Nghost-K,J)
-       ENDDO
-      ENDDO
+                DO J=Jbeg,Jend
+                DO K=1,Nghost
+                    PHI(K,J)=PHI(Ibeg+Nghost-K,J)
+                ENDDO
+                ENDDO
 # if defined (COUPLING)
-    ENDIF
+            ENDIF
 # endif
 # if defined (PARALLEL)
-    endif
+        endif
 # endif
 
 # if defined (PARALLEL)
-    if ( n_east .eq. MPI_PROC_NULL ) then
+        if ( n_east .eq. MPI_PROC_NULL ) then
 # endif
 # if defined (COUPLING)
-    IF(.NOT.IN_DOMAIN_EAST)THEN
+            IF(.NOT.IN_DOMAIN_EAST)THEN
 # endif
-      DO J=Jbeg,Jend
-      DO K=1,Nghost
-        PHI(Iend+K,J)=PHI(Iend-K+1,J)
-      ENDDO
-      ENDDO
+                DO J=Jbeg,Jend
+                DO K=1,Nghost
+                    PHI(Iend+K,J)=PHI(Iend-K+1,J)
+                ENDDO
+                ENDDO
 # if defined (COUPLING)
-    ENDIF
+            ENDIF
 # endif
 # if defined (PARALLEL)
-    endif
+        endif
 # endif
 
-      ! y-direction and corners
+        ! y-direction and corners
 
 # if defined (PARALLEL)
-    if ( n_suth .eq. MPI_PROC_NULL ) then
+        if ( n_suth .eq. MPI_PROC_NULL ) then
 # endif
 # if defined (COUPLING)
-    IF(.NOT.IN_DOMAIN_SOUTH)THEN
+            IF(.NOT.IN_DOMAIN_SOUTH)THEN
 # endif
-      DO I=1,Mloc
-      DO K=1,Nghost
-        PHI(I,K)=PHI(I,Jbeg+Nghost-K)
-      ENDDO
-      ENDDO
+                DO I=1,Mloc
+                DO K=1,Nghost
+                    PHI(I,K)=PHI(I,Jbeg+Nghost-K)
+                ENDDO
+                ENDDO
 # if defined (COUPLING)
-    ENDIF
+            ENDIF
 # endif
 # if defined (PARALLEL)
-    endif
-# endif
-
-# if defined (PARALLEL)
-    if ( n_nrth .eq. MPI_PROC_NULL ) then
-# endif
-# if defined (COUPLING)
-    IF(.NOT.IN_DOMAIN_NORTH)THEN
-# endif
-      DO I=1,Mloc
-      DO K=1,Nghost
-        PHI(I,Jend+K)=PHI(I,Jend-K+1)
-      ENDDO
-      ENDDO
-# if defined (COUPLING)
-    ENDIF
-# endif
-# if defined (PARALLEL)
-    endif
-# endif
-
-     ENDIF ! end vtype=5
-
-! for anti-symmetric
-     IF(VTYPE==6)THEN
-      ! x-direction
-# if defined (PARALLEL)
-    if ( n_west .eq. MPI_PROC_NULL ) then
-# endif
-# if defined (COUPLING)
-    IF(.NOT.IN_DOMAIN_WEST)THEN
-# endif
-      DO J=Jbeg,Jend
-      DO K=1,Nghost
-        PHI(K,J)=-PHI(Ibeg+Nghost-K,J)
-      ENDDO
-      ENDDO 
-# if defined (COUPLING)
-    ENDIF
-# endif
-# if defined (PARALLEL)
-    endif
+        endif
 # endif
 
 # if defined (PARALLEL)
-    if ( n_east .eq. MPI_PROC_NULL ) then
+        if ( n_nrth .eq. MPI_PROC_NULL ) then
 # endif
 # if defined (COUPLING)
-    IF(.NOT.IN_DOMAIN_EAST)THEN
+            IF(.NOT.IN_DOMAIN_NORTH)THEN
 # endif
-      DO J=Jbeg,Jend
-      DO K=1,Nghost
-        PHI(Iend+K,J)=-PHI(Iend-K+1,J)
-      ENDDO
-      ENDDO 
+                DO I=1,Mloc
+                DO K=1,Nghost
+                    PHI(I,Jend+K)=PHI(I,Jend-K+1)
+                ENDDO
+                ENDDO
 # if defined (COUPLING)
-    ENDIF
+            ENDIF
 # endif
 # if defined (PARALLEL)
-    endif
+        endif
 # endif
 
-      ! y-direction and corners
+    ENDIF ! end vtype=5
+
+! ---------------------------- VTYPE = 6 -------------------------------
+
+    ! for anti-symmetric
+    IF(VTYPE==6)THEN
+        ! x-direction
 # if defined (PARALLEL)
-    if ( n_suth .eq. MPI_PROC_NULL ) then
+        if ( n_west .eq. MPI_PROC_NULL ) then
 # endif
 # if defined (COUPLING)
-    IF(.NOT.IN_DOMAIN_SOUTH)THEN
+            IF(.NOT.IN_DOMAIN_WEST)THEN
 # endif
-      DO I=1,Mloc
-      DO K=1,Nghost
-        PHI(I,K)=-PHI(I,Jbeg+Nghost-K)
-      ENDDO
-      ENDDO   
+                DO J=Jbeg,Jend
+                DO K=1,Nghost
+                    PHI(K,J)=-PHI(Ibeg+Nghost-K,J)
+                ENDDO
+                ENDDO
 # if defined (COUPLING)
-    ENDIF
-# endif  
+            ENDIF
+# endif
 # if defined (PARALLEL)
-    endif
+        endif
 # endif
 
 # if defined (PARALLEL)
-    if ( n_nrth .eq. MPI_PROC_NULL ) then
+        if ( n_east .eq. MPI_PROC_NULL ) then
 # endif
 # if defined (COUPLING)
-    IF(.NOT.IN_DOMAIN_NORTH)THEN
+            IF(.NOT.IN_DOMAIN_EAST)THEN
 # endif
-      DO I=1,Mloc
-      DO K=1,Nghost
-        PHI(I,Jend+K)=-PHI(I,Jend-K+1)
-      ENDDO
-      ENDDO     
+                DO J=Jbeg,Jend
+                DO K=1,Nghost
+                    PHI(Iend+K,J)=-PHI(Iend-K+1,J)
+                ENDDO
+                ENDDO
 # if defined (COUPLING)
-    ENDIF
+            ENDIF
 # endif
 # if defined (PARALLEL)
-    endif
+        endif
 # endif
 
+    ! y-direction and corners
+# if defined (PARALLEL)
+        if ( n_suth .eq. MPI_PROC_NULL ) then
+# endif
+# if defined (COUPLING)
+            IF(.NOT.IN_DOMAIN_SOUTH)THEN
+# endif
+                DO I=1,Mloc
+                DO K=1,Nghost
+                    PHI(I,K)=-PHI(I,Jbeg+Nghost-K)
+                ENDDO
+                ENDDO
+# if defined (COUPLING)
+            ENDIF
+# endif
+# if defined (PARALLEL)
+        endif
+# endif
+
+# if defined (PARALLEL)
+        if ( n_nrth .eq. MPI_PROC_NULL ) then
+# endif
+# if defined (COUPLING)
+            IF(.NOT.IN_DOMAIN_NORTH)THEN
+# endif
+                DO I=1,Mloc
+                DO K=1,Nghost
+                    PHI(I,Jend+K)=-PHI(I,Jend-K+1)
+                ENDDO
+                ENDDO
+# if defined (COUPLING)
+            ENDIF
+# endif
+# if defined (PARALLEL)
+        endif
+# endif
 
     ENDIF ! end vtype=6
+
+! ---------------------------- END OF VTYPE ----------------------------
 
 # if defined (PARALLEL)
     call phi_exch (PHI)
 # endif
 
 END SUBROUTINE PHI_COLL
-
-
-
