@@ -72,11 +72,12 @@ SUBROUTINE SourceTerms
     REAL(SP), DIMENSION(NumWaveComp,1) :: BB1 ! for WK_TIME (optimized)
     REAL(SP), DIMENSION(NumFreq) :: BB2,CC2 ! for WK_DATA (optimized)
     INTEGER :: kf_index ! Chen, Salatin
-    ! Smagorinsky
+    ! eddy viscosity, Salatin
     REAL(SP),DIMENSION(Mloc,Mloc) :: temp_smg
     REAL(SP),DIMENSION(Mloc,Mloc),INTENT(OUT) :: nu_smg
     REAL(SP),INTENT(IN) :: C_smg
     REAL(SP),DIMENSION(Mloc,Mloc) :: tempX,tempY
+    INTEGER :: VTYPE
 
 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
@@ -256,8 +257,9 @@ SUBROUTINE SourceTerms
     ENDDO
     ENDDO
 
-    PHI_COLL(Mloc,Nloc,Ibeg,Iend,Jbeg,Jend,Nghost,tempX,1,PERIODIC)
-    PHI_COLL(Mloc,Nloc,Ibeg,Iend,Jbeg,Jend,Nghost,tempY,1,PERIODIC)
+    VTYPE = 1
+    PHI_COLL(Mloc,Nloc,Ibeg,Iend,Jbeg,Jend,Nghost,tempX,VTYPE,PERIODIC)
+    PHI_COLL(Mloc,Nloc,Ibeg,Iend,Jbeg,Jend,Nghost,tempY,VTYPE,PERIODIC)
 
 # endif
 # endif
