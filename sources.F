@@ -222,6 +222,7 @@ SUBROUTINE SourceTerms
     ! Sub-grid-scale Turbulence
     ! Horizontal Eddy viscosity
     temp_smg = SQRT(2.0*uMAx**2+2.0*vMAy**2+(uMAy+vMAx)*(uMAy+vMAx))
+    print *, 'hello from source 1.1'
     nu_smg = C_smg**2*DX*DY*temp_smg
 
     print *, 'hello from source 2'
