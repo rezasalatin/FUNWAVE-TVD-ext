@@ -254,12 +254,13 @@ SUBROUTINE SourceTerms
             -nu_smg(I-1,J)*0.5_SP/DY*(P(I-1,J+1)-P(I-1,J-1)))
     ENDDO
     ENDDO
-
+    print *, 'hello'
     VTYPE = 1
     CALL PHI_COLL(Mloc,Nloc,Ibeg,Iend,Jbeg,Jend,Nghost,&
         tempX,VTYPE,PERIODIC)
     CALL PHI_COLL(Mloc,Nloc,Ibeg,Iend,Jbeg,Jend,Nghost,&
         tempY,VTYPE,PERIODIC)
+    print *, 'hello again'
 
 # endif
 # endif
@@ -404,8 +405,8 @@ SUBROUTINE SourceTerms
         nu_smg_effectx(I,J) = tempX(I,J)
         nu_smg_effecty(I,J) = SourceX(I,J)
 
-        SourceX(I,J) = SourceX(I,J)! + tempX
-        SourceY(I,J) = SourceY(I,J)! + tempY
+        SourceX(I,J) = SourceX(I,J) ! + tempX
+        SourceY(I,J) = SourceY(I,J) ! + tempY
 
 # endif
 
