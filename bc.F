@@ -432,47 +432,63 @@ SUBROUTINE EXCHANGE
 # endif
 
 # if defined (CARTESIAN)
+! ---------------------------- VTYPE = 1 -------------------------------
     VTYPE=1
-    CALL PHI_COLL(Mloc,Nloc,Ibeg,Iend,Jbeg,Jend,Nghost,Eta,VTYPE,PERIODIC)
+    CALL PHI_COLL(Mloc,Nloc,Ibeg,Iend,Jbeg,Jend,Nghost,&
+        Eta,VTYPE,PERIODIC)
 
     IF(VISCOSITY_BREAKING) THEN
-	CALL PHI_COLL(Mloc,Nloc,Ibeg,Iend,Jbeg,Jend,Nghost,AGE_BREAKING,VTYPE,PERIODIC)
+        CALL PHI_COLL(Mloc,Nloc,Ibeg,Iend,Jbeg,Jend,Nghost,&
+            AGE_BREAKING,VTYPE,PERIODIC)
     ENDIF
 
     !ykchoi (08.19.2015) :: new variable (WAVEMAKER_VIS)
     IF(VISCOSITY_BREAKING .OR. WAVEMAKER_VIS) THEN
-	CALL PHI_COLL(Mloc,Nloc,Ibeg,Iend,Jbeg,Jend,Nghost,nu_break,VTYPE,PERIODIC)
+        CALL PHI_COLL(Mloc,Nloc,Ibeg,Iend,Jbeg,Jend,Nghost,&
+            nu_break,VTYPE,PERIODIC)
     ENDIF
 
     IF(VISCOSITY_BREAKING .OR. DIFFUSION_SPONGE .OR. WAVEMAKER_VIS)THEN
-      CALL PHI_COLL_VARIABLE_LENGTH(Mloc1,Nloc,Ibeg,Iend1,Jbeg,Jend,Nghost,P,VTYPE)
-      CALL PHI_COLL_VARIABLE_LENGTH(Mloc,Nloc1,Ibeg,Iend,Jbeg,Jend1,Nghost,Q,VTYPE)
+        CALL PHI_COLL_VARIABLE_LENGTH(Mloc1,Nloc,Ibeg,Iend1,Jbeg,Jend,&
+            Nghost,P,VTYPE)
+        CALL PHI_COLL_VARIABLE_LENGTH(Mloc,Nloc1,Ibeg,Iend,Jbeg,Jend1,&
+            Nghost,Q,VTYPE)
     ENDIF
 
     rMASK = MASK ! for periodic boundary condition
-    CALL PHI_COLL(Mloc,Nloc,Ibeg,Iend,Jbeg,Jend,Nghost,rMASK,VTYPE,PERIODIC)
+    CALL PHI_COLL(Mloc,Nloc,Ibeg,Iend,Jbeg,Jend,Nghost,&
+        rMASK,VTYPE,PERIODIC)
     MASK = rMASK
-
+! ---------------------------- VTYPE = 2 -------------------------------
     VTYPE=2
-    CALL PHI_COLL(Mloc,Nloc,Ibeg,Iend,Jbeg,Jend,Nghost,U,VTYPE,PERIODIC)
-    CALL PHI_COLL(Mloc,Nloc,Ibeg,Iend,Jbeg,Jend,Nghost,HU,VTYPE,PERIODIC)
+    CALL PHI_COLL(Mloc,Nloc,Ibeg,Iend,Jbeg,Jend,Nghost,&
+        U,VTYPE,PERIODIC)
+    CALL PHI_COLL(Mloc,Nloc,Ibeg,Iend,Jbeg,Jend,Nghost,&
+        HU,VTYPE,PERIODIC)
+! ---------------------------- VTYPE = 3 -------------------------------
     VTYPE=3
-    CALL PHI_COLL(Mloc,Nloc,Ibeg,Iend,Jbeg,Jend,Nghost,V,VTYPE,PERIODIC)
-    CALL PHI_COLL(Mloc,Nloc,Ibeg,Iend,Jbeg,Jend,Nghost,HV,VTYPE,PERIODIC)
+    CALL PHI_COLL(Mloc,Nloc,Ibeg,Iend,Jbeg,Jend,Nghost,&
+        V,VTYPE,PERIODIC)
+    CALL PHI_COLL(Mloc,Nloc,Ibeg,Iend,Jbeg,Jend,Nghost,&
+        HV,VTYPE,PERIODIC)
 # else
+! not cartesian
+! ---------------------------- VTYPE = 1 -------------------------------
     VTYPE=1
     CALL PHI_COLL(Mloc,Nloc,Ibeg,Iend,Jbeg,Jend,Nghost,Eta,VTYPE)
-
+! ---------------------------- VTYPE = 2 -------------------------------
     VTYPE=2
     CALL PHI_COLL(Mloc,Nloc,Ibeg,Iend,Jbeg,Jend,Nghost,U,VTYPE)
     CALL PHI_COLL(Mloc,Nloc,Ibeg,Iend,Jbeg,Jend,Nghost,HU,VTYPE)
+! ---------------------------- VTYPE = 3 -------------------------------
     VTYPE=3
     CALL PHI_COLL(Mloc,Nloc,Ibeg,Iend,Jbeg,Jend,Nghost,V,VTYPE)
     CALL PHI_COLL(Mloc,Nloc,Ibeg,Iend,Jbeg,Jend,Nghost,HV,VTYPE)
 # endif
+! ---------------------------- VTYPE END -------------------------------
 
-! etaR x mask is a wrong idea
-!    Eta=Eta*MASK
+!   etaR x mask is a wrong idea
+!   Eta=Eta*MASK
 
     U=U*MASK
     V=V*MASK
@@ -480,35 +496,38 @@ SUBROUTINE EXCHANGE
     HV=HV*MASK
 
 # if defined (FILTERING)
-     filter_count = filter_count + 1
+    filter_count = filter_count + 1
 # if defined (CARTESIAN)
-     IF (filter_count > filter_interval) THEN
-       filter_count =0
+    IF (filter_count > filter_interval) THEN
+        filter_count =0
+        CALL SHAPIRO_3(Mloc,Nloc,Nghost,MASK,Eta)
+        CALL SHAPIRO_3(Mloc,Nloc,Nghost,MASK,U)
+        CALL SHAPIRO_3(Mloc,Nloc,Nghost,MASK,V)
+! ---------------------------- VTYPE = 1 -------------------------------
+        VTYPE=1
+        CALL PHI_COLL(Mloc,Nloc,Ibeg,Iend,Jbeg,Jend,Nghost,&
+            Eta,VTYPE,PERIODIC)
+! ---------------------------- VTYPE = 2 -------------------------------
+        VTYPE=2
+        CALL PHI_COLL(Mloc,Nloc,Ibeg,Iend,Jbeg,Jend,Nghost,&
+            U,VTYPE,PERIODIC)
+! ---------------------------- VTYPE = 3 -------------------------------
+        VTYPE=3
+        CALL PHI_COLL(Mloc,Nloc,Ibeg,Iend,Jbeg,Jend,Nghost,&
+            V,VTYPE,PERIODIC)
+! ---------------------------- VTYPE END -------------------------------
+        H=Eta*Gamma3+Depth
 
-       CALL SHAPIRO_3(Mloc,Nloc,Nghost,MASK,Eta)
+        DO J=Jbeg,Jend
+        DO I=Ibeg,Iend
+            IF(MASK(I,J)==1)THEN
+                HU(I,J)=Max(H(I,J),MinDepthFrc)*U(I,J)
+                HV(I,J)=Max(H(I,J),MinDepthFrc)*V(I,J)
+            ENDIF
+        ENDDO
+        ENDDO
 
-       CALL SHAPIRO_3(Mloc,Nloc,Nghost,MASK,U)
-       CALL SHAPIRO_3(Mloc,Nloc,Nghost,MASK,V)
-
-    VTYPE=1
-    CALL PHI_COLL(Mloc,Nloc,Ibeg,Iend,Jbeg,Jend,Nghost,Eta,VTYPE,PERIODIC)
-    VTYPE=2
-    CALL PHI_COLL(Mloc,Nloc,Ibeg,Iend,Jbeg,Jend,Nghost,U,VTYPE,PERIODIC)
-    VTYPE=3
-    CALL PHI_COLL(Mloc,Nloc,Ibeg,Iend,Jbeg,Jend,Nghost,V,VTYPE,PERIODIC)
-
-    H=Eta*Gamma3+Depth
-
-     DO J=Jbeg,Jend
-     DO I=Ibeg,Iend
-       IF(MASK(I,J)==1)THEN
-        HU(I,J)=Max(H(I,J),MinDepthFrc)*U(I,J)
-        HV(I,J)=Max(H(I,J),MinDepthFrc)*V(I,J)
-       ENDIF
-     ENDDO
-     ENDDO
-
-     ENDIF ! end filter_count
+    ENDIF   ! end filter_count
 # endif
 # endif
 
@@ -522,7 +541,8 @@ END SUBROUTINE EXCHANGE
 !   07/09/2010 Fengyan Shi
 !
 !-----------------------------------------------------------------------------------
-SUBROUTINE PHI_COLL_VARIABLE_LENGTH(Mloc,Nloc,Ibeg,Iend,Jbeg,Jend,Nghost,PHI,VTYPE)
+SUBROUTINE PHI_COLL_VARIABLE_LENGTH(Mloc,Nloc,Ibeg,Iend,Jbeg,Jend,&
+    Nghost,PHI,VTYPE)
 
     USE PARAM
     USE GLOBAL,ONLY : WaveMaker
@@ -665,6 +685,8 @@ SUBROUTINE PHI_COLL(Mloc,Nloc,Ibeg,Iend,Jbeg,Jend,Nghost,PHI,VTYPE)
         IF (PY>1)THEN
             len=Mloc*Nghost
             ! south
+            ! put three points from lower boundary into upper boundary
+            ! ghost points
             DO II = 1,PX
                 if(myid==ProcessorID(II,1)) then
                     DO I = 1,Mloc
@@ -687,6 +709,8 @@ SUBROUTINE PHI_COLL(Mloc,Nloc,Ibeg,Iend,Jbeg,Jend,Nghost,PHI,VTYPE)
                 endif
 
                 ! north
+                ! put three points from uppermost boundary into
+                ! lower boundary ghost points
                 if(myid==ProcessorID(II,PY)) then
                     DO I = 1,Mloc
                     DO J = 1,Nghost
@@ -721,6 +745,8 @@ SUBROUTINE PHI_COLL(Mloc,Nloc,Ibeg,Iend,Jbeg,Jend,Nghost,PHI,VTYPE)
 # else
 
 !    not parallel
+        ! put three upper points into lower ghost points
+        ! then put three lowest points into upper ghost points
         DO I=1,Mloc
         DO K=1,Nghost
             PHI(I,K)=PHI(I,Jend-Nghost+K)
@@ -740,9 +766,9 @@ SUBROUTINE PHI_COLL(Mloc,Nloc,Ibeg,Iend,Jbeg,Jend,Nghost,PHI,VTYPE)
     !   add left_bc wavemaker 09/13/2017
 
 ! ---------------------------- VTYPE = 1 -------------------------------
+! x is symmetric - y is symmetric
     ! for Eta
     IF(VTYPE==1) THEN  ! for eta
-
         ! x-direction WEST
 # if defined (PARALLEL)
         if ( n_west .eq. MPI_PROC_NULL ) then
@@ -775,7 +801,7 @@ SUBROUTINE PHI_COLL(Mloc,Nloc,Ibeg,Iend,Jbeg,Jend,Nghost,PHI,VTYPE)
 # endif
                 DO J=Jbeg,Jend
                 DO K=1,Nghost
-                  PHI(Iend+K,J)=PHI(Iend-K+1,J)
+                    PHI(Iend+K,J)=PHI(Iend-K+1,J)
                 ENDDO
                 ENDDO
 # if defined (COUPLING)
@@ -785,6 +811,7 @@ SUBROUTINE PHI_COLL(Mloc,Nloc,Ibeg,Iend,Jbeg,Jend,Nghost,PHI,VTYPE)
         endif
 # endif
 
+        ! if cartesian then should not be periodic
 
 # if defined (CARTESIAN)
         IF(.NOT.PERIODIC)THEN
@@ -834,7 +861,7 @@ SUBROUTINE PHI_COLL(Mloc,Nloc,Ibeg,Iend,Jbeg,Jend,Nghost,PHI,VTYPE)
     ENDIF ! end vtype=1
 
 ! ---------------------------- VTYPE = 2 -------------------------------
-
+! x is asymmetric - y is symmetric
     ! for u
     IF(VTYPE==2) THEN  ! for u (x-mirror condition)
         ! x-direction
@@ -926,6 +953,7 @@ SUBROUTINE PHI_COLL(Mloc,Nloc,Ibeg,Iend,Jbeg,Jend,Nghost,PHI,VTYPE)
     ENDIF ! end vtype=2
 
 ! ---------------------------- VTYPE = 3 -------------------------------
+! x is symmetric - y is asymmetric
     IF(VTYPE==3) THEN ! for v (y-mirror condition)
         ! for v
         ! x-direction
@@ -1018,7 +1046,7 @@ SUBROUTINE PHI_COLL(Mloc,Nloc,Ibeg,Iend,Jbeg,Jend,Nghost,PHI,VTYPE)
     ENDIF ! end vtype=3
 
 ! ---------------------------- VTYPE = 4 -------------------------------
-
+! all ghost points equal to zero
 ! for cross-derivatives
     IF(VTYPE==4) THEN ! VTYPE==4 for u and v cross-mirror
         ! x-direction
@@ -1098,6 +1126,8 @@ SUBROUTINE PHI_COLL(Mloc,Nloc,Ibeg,Iend,Jbeg,Jend,Nghost,PHI,VTYPE)
     ENDIF ! end vtype=4
 
 ! ---------------------------- VTYPE = 5 -------------------------------
+! like VTYPE 1 but does not exclude LEFT_BC_IRR for x-dir
+! and does not include if CARTESIAN if periodic for the y-dir
 
     ! for symmetric
     IF(VTYPE==5)THEN
@@ -1179,6 +1209,8 @@ SUBROUTINE PHI_COLL(Mloc,Nloc,Ibeg,Iend,Jbeg,Jend,Nghost,PHI,VTYPE)
     ENDIF ! end vtype=5
 
 ! ---------------------------- VTYPE = 6 -------------------------------
+! like VTYPE 2 but does not exclude LEFT_BC_IRR for x-dir
+! and does not include if CARTESIAN if periodic for the y-dir
 
     ! for anti-symmetric
     IF(VTYPE==6)THEN

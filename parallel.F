@@ -5,7 +5,7 @@
 !      This file is part of the FUNWAVE-TVD program under the Simplified BSD license
 !
 !-------------------------------------------------------------------------------------
-! 
+!
 !    Copyright (c) 2016, FUNWAVE Development Team
 !
 !    (See http://www.udel.edu/kirby/programs/funwave/funwave.html
@@ -36,18 +36,18 @@
 !    ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 !    (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 !    SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
-!  
+!
 !    The views and conclusions contained in the software and documentation are those
 !    of the authors and should not be interpreted as representing official policies,
 !    either expressed or implied, of the FreeBSD Project.
-!  
+!
 !-------------------------------------------------------------------------------------
 # if defined (PARALLEL)
 !-------------------------------------------------------------------------------------
 !
 !    phi_exch is the subroutine to exchange variable at processor interface
-!    
-!    HISTORY: 
+!
+!    HISTORY:
 !      02/14/2011 Jeff Harris
 !      05/01/2011 Fengyan Shi, implemented into the TVD code
 !
@@ -57,12 +57,11 @@ SUBROUTINE phi_exch (PHI)
     USE GLOBAL
     IMPLICIT NONE
     REAL(SP),INTENT(INOUT) :: PHI(Mloc,Nloc)
-
     INTEGER,DIMENSION(MPI_STATUS_SIZE,4) :: status
     INTEGER,DIMENSION(4) :: req
     INTEGER :: nreq,len
-    REAL(SP),DIMENSION(Mloc,Nghost) :: rNmsg, sNmsg,rSmsg,sSmsg
-    REAL(SP),DIMENSION(Nloc,Nghost) :: rWmsg, sWmsg,rEmsg,sEmsg
+    REAL(SP),DIMENSION(Mloc,Nghost) :: rNmsg,sNmsg,rSmsg,sSmsg
+    REAL(SP),DIMENSION(Nloc,Nghost) :: rWmsg,sWmsg,rEmsg,sEmsg
 
 ! for east-west
 
@@ -70,30 +69,30 @@ SUBROUTINE phi_exch (PHI)
 
     nreq = 0
     if ( n_west .ne. MPI_PROC_NULL ) then
-       nreq = nreq + 1
-       call MPI_IRECV( rWmsg, len, MPI_SP, &
+        nreq = nreq + 1
+        call MPI_IRECV( rWmsg, len, MPI_SP, &
             n_west, 0, comm2d, req(nreq), ier )
-       do j = 1, Nloc
-       do i = 1, Nghost
-          sWmsg(j,i) = PHI(Ibeg+i-1,j)
-       enddo
-       enddo
-       nreq = nreq +1
-       call MPI_ISEND( sWmsg, len, MPI_SP, &
+        do j = 1, Nloc
+        do i = 1, Nghost
+            sWmsg(j,i) = PHI(Ibeg+i-1,j)
+        enddo
+        enddo
+        nreq = nreq +1
+        call MPI_ISEND( sWmsg, len, MPI_SP, &
             n_west, 1, comm2d, req(nreq), ier )
     endif
 
     if ( n_east .ne. MPI_PROC_NULL ) then
-       nreq = nreq + 1
-       call MPI_IRECV( rEmsg, len, MPI_SP, &
+        nreq = nreq + 1
+        call MPI_IRECV( rEmsg, len, MPI_SP, &
             n_east, 1, comm2d, req(nreq), ier )
-       do j = 1, Nloc
-       do i = 1, Nghost
-          sEmsg(j,i) = PHI(Iend-i+1,j)
-       enddo
-       enddo
-       nreq = nreq +1
-       call MPI_ISEND( sEmsg, len, MPI_SP, &
+        do j = 1, Nloc
+        do i = 1, Nghost
+            sEmsg(j,i) = PHI(Iend-i+1,j)
+        enddo
+        enddo
+        nreq = nreq +1
+        call MPI_ISEND( sEmsg, len, MPI_SP, &
             n_east, 0, comm2d, req(nreq), ier )
     endif
 
@@ -172,10 +171,10 @@ END SUBROUTINE phi_exch
 # if defined(PARALLEL)
 !-------------------------------------------------------------------------------------
 !
-!    phi_exch_variable_length is the subroutine 
+!    phi_exch_variable_length is the subroutine
 !    to exchange variable at processor interface, variable length
-!    
-!    HISTORY: 02/14/2011 Jeff Harris 
+!
+!    HISTORY: 02/14/2011 Jeff Harris
 !             05/01/2011 Fengyan Shi, implemented into the TVD code
 !
 !-------------------------------------------------------------------------------------
@@ -191,8 +190,8 @@ SUBROUTINE phi_exch_variable_length (PHI,Mloc,Nloc,Ibeg,Iend,Jbeg,Jend,Nghost)
     INTEGER,DIMENSION(MPI_STATUS_SIZE,4) :: status
     INTEGER,DIMENSION(4) :: req
     INTEGER :: nreq,len
-    REAL(SP),DIMENSION(Mloc,Nghost) :: rNmsg, sNmsg,rSmsg,sSmsg
-    REAL(SP),DIMENSION(Nloc,Nghost) :: rWmsg, sWmsg,rEmsg,sEmsg
+    REAL(SP),DIMENSION(Mloc,Nghost) :: rNmsg,sNmsg,rSmsg,sSmsg
+    REAL(SP),DIMENSION(Nloc,Nghost) :: rWmsg,sWmsg,rEmsg,sEmsg
 
 ! for east-west
 
@@ -305,7 +304,7 @@ END SUBROUTINE phi_exch_variable_length
 !-------------------------------------------------------------------------------------
 !
 !    phi_exch is the subroutine to exchange variable at processor interface
-!    
+!
 !    HISTORY: 02/14/2011 Jeff Harris
 !             05/01/2011 Fengyan Shi, implemented into the TVD code
 !
@@ -431,17 +430,17 @@ END SUBROUTINE phi_int_exch
 # if defined (PARALLEL)
 !-------------------------------------------------------------------------------------
 !
-!    DISTRIBUTE_VarGlob is subroutine to distribute global variable into local variable 
+!    DISTRIBUTE_VarGlob is subroutine to distribute global variable into local variable
 !
 !    HISTORY: 09/24/2011 Fengyan Shi
 !
 !-------------------------------------------------------------------------------------
 !-------------------------------------------------------------------------------------
 !
-!    DISTRIBUTE_VarGlob is subroutine to distribute global variable into local variable 
+!    DISTRIBUTE_VarGlob is subroutine to distribute global variable into local variable
 !
 !    HISTORY: 09/24/2011 Fengyan Shi
-!             05/08/2017 Young-Kwang Choi 
+!             05/08/2017 Young-Kwang Choi
 !-------------------------------------------------------------------------------------
 SUBROUTINE DISTRIBUTE_VarGlob(VarGlob,PHI)
      USE GLOBAL
@@ -527,7 +526,7 @@ SUBROUTINE DISTRIBUTE_VarGlob(VarGlob,PHI)
           deallocate( xx )
 
 	  elseif( myid == irank ) then
-	    
+
 	    lenx = Niend-Nista+1+2*Nghost
 	    leny = Njend-Njsta+1+2*Nghost
 	    lenxy = lenx*leny
@@ -543,5 +542,3 @@ SUBROUTINE DISTRIBUTE_VarGlob(VarGlob,PHI)
 END SUBROUTINE DISTRIBUTE_VarGlob
 
 # endif
-
-  
