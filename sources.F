@@ -218,11 +218,13 @@ SUBROUTINE SourceTerms
 # if defined (CARTESIAN)
 # if defined (MIXING)
 
-    print *, 'hello from source'
+    print *, 'hello from source 1'
     ! Sub-grid-scale Turbulence
     ! Horizontal Eddy viscosity
     temp_smg = SQRT(2.0*uMAx**2+2.0*vMAy**2+(uMAy+vMAx)*(uMAy+vMAx))
     nu_smg = C_smg**2*DX*DY*temp_smg
+
+    print *, 'hello from source 2'
 
     ! depth gradient term
     DO J=Jbeg,Jend
@@ -257,12 +259,15 @@ SUBROUTINE SourceTerms
     ENDDO
     ENDDO
 
+    print *, 'hello from source 3'
+
     VTYPE = 1
     CALL PHI_COLL(Mloc,Nloc,Ibeg,Iend,Jbeg,Jend,Nghost,&
         tempX,VTYPE,PERIODIC)
     CALL PHI_COLL(Mloc,Nloc,Ibeg,Iend,Jbeg,Jend,Nghost,&
         tempY,VTYPE,PERIODIC)
-    print *, 'hello again from source'
+
+    print *, 'hello again from source final'
 
 # endif
 # endif
