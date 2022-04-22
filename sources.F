@@ -74,7 +74,7 @@ SUBROUTINE SourceTerms
     INTEGER :: kf_index ! Chen, Salatin
     ! eddy viscosity, Salatin
     REAL(SP),DIMENSION(Mloc,Mloc) :: temp_smg
-    REAL(SP),DIMENSION(Mloc,Mloc),INTENT(OUT) :: nu_smg
+    REAL(SP),DIMENSION(Mloc,Mloc) :: nu_smg
     REAL(SP),INTENT(IN) :: C_smg
     REAL(SP),DIMENSION(Mloc,Mloc) :: tempX,tempY
     INTEGER :: VTYPE
