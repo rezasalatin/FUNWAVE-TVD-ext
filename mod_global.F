@@ -297,6 +297,7 @@ MODULE GLOBAL
       REAL(SP),DIMENSION(:,:,:),ALLOCATABLE :: Syx_temp
 ! Chen, Salatin, Oct 2021, moving average of u, v, eta, and vorticity
       REAL(SP),DIMENSION(:,:),ALLOCATABLE :: uMA,vMA
+      REAL(SP),DIMENSION(:,:),ALLOCATABLE :: uMAx,vMAx,uMAy,vMAy
       REAL(SP),DIMENSION(:,:,:),ALLOCATABLE :: U_Window, V_Window
       REAL(SP),DIMENSION(:,:),ALLOCATABLE :: eta_MA
       REAL(SP),DIMENSION(:,:,:),ALLOCATABLE :: eta_MA_temp
