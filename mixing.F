@@ -304,8 +304,6 @@ SUBROUTINE CALCULATE_MovingAverage(DT,M,N,U,V,ETA,MASK,DX,DY,Depth,&
 
     T_MA_Sum=T_MA_Sum+DT
 
-    print *, 'hello from moving average'
-
     IF(T_MA_Sum.GE.T_MA_STEP)THEN
         ! shift the window and make space for new variables
         IF(OUT_uvMA.OR.OUT_RadStr.OR.OUT_VorMA)THEN
@@ -366,6 +364,5 @@ SUBROUTINE CALCULATE_MovingAverage(DT,M,N,U,V,ETA,MASK,DX,DY,Depth,&
         ! go to next time step
         T_MA_Sum=T_MA_Sum-T_MA_STEP
 
-        print *, 'hello again from moving average'
     ENDIF
 END SUBROUTINE CALCULATE_MovingAverage
