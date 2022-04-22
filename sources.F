@@ -73,7 +73,6 @@ SUBROUTINE SourceTerms
     REAL(SP), DIMENSION(NumFreq) :: BB2,CC2 ! for WK_DATA (optimized)
     INTEGER :: kf_index ! Chen, Salatin
     ! eddy viscosity, Salatin
-    REAL(SP),DIMENSION(Mloc,Mloc) :: uMAx, uMAy, vMAx, vMAy
     REAL(SP),DIMENSION(Mloc,Mloc) :: temp_smg
     REAL(SP),DIMENSION(Mloc,Mloc) :: tempX,tempY
     INTEGER :: VTYPE
