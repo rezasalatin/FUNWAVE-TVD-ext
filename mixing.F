@@ -261,114 +261,105 @@ END SUBROUTINE CALCULATE_MEAN
 !
 !-------------------------------------------------------------------------------------
 SUBROUTINE CALCULATE_MovingAverage(DT,M,N,U,V,ETA,MASK,DX,DY,Depth,&
-     Ibeg,Iend,Jbeg,Jend, &
-     OUT_uvMA,OUT_VorMA,OUT_RadStr,OUT_etaMA,&
-     MA_Window,T_MA_Sum,T_MA_STEP,&
-     Syx_temp,Syx_x,U_Window,V_Window,uMA,vMA,eta_MA_temp,eta_MA,Vor_MA,&
-     C_smg,nu_smg,PERIODIC,Nghost,nu_vis_v_x,nu_vis_v_y,nu_vis_v_r,Cd)
+    Ibeg,Iend,Jbeg,Jend, &
+    OUT_uvMA,OUT_VorMA,OUT_RadStr,OUT_etaMA,&
+    MA_Window,T_MA_Sum,T_MA_STEP,&
+    Syx_temp,Syx_x,U_Window,V_Window,uMA,vMA,eta_MA_temp,eta_MA,Vor_MA,&
+    C_smg,nu_smg,PERIODIC,Nghost,nu_vis_v_x,nu_vis_v_y,nu_vis_v_r,Cd)
 
-     USE PARAM
-     IMPLICIT NONE
-     REAL(SP),INTENT(IN) :: DT
-     INTEGER, INTENT(IN) :: M,N,Ibeg,Iend,Jbeg,Jend
-     REAL(SP),DIMENSION(M,N),INTENT(IN)::U,V,ETA,Depth,MASK
-     REAL(SP),INTENT(IN) :: DX,DY
-     LOGICAL :: OUT_uvMA,OUT_VorMA,OUT_RadStr,OUT_etaMA
-     ! moving average, temporal properties
-     INTEGER, INTENT(IN) :: MA_Window
-     REAL(SP),INTENT(IN) :: T_MA_STEP
-     REAL(SP),INTENT(OUT) :: T_MA_Sum
-     ! moving average of current speed
-     REAL(SP),DIMENSION(M,N) :: U_temp1,V_temp1
-     REAL(SP),DIMENSION(M,N,MA_Window),INTENT(INOUT) :: U_Window,V_Window
-     REAL(SP),DIMENSION(M,N) :: U_Window_Sum,V_Window_Sum
-     REAL(SP),DIMENSION(M,N),INTENT(OUT) :: uMA,vMA
-     REAL(SP),DIMENSION(M,N) :: uMAx, uMAy, vMAx, vMAy
-     ! moving averaged of radiation shear stress
-     REAL(SP),DIMENSION(M,N,MA_Window),INTENT(INOUT) :: Syx_temp
-     REAL(SP),DIMENSION(M,N) :: Syx_temp_sum,Syx
-     REAL(SP),DIMENSION(M,N),INTENT(OUT) :: Syx_x
-     ! moving average of surface elevation
-     REAL(SP),DIMENSION(M,N,MA_Window),INTENT(INOUT) :: eta_MA_temp
-     REAL(SP),DIMENSION(M,N),INTENT(OUT) :: eta_MA
-     REAL(SP),DIMENSION(M,N) :: eta_MA_Sum
-     ! moving average of vorticity
-     REAL(SP),DIMENSION(M,N),INTENT(OUT) :: Vor_MA
-     ! Smagorinsky
-     REAL(SP),DIMENSION(M,N) :: temp_smg
-     REAL(SP),INTENT(IN) :: C_smg
-     REAL(SP),DIMENSION(M,N),INTENT(OUT) :: nu_smg
-     REAL(SP),DIMENSION(M,N),INTENT(OUT) :: nu_vis_v_x,nu_vis_v_y,nu_vis_v_r
-     REAL(SP),DIMENSION(M,N),INTENT(IN)  :: Cd
-     INTEGER :: VTYPE,Nghost
-     LOGICAL :: PERIODIC
+    USE PARAM
+    IMPLICIT NONE
+    REAL(SP),INTENT(IN) :: DT
+    INTEGER, INTENT(IN) :: M,N,Ibeg,Iend,Jbeg,Jend
+    REAL(SP),DIMENSION(M,N),INTENT(IN)::U,V,ETA,Depth,MASK
+    REAL(SP),INTENT(IN) :: DX,DY
+    LOGICAL :: OUT_uvMA,OUT_VorMA,OUT_RadStr,OUT_etaMA
+    ! moving average, temporal properties
+    INTEGER, INTENT(IN) :: MA_Window
+    REAL(SP),INTENT(IN) :: T_MA_STEP
+    REAL(SP),INTENT(OUT) :: T_MA_Sum
+    ! moving average of current speed
+    REAL(SP),DIMENSION(M,N) :: U_temp1,V_temp1
+    REAL(SP),DIMENSION(M,N,MA_Window),INTENT(INOUT) :: U_Window,V_Window
+    REAL(SP),DIMENSION(M,N) :: U_Window_Sum,V_Window_Sum
+    REAL(SP),DIMENSION(M,N),INTENT(OUT) :: uMA,vMA
+    REAL(SP),DIMENSION(M,N) :: uMAx, uMAy, vMAx, vMAy
+    ! moving averaged of radiation shear stress
+    REAL(SP),DIMENSION(M,N,MA_Window),INTENT(INOUT) :: Syx_temp
+    REAL(SP),DIMENSION(M,N) :: Syx_temp_sum,Syx
+    REAL(SP),DIMENSION(M,N),INTENT(OUT) :: Syx_x
+    ! moving average of surface elevation
+    REAL(SP),DIMENSION(M,N,MA_Window),INTENT(INOUT) :: eta_MA_temp
+    REAL(SP),DIMENSION(M,N),INTENT(OUT) :: eta_MA
+    REAL(SP),DIMENSION(M,N) :: eta_MA_Sum
+    ! moving average of vorticity
+    REAL(SP),DIMENSION(M,N),INTENT(OUT) :: Vor_MA
+    ! eddy viscosity
+    REAL(SP),DIMENSION(M,N),INTENT(OUT) :: nu_vis_v_x,nu_vis_v_y,nu_vis_v_r
+    REAL(SP),DIMENSION(M,N),INTENT(IN)  :: Cd
+    INTEGER :: VTYPE,Nghost
+    LOGICAL :: PERIODIC
 
-     T_MA_Sum=T_MA_Sum+DT
+    T_MA_Sum=T_MA_Sum+DT
 
-     IF(T_MA_Sum.GE.T_MA_STEP)THEN
-       ! shift the window and make space for new variables
-       IF(OUT_uvMA.OR.OUT_RadStr.OR.OUT_VorMA)THEN
-         U_Window = CSHIFT(U_Window,-1,3)
-         V_Window = CSHIFT(V_Window,-1,3)
-         ! replace oldest variable by the newest
-         U_Window(:,:,1) = U
-         V_Window(:,:,1) = V
-         ! only sum up the values within the window
-         U_Window_Sum = SUM(U_Window,3)
-         V_Window_Sum = SUM(V_Window,3)
-         ! do averaging
-         uMA = U_Window_Sum/MA_Window
-         vMA = V_Window_Sum/MA_Window
-         CALL DERIVATIVE_X(M,N,Ibeg,Iend,Jbeg,Jend,MASK,DX,vMA,vMAx)
-         CALL DERIVATIVE_Y(M,N,Ibeg,Iend,Jbeg,Jend,MASK,DY,vMA,vMAy)
-         CALL DERIVATIVE_X(M,N,Ibeg,Iend,Jbeg,Jend,MASK,DX,uMA,uMAx)
-         CALL DERIVATIVE_Y(M,N,Ibeg,Iend,Jbeg,Jend,MASK,DY,uMA,uMAy)
-         VTYPE=1  !in both directions
-         CALL PHI_COLL(M,N,Ibeg,Iend,Jbeg,Jend,Nghost,uMAx,VTYPE,PERIODIC)
-         CALL PHI_COLL(M,N,Ibeg,Iend,Jbeg,Jend,Nghost,vMAy,VTYPE,PERIODIC)
-         VTYPE=3  !like v
-         CALL PHI_COLL(M,N,Ibeg,Iend,Jbeg,Jend,Nghost,uMAy,VTYPE,PERIODIC)
-         Vtype=2  !like u
-         CALL PHI_COLL(M,N,Ibeg,Iend,Jbeg,Jend,Nghost,vMAx,VTYPE,PERIODIC)
+    IF(T_MA_Sum.GE.T_MA_STEP)THEN
+        ! shift the window and make space for new variables
+        IF(OUT_uvMA.OR.OUT_RadStr.OR.OUT_VorMA)THEN
+            U_Window = CSHIFT(U_Window,-1,3)
+            V_Window = CSHIFT(V_Window,-1,3)
+            ! replace oldest variable by the newest
+            U_Window(:,:,1) = U
+            V_Window(:,:,1) = V
+            ! only sum up the values within the window
+            U_Window_Sum = SUM(U_Window,3)
+            V_Window_Sum = SUM(V_Window,3)
+            ! do averaging
+            uMA = U_Window_Sum/MA_Window
+            vMA = V_Window_Sum/MA_Window
+            CALL DERIVATIVE_X(M,N,Ibeg,Iend,Jbeg,Jend,MASK,DX,vMA,vMAx)
+            CALL DERIVATIVE_Y(M,N,Ibeg,Iend,Jbeg,Jend,MASK,DY,vMA,vMAy)
+            CALL DERIVATIVE_X(M,N,Ibeg,Iend,Jbeg,Jend,MASK,DX,uMA,uMAx)
+            CALL DERIVATIVE_Y(M,N,Ibeg,Iend,Jbeg,Jend,MASK,DY,uMA,uMAy)
+            VTYPE=1  !in both directions
+            CALL PHI_COLL(M,N,Ibeg,Iend,Jbeg,Jend,Nghost,uMAx,VTYPE,PERIODIC)
+            CALL PHI_COLL(M,N,Ibeg,Iend,Jbeg,Jend,Nghost,vMAy,VTYPE,PERIODIC)
+            VTYPE=3  !like v
+            CALL PHI_COLL(M,N,Ibeg,Iend,Jbeg,Jend,Nghost,uMAy,VTYPE,PERIODIC)
+            Vtype=2  !like u
+            CALL PHI_COLL(M,N,Ibeg,Iend,Jbeg,Jend,Nghost,vMAx,VTYPE,PERIODIC)
 
-         ! Sub-grid-scale Turbulence
-         ! Horizontal Eddy viscosity
-         temp_smg = SQRT(2.0*uMAx**2+2.0*vMAy**2+(uMAy+vMAx)*(uMAy+vMAx))
-         nu_smg = C_smg**2*DX*DY*temp_smg
-         VTYPE=1
-         ! CALL PHI_COLL(M,N,Ibeg,Iend,Jbeg,Jend,Nghost,nu_smg,VTYPE,PERIODIC)
-         ! Vertical Eddy Viscosity
-         ! if you want to use orbital velocity (wave+current)
-         !nu_vis_v_x = 0.4/6.0*(Depth+Eta)*SQRT(Cd*abs(U)*SQRT(U*U+V*V))
-         !nu_vis_v_y = 0.4/6.0*(Depth+Eta)*SQRT(Cd*abs(V)*SQRT(U*U+V*V))
-         ! if you want to use current speed
-         nu_vis_v_x = 0.4/6.0*Depth*SQRT(Cd*abs(uMA)*SQRT(uMA*uMA+vMA*vMA))
-         nu_vis_v_y = 0.4/6.0*Depth*SQRT(Cd*abs(vMA)*SQRT(uMA*uMA+vMA*vMA))
-         nu_vis_v_r = SQRT(nu_vis_v_x**2+nu_vis_v_y**2)
-         ! subtracting average velocity from the instant velocity
-         U_temp1 = U - uMA
-         V_temp1 = V - vMA
-       ENDIF
-       IF(OUT_RadStr)THEN
-         ! Calculate the radiation shear stress
-         Syx_temp = CSHIFT(Syx_temp,-1,3)
-         Syx_temp(:,:,1) = RHO_WATER*U_temp1*V_temp1*(Depth+Eta)
-         Syx_temp_sum = SUM(Syx_temp,3)
-         Syx = Syx_temp_sum/MA_Window
-         CALL DERIVATIVE_X(M,N,Ibeg,Iend,Jbeg,Jend,MASK,DX,Syx,Syx_x)
-       ENDIF
-       IF(OUT_VorMA)THEN
-         ! moving average of vorticity
-         Vor_MA=vMAx-uMAy
-       ENDIF
-       IF(OUT_etaMA)THEN
-         ! moving average of the surface elevation
-         eta_MA_temp = CSHIFT(eta_MA_temp,-1,3)
-         eta_MA_temp(:,:,1) = ETA
-         eta_MA_Sum = SUM(eta_MA_temp,3)
-         eta_MA = eta_MA_Sum/MA_Window
-       ENDIF
-         ! go to next time step
-         T_MA_Sum=T_MA_Sum-T_MA_STEP
-     ENDIF
+            ! Vertical Eddy Viscosity
+            ! if you want to use orbital velocity (wave+current)
+            !nu_vis_v_x = 0.4/6.0*(Depth+Eta)*SQRT(Cd*abs(U)*SQRT(U*U+V*V))
+            !nu_vis_v_y = 0.4/6.0*(Depth+Eta)*SQRT(Cd*abs(V)*SQRT(U*U+V*V))
+            ! if you want to use current speed
+            nu_vis_v_x = 0.4/6.0*Depth*SQRT(Cd*abs(uMA)*SQRT(uMA*uMA+vMA*vMA))
+            nu_vis_v_y = 0.4/6.0*Depth*SQRT(Cd*abs(vMA)*SQRT(uMA*uMA+vMA*vMA))
+            nu_vis_v_r = SQRT(nu_vis_v_x**2+nu_vis_v_y**2)
+            ! subtracting average velocity from the instant velocity
+            U_temp1 = U - uMA
+            V_temp1 = V - vMA
+        ENDIF
+        IF(OUT_RadStr)THEN
+            ! Calculate the radiation shear stress
+            Syx_temp = CSHIFT(Syx_temp,-1,3)
+            Syx_temp(:,:,1) = RHO_WATER*U_temp1*V_temp1*(Depth+Eta)
+            Syx_temp_sum = SUM(Syx_temp,3)
+            Syx = Syx_temp_sum/MA_Window
+            CALL DERIVATIVE_X(M,N,Ibeg,Iend,Jbeg,Jend,MASK,DX,Syx,Syx_x)
+        ENDIF
+        IF(OUT_VorMA)THEN
+            ! moving average of vorticity
+            Vor_MA=vMAx-uMAy
+        ENDIF
+        IF(OUT_etaMA)THEN
+            ! moving average of the surface elevation
+            eta_MA_temp = CSHIFT(eta_MA_temp,-1,3)
+            eta_MA_temp(:,:,1) = ETA
+            eta_MA_Sum = SUM(eta_MA_temp,3)
+            eta_MA = eta_MA_Sum/MA_Window
+        ENDIF
+        ! go to next time step
+        T_MA_Sum=T_MA_Sum-T_MA_STEP
+    ENDIF
 END SUBROUTINE CALCULATE_MovingAverage

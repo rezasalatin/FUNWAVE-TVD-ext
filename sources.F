@@ -71,8 +71,12 @@ SUBROUTINE SourceTerms
     REAL(SP), DIMENSION(Nfreq) :: BB,CC     ! for WK_IRR (optimized)
     REAL(SP), DIMENSION(NumWaveComp,1) :: BB1 ! for WK_TIME (optimized)
     REAL(SP), DIMENSION(NumFreq) :: BB2,CC2 ! for WK_DATA (optimized)
-    REAL(SP) :: tempX,tempY
     INTEGER :: kf_index ! Chen, Salatin
+    ! Smagorinsky
+    REAL(SP),DIMENSION(Mloc,Mloc) :: temp_smg
+    REAL(SP),DIMENSION(Mloc,Mloc),INTENT(OUT) :: nu_smg
+    REAL(SP),INTENT(IN) :: C_smg
+    REAL(SP),DIMENSION(Mloc,Mloc) :: tempX,tempY
 
 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
@@ -212,6 +216,53 @@ SUBROUTINE SourceTerms
 
 107   format(500f12.6)
 
+# if defined (CARTESIAN)
+# if defined (MIXING)
+    ! Sub-grid-scale Turbulence
+    ! Horizontal Eddy viscosity
+    temp_smg = SQRT(2.0*uMAx**2+2.0*vMAy**2+(uMAy+vMAx)*(uMAy+vMAx))
+    nu_smg = C_smg**2*DX*DY*temp_smg
+
+    ! depth gradient term
+    DO J=Jbeg,Jend
+    DO I=Ibeg,Iend
+        tempX(I,J) = 1.0_SP/DX*( &
+            0.5_SP*(nu_smg(I,J)+nu_smg(I+1,J)) &
+            *1.0_SP/DX*(P(I+1,J)-P(I,J))  &
+            - 0.5_SP*(nu_smg(I,J)+nu_smg(I-1,J)) &
+            *1.0_SP/DX*(P(I,J)-P(I-1,J))) &
+            + 0.5_SP/DY*( &
+            0.5_SP*(nu_smg(I,J+1)+nu_smg(I,J)) &
+            *1.0_SP/DY*(P(I,J+1)-P(I,J)) &
+            -0.5_SP*(nu_smg(I,J-1)+nu_smg(I,J)) &
+            *1.0_SP/DY*(P(I,J)-P(I,J-1))) &
+            + 1.0_SP/DY*( &
+            nu_smg(I,J+1)*0.5_SP/DX*(Q(I+1,J+1)-Q(I-1,J+1)) &
+            -nu_smg(I,J-1)*0.5_SP/DX*(Q(I+1,J-1)-Q(I-1,J-1)))
+
+        tempY(I,J) = 1.0_SP/DY*( &
+            0.5_SP*(nu_smg(I,J)+nu_smg(I,J+1)) &
+            *1.0_SP/DY*(Q(I,J+1)-Q(I,J))  &
+            - 0.5_SP*(nu_smg(I,J)+nu_smg(I,J-1)) &
+            *1.0_SP/DY*(Q(I,J)-Q(I,J-1))) &
+            + 0.5_SP/DX*( &
+            0.5_SP*(nu_smg(I+1,J)+nu_smg(I,J)) &
+            *1.0_SP/DX*(Q(I+1,J)-Q(I,J)) &
+            -0.5_SP*(nu_smg(I-1,J)+nu_smg(I,J)) &
+            *1.0_SP/DX*(Q(I,J)-Q(I-1,J))) &
+            + 1.0_SP/DX*( &
+            nu_smg(I+1,J)*0.5_SP/DY*(P(I+1,J+1)-P(I+1,J-1)) &
+            -nu_smg(I-1,J)*0.5_SP/DY*(P(I-1,J+1)-P(I-1,J-1)))
+    ENDDO
+    ENDDO
+
+    PHI_COLL(Mloc,Nloc,Ibeg,Iend,Jbeg,Jend,Nghost,tempX,1,PERIODIC)
+    PHI_COLL(Mloc,Nloc,Ibeg,Iend,Jbeg,Jend,Nghost,tempY,1,PERIODIC)
+
+# endif
+# endif
+
+
     ! depth gradient term
     DO J=Jbeg,Jend
     DO I=Ibeg,Iend
@@ -347,39 +398,12 @@ SUBROUTINE SourceTerms
 # endif
 
 # if defined (MIXING)
-        tempX = 1.0_SP/DX*( &
-            0.5_SP*(nu_smg(I,J)+nu_smg(I+1,J)) &
-            *1.0_SP/DX*(P(I+1,J)-P(I,J))  &
-            - 0.5_SP*(nu_smg(I,J)+nu_smg(I-1,J)) &
-            *1.0_SP/DX*(P(I,J)-P(I-1,J))) &
-            + 0.5_SP/DY*( &
-            0.5_SP*(nu_smg(I,J+1)+nu_smg(I,J)) &
-            *1.0_SP/DY*(P(I,J+1)-P(I,J)) &
-            -0.5_SP*(nu_smg(I,J-1)+nu_smg(I,J)) &
-            *1.0_SP/DY*(P(I,J)-P(I,J-1))) &
-            + 1.0_SP/DY*( &
-            nu_smg(I,J+1)*0.5_SP/DX*(Q(I+1,J+1)-Q(I-1,J+1)) &
-            -nu_smg(I,J-1)*0.5_SP/DX*(Q(I+1,J-1)-Q(I-1,J-1)))
-        PHI_COLL(Mloc,Nloc,Ibeg,Iend,Jbeg,Jend,Nghost,&
-            tempX,1,PERIODIC)
-        nu_smg_effectx(I,J) = tempX
-        SourceX(I,J) = SourceX(I,J) + tempX
 
-        tempY = 1.0_SP/DY*( &
-            0.5_SP*(nu_smg(I,J)+nu_smg(I,J+1)) &
-            *1.0_SP/DY*(Q(I,J+1)-Q(I,J))  &
-            - 0.5_SP*(nu_smg(I,J)+nu_smg(I,J-1)) &
-            *1.0_SP/DY*(Q(I,J)-Q(I,J-1))) &
-            + 0.5_SP/DX*( &
-            0.5_SP*(nu_smg(I+1,J)+nu_smg(I,J)) &
-            *1.0_SP/DX*(Q(I+1,J)-Q(I,J)) &
-            -0.5_SP*(nu_smg(I-1,J)+nu_smg(I,J)) &
-            *1.0_SP/DX*(Q(I,J)-Q(I-1,J))) &
-            + 1.0_SP/DX*( &
-            nu_smg(I+1,J)*0.5_SP/DY*(P(I+1,J+1)-P(I+1,J-1)) &
-            -nu_smg(I-1,J)*0.5_SP/DY*(P(I-1,J+1)-P(I-1,J-1)))
+        nu_smg_effectx(I,J) = tempX(I,J)
         nu_smg_effecty(I,J) = SourceX(I,J)
-        SourceY(I,J) = SourceY(I,J) + tempY
+
+        SourceX(I,J) = SourceX(I,J)! + tempX
+        SourceY(I,J) = SourceY(I,J)! + tempY
 
 # endif
 
