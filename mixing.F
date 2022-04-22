@@ -336,7 +336,7 @@ SUBROUTINE CALCULATE_MovingAverage(DT,M,N,U,V,ETA,MASK,DX,DY,Depth,&
          temp_smg = SQRT(2.0*uMAx**2+2.0*vMAy**2+(uMAy+vMAx)*(uMAy+vMAx))
          nu_smg = C_smg**2*DX*DY*temp_smg
          VTYPE=1
-         ! CALL PHI_COLL(M,N,Ibeg,Iend,Jbeg,Jend,Nghost,nu_smg,VTYPE,PERIODIC)
+         CALL PHI_COLL(M,N,Ibeg,Iend,Jbeg,Jend,Nghost,nu_smg,VTYPE,PERIODIC)
          ! Vertical Eddy Viscosity
          ! if you want to use orbital velocity (wave+current)
          !nu_vis_v_x = 0.4/6.0*(Depth+Eta)*SQRT(Cd*abs(U)*SQRT(U*U+V*V))
