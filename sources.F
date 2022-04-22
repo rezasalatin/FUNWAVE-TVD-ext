@@ -258,8 +258,10 @@ SUBROUTINE SourceTerms
     ENDDO
 
     VTYPE = 1
-    PHI_COLL(Mloc,Nloc,Ibeg,Iend,Jbeg,Jend,Nghost,tempX,VTYPE,PERIODIC)
-    PHI_COLL(Mloc,Nloc,Ibeg,Iend,Jbeg,Jend,Nghost,tempY,VTYPE,PERIODIC)
+    CALL PHI_COLL(Mloc,Nloc,Ibeg,Iend,Jbeg,Jend,Nghost,&
+        tempX,VTYPE,PERIODIC)
+    CALL PHI_COLL(Mloc,Nloc,Ibeg,Iend,Jbeg,Jend,Nghost,&
+        tempY,VTYPE,PERIODIC)
 
 # endif
 # endif
