@@ -410,10 +410,10 @@ SUBROUTINE SourceTerms
         ! new variable :: WAVEMAKER_VIS
         !IF(VISCOSITY_BREAKING.OR.DIFFUSION_SPONGE)THEN
         IF(VISCOSITY_BREAKING.OR.DIFFUSION_SPONGE.OR.WAVEMAKER_VIS)THEN
-            IF(PQ_scheme)THEN
+            IF( .NOT. PQ_scheme)THEN
                 ! it turns out P and Q are not exchanged at processor
                 ! interface. it affects edges, make PQ_scheme=false
-                SourceX(I,J) = SourceX(I,J) + 0.5_SP/DX*( &
+                tempX_vis(I,J) = 0.5_SP/DX*( &
                     nu_vis(I+1,J)* &
                     1.0_SP/DX*(P(I+2,J)-P(I+1,J)) &
                     -nu_vis(I-1,J)* &
@@ -423,8 +423,9 @@ SUBROUTINE SourceTerms
                     0.5_SP/DY*(P(I,J+1)+P(I+1,J+1)-P(I,J)-P(I+1,J)) &
                     -0.5_SP*(nu_vis(I,J-1)+nu_vis(I,J))* &
                     0.5_SP/DY*(P(I,J)+P(I+1,J)-P(I,J-1)-P(I+1,J-1)) )
+                SourceX(I,J) = SourceX(I,J) + tempX_vis(I,J)
 
-                SourceY(I,J) = SourceY(I,J) + 0.5_SP/DY*( &
+                tempY_vis(I,J) = 0.5_SP/DY*( &
                     nu_vis(I,J+1)* &
                     1.0_SP/DY*(Q(I,J+2)-Q(I,J+1)) &
                     -nu_vis(I,J-1)* &
@@ -434,6 +435,7 @@ SUBROUTINE SourceTerms
                     0.5_SP/DX*(Q(I+1,J)+Q(I+1,J+1)-Q(I,J)-Q(I,J+1)) &
                     -0.5_SP*(nu_vis(I-1,J)+nu_vis(I,J))* &
                     0.5_SP/DX*(Q(I,J)+Q(I,J+1)-Q(I-1,J)-Q(I-1,J+1)) )
+                SourceY(I,J) = SourceY(I,J) + tempY_vis(I,J)
 
             ELSE
 
