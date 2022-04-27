@@ -74,7 +74,8 @@ SUBROUTINE SourceTerms
     INTEGER :: kf_index ! Chen, Salatin
     ! eddy viscosity, Salatin
     REAL(SP),DIMENSION(Mloc,Nloc) :: temp_smg
-    REAL(SP),DIMENSION(Mloc,Nloc) :: tempX,tempY
+    ! temp files for sourceX and sourceY
+    REAL(SP),DIMENSION(Mloc,Nloc) :: tempX,tempY,tempX_vis,tempY_vis
     INTEGER :: VTYPE
 
 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
@@ -256,12 +257,6 @@ SUBROUTINE SourceTerms
     ENDDO
     ENDDO
 
-# if defined (PARALLEL)
-    VTYPE=1  !in both directions
-    CALL PHI_COLL(Mloc,Nloc,Ibeg,Iend,Jbeg,Jend,Nghost,tempX,VTYPE,PERIODIC)
-    CALL PHI_COLL(Mloc,Nloc,Ibeg,Iend,Jbeg,Jend,Nghost,tempY,VTYPE,PERIODIC)
-# endif
-
 # endif
 # endif
 
@@ -402,8 +397,8 @@ SUBROUTINE SourceTerms
 
 # if defined (MIXING)
 
-        nu_smg_effectx(I,J) = tempX(I,J)
-        nu_smg_effecty(I,J) = tempY(I,J)
+        !nu_smg_effectx(I,J) = tempX(I,J)
+        !nu_smg_effecty(I,J) = tempY(I,J)
 
         SourceX(I,J) = SourceX(I,J) ! + tempX
         SourceY(I,J) = SourceY(I,J) ! + tempY
@@ -442,7 +437,7 @@ SUBROUTINE SourceTerms
 
             ELSE
 
-                SourceX(I,J) = SourceX(I,J) + 0.5_SP/DX*( &
+                tempX_vis(I,J) = 0.5_SP/DX*( &
                     (nu_vis(I+1,J)+nu_vis(I,J)) &
                     *1.0_SP/DX*(HU(I+1,J)-HU(I,J)) &
                     -(nu_vis(I-1,J)+nu_vis(I,J)) &
@@ -452,8 +447,9 @@ SUBROUTINE SourceTerms
                     *1.0_SP/DY*(HU(I,J+1)-HU(I,J)) &
                     -(nu_vis(I,J-1)+nu_vis(I,J)) &
                     *1.0_SP/DY*(HU(I,J)-HU(I,J-1)) )
+                SourceX(I,J) = SourceX(I,J) + tempX_vis(I,J)
 
-                SourceY(I,J) = SourceY(I,J) + 0.5_SP/DX*( &
+                tempY_vis(I,J) = 0.5_SP/DX*( &
                     (nu_vis(I+1,J)+nu_vis(I,J)) &
                     *1.0_SP/DX*(HV(I+1,J)-HV(I,J)) &
                     -(nu_vis(I-1,J)+nu_vis(I,J)) &
@@ -463,8 +459,11 @@ SUBROUTINE SourceTerms
                     *1.0_SP/DY*(HV(I,J+1)-HV(I,J)) &
                     -(nu_vis(I,J-1)+nu_vis(I,J)) &
                     *1.0_SP/DY*(HV(I,J)-HV(I,J-1)) )
+                SourceY(I,J) = SourceY(I,J) + tempY_vis(I,J)
             ENDIF ! end pq_scheme
         ENDIF  ! end eddy viscosity breaking
+
+        nu_smg_effectx(I,J) = tempX_vis(I,J)
 # else
 
 ! second order, move the second term to left-hand side
