@@ -262,12 +262,6 @@ SUBROUTINE SourceTerms
     ENDDO
     ENDDO
 
-    VTYPE = 1
-    CALL PHI_COLL(Mloc,Nloc,Ibeg,Iend,Jbeg,Jend,Nghost,&
-        tempX,VTYPE,PERIODIC)
-    CALL PHI_COLL(Mloc,Nloc,Ibeg,Iend,Jbeg,Jend,Nghost,&
-        tempY,VTYPE,PERIODIC)
-
 # endif
 # endif
 
@@ -408,8 +402,8 @@ SUBROUTINE SourceTerms
 
 # if defined (MIXING)
 
-        nu_smg_effectx(I,J) = P(I,J)
-        nu_smg_effecty(I,J) = Q(I,J)
+        nu_smg_effectx(I,J) = tempX
+        nu_smg_effecty(I,J) = tempY
 
         SourceX(I,J) = SourceX(I,J) ! + tempX
         SourceY(I,J) = SourceY(I,J) ! + tempY
