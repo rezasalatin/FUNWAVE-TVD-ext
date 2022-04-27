@@ -225,7 +225,7 @@ SUBROUTINE SourceTerms
 
     DO J=Jbeg,Jend
     DO I=Ibeg,Iend
-        P(I,J) = 0.1
+        !P(I,J) = 0.1
     ENDDO
     ENDDO
 
@@ -408,8 +408,8 @@ SUBROUTINE SourceTerms
 
 # if defined (MIXING)
 
-        nu_smg_effectx(I,J) = tempX(I,J)
-        nu_smg_effecty(I,J) = SourceX(I,J)
+        nu_smg_effectx(I,J) = P(I,J)
+        nu_smg_effecty(I,J) = Q(I,J)
 
         SourceX(I,J) = SourceX(I,J) ! + tempX
         SourceY(I,J) = SourceY(I,J) ! + tempY
