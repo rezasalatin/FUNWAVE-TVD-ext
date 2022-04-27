@@ -257,8 +257,9 @@ SUBROUTINE SourceTerms
     ENDDO
 
 # if defined (PARALLEL)
-    CALL phi_exch(tempX)
-    CALL phi_exch(tempY)
+    VTYPE=1  !in both directions
+    CALL PHI_COLL(Mloc,Nloc,Ibeg,Iend,Jbeg,Jend,Nghost,tempX,VTYPE,PERIODIC)
+    CALL PHI_COLL(Mloc,Nloc,Ibeg,Iend,Jbeg,Jend,Nghost,tempY,VTYPE,PERIODIC)
 # endif
 
 # endif
