@@ -402,8 +402,8 @@ SUBROUTINE SourceTerms
 
 # if defined (MIXING)
 
-        nu_smg_effectx(I,J) = tempX
-        nu_smg_effecty(I,J) = tempY
+        nu_smg_effectx(I,J) = tempX(I,J)
+        nu_smg_effecty(I,J) = tempY(I,J)
 
         SourceX(I,J) = SourceX(I,J) ! + tempX
         SourceY(I,J) = SourceY(I,J) ! + tempY
