@@ -262,6 +262,11 @@ SUBROUTINE SourceTerms
     ENDDO
     ENDDO
 
+# if defined (PARALLEL)
+    CALL phi_exch(tempX)
+    CALL phi_exch(tempY)
+# endif
+
 # endif
 # endif
 
