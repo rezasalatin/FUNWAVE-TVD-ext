@@ -225,7 +225,7 @@ SUBROUTINE SourceTerms
 
     DO J=Jbeg,Jend
     DO I=Ibeg,Iend
-        nu_smg(I,J) = 0.002
+        P(I,J) = 0.1
     ENDDO
     ENDDO
 
