@@ -223,15 +223,9 @@ SUBROUTINE SourceTerms
     temp_smg = SQRT(2.0*uMAx**2+2.0*vMAy**2+(uMAy+vMAx)*(uMAy+vMAx))
     nu_smg = C_smg**2*DX*DY*temp_smg
 
-    DO J=Jbeg,Jend
-    DO I=Ibeg,Iend
-        !P(I,J) = 0.1
-    ENDDO
-    ENDDO
-
     ! depth gradient term
-    DO J=Jbeg,Jend
-    DO I=Ibeg,Iend
+    DO J=1,Nloc
+    DO I=1,Mloc
         tempX(I,J) = 1.0_SP/DX*( &
             0.5_SP*(nu_smg(I,J)+nu_smg(I+1,J)) &
             *1.0_SP/DX*(P(I+1,J)-P(I,J))  &
