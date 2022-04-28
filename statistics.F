@@ -5,7 +5,7 @@
 !      This file is part of the FUNWAVE-TVD program under the Simplified BSD license
 !
 !-------------------------------------------------------------------------------------
-! 
+!
 !    Copyright (c) 2016, FUNWAVE Development Team
 !
 !    (See http://www.udel.edu/kirby/programs/funwave/funwave.html
@@ -36,128 +36,128 @@
 !    ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 !    (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 !    SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
-!  
+!
 !    The views and conclusions contained in the software and documentation are those
 !    of the authors and should not be interpreted as representing official policies,
 !    either expressed or implied, of the FreeBSD Project.
-!  
+!
 !-------------------------------------------------------------------------------------
 !
 !    STATISTICS is subroutine to calculate statistics
 !
-!    HISTORY: 
+!    HISTORY:
 !       05/06/2010 Fengyan Shi
 !
 !-------------------------------------------------------------------------------------
 SUBROUTINE STATISTICS
-     USE GLOBAL
-     IMPLICIT NONE
+  USE GLOBAL
+  IMPLICIT NONE
 
-     REAL(SP)::MassVolume=ZERO,Energy=ZERO,MaxEta=ZERO,MinEta=ZERO, &
-              MaxU=ZERO,MaxV=ZERO,Fr=ZERO,UTotal=ZERO,UTotalMax=ZERO, &
-	      MaxM=ZERO
-     REAL(SP)::MassVolume0
-     LOGICAL :: FirstCallStatistics = .TRUE.
-     SAVE FirstCallStatistics
+  REAL(SP)::MassVolume=ZERO,Energy=ZERO,MaxEta=ZERO,MinEta=ZERO, &
+  MaxU=ZERO,MaxV=ZERO,Fr=ZERO,UTotal=ZERO,UTotalMax=ZERO, &
+  MaxM=ZERO
+  REAL(SP)::MassVolume0
+  LOGICAL :: FirstCallStatistics = .TRUE.
+  SAVE FirstCallStatistics
 # if defined (PARALLEL)
-     REAL(SP)::myvar
+  REAL(SP)::myvar
 # endif
-!
+  !
 
 
-     MassVolume=ZERO
-     Energy=ZERO
-     UTotalMax=ZERO
+  MassVolume=ZERO
+  Energy=ZERO
+  UTotalMax=ZERO
 
-     DO J=Jbeg,Jend
-     DO I=Ibeg,Iend
+  DO J=Jbeg,Jend
+    DO I=Ibeg,Iend
 
-! Vol=SUM(Eta*dx*dy), reference is at z=0
-! Energy=SUM(1/2*g*H^2*dx*dy+0.5*u^2*H*dx*dy)
+      ! Vol=SUM(Eta*dx*dy), reference is at z=0
+      ! Energy=SUM(1/2*g*H^2*dx*dy+0.5*u^2*H*dx*dy)
 
 # if defined (CARTESIAN)
-       IF(MASK(I,J)>0)THEN
-         MassVolume=MassVolume+Eta(I,J)*DX*DY
-       ENDIF
-
-       Energy=Energy+0.5_SP*H(I,J)*H(I,J)*GRAV*DX*DY &
-             +0.5_SP*U(I,J)*U(I,J)*H(I,J)*DX*DY &
-             +0.5_SP*V(I,J)*V(I,J)*H(I,J)*DX*DY
-# else
-       IF(MASK(I,J)>0)THEN
-         MassVolume=MassVolume+Eta(I,J)*DX(I,J)*DY(I,J)
-       ENDIF
-       Energy=Energy+0.5_SP*H(I,J)*H(I,J)*GRAV*DX(I,J)*DY(I,J) &
-             +0.5_SP*U(I,J)*U(I,J)*H(I,J)*DX(I,J)*DY(I,J) &
-             +0.5_SP*V(I,J)*V(I,J)*H(I,J)*DX(I,J)*DY(I,J)
-# endif      
-     ENDDO
-     ENDDO
-
-     MaxEta=MAXVAL(Eta(Ibeg:Iend,Jbeg:Jend))
-     MinEta=MINVAL(Eta(Ibeg:Iend,Jbeg:Jend))
-     MaxU=MAXVAL(ABS(U(Ibeg:Iend,Jbeg:Jend)))
-     MaxV=MAXVAL(ABS(V(Ibeg:Iend,Jbeg:Jend)))
-
-! found Froude vs. max speed
-     DO J=Jbeg,Jend
-     DO I=Ibeg,Iend
-      IF(MASK(I,J)>ZERO)THEN
-       Utotal=SQRT(U(I,J)*U(I,J)+V(I,J)*V(I,J))
-       IF(Utotal.gt.UtotalMax)THEN
-         UtotalMax=Utotal
-         Fr=SQRT(GRAV*Max(H(I,J),MinDepthfrc))
-       ENDIF
+      IF(MASK(I,J)>0)THEN
+        MassVolume=MassVolume+Eta(I,J)*DX*DY
       ENDIF
-     ENDDO
-     ENDDO
-     IF(Fr==ZERO)Fr=SQRT(GRAV*MinDepthfrc)
+
+      Energy=Energy+0.5_SP*H(I,J)*H(I,J)*GRAV*DX*DY &
+      +0.5_SP*U(I,J)*U(I,J)*H(I,J)*DX*DY &
+      +0.5_SP*V(I,J)*V(I,J)*H(I,J)*DX*DY
+# else
+      IF(MASK(I,J)>0)THEN
+        MassVolume=MassVolume+Eta(I,J)*DX(I,J)*DY(I,J)
+      ENDIF
+      Energy=Energy+0.5_SP*H(I,J)*H(I,J)*GRAV*DX(I,J)*DY(I,J) &
+      +0.5_SP*U(I,J)*U(I,J)*H(I,J)*DX(I,J)*DY(I,J) &
+      +0.5_SP*V(I,J)*V(I,J)*H(I,J)*DX(I,J)*DY(I,J)
+# endif
+    ENDDO
+  ENDDO
+
+  MaxEta=MAXVAL(Eta(Ibeg:Iend,Jbeg:Jend))
+  MinEta=MINVAL(Eta(Ibeg:Iend,Jbeg:Jend))
+  MaxU=MAXVAL(ABS(U(Ibeg:Iend,Jbeg:Jend)))
+  MaxV=MAXVAL(ABS(V(Ibeg:Iend,Jbeg:Jend)))
+
+  ! found Froude vs. max speed
+  DO J=Jbeg,Jend
+    DO I=Ibeg,Iend
+      IF(MASK(I,J)>ZERO)THEN
+        Utotal=SQRT(U(I,J)*U(I,J)+V(I,J)*V(I,J))
+        IF(Utotal.gt.UtotalMax)THEN
+          UtotalMax=Utotal
+          Fr=SQRT(GRAV*Max(H(I,J),MinDepthfrc))
+        ENDIF
+      ENDIF
+    ENDDO
+  ENDDO
+  IF(Fr==ZERO)Fr=SQRT(GRAV*MinDepthfrc)
 
 # if defined (PARALLEL)
-     call MPI_ALLREDUCE(MassVolume,myvar,1,MPI_SP,MPI_SUM,MPI_COMM_WORLD,ier)
-     MassVolume = myvar
-     call MPI_ALLREDUCE(Energy,myvar,1,MPI_SP,MPI_SUM,MPI_COMM_WORLD,ier)
-     Energy = myvar
-     call MPI_ALLREDUCE(MaxEta,myvar,1,MPI_SP,MPI_MAX,MPI_COMM_WORLD,ier)
-     MaxEta = myvar
-     call MPI_ALLREDUCE(MinEta,myvar,1,MPI_SP,MPI_MIN,MPI_COMM_WORLD,ier)
-     MinEta = myvar
-     call MPI_ALLREDUCE(MaxU,myvar,1,MPI_SP,MPI_MAX,MPI_COMM_WORLD,ier)
-     MaxU = myvar
-     call MPI_ALLREDUCE(MaxV,myvar,1,MPI_SP,MPI_MAX,MPI_COMM_WORLD,ier)
-     MaxV = myvar
-     call MPI_ALLREDUCE(UTotalMax,myvar,1,MPI_SP,MPI_MAX,MPI_COMM_WORLD,ier)
-     UTotalMax = myvar
-     call MPI_ALLREDUCE(Fr,myvar,1,MPI_SP,MPI_MAX,MPI_COMM_WORLD,ier)
-     Fr = myvar
+  call MPI_ALLREDUCE(MassVolume,myvar,1,MPI_SP,MPI_SUM,MPI_COMM_WORLD,ier)
+  MassVolume = myvar
+  call MPI_ALLREDUCE(Energy,myvar,1,MPI_SP,MPI_SUM,MPI_COMM_WORLD,ier)
+  Energy = myvar
+  call MPI_ALLREDUCE(MaxEta,myvar,1,MPI_SP,MPI_MAX,MPI_COMM_WORLD,ier)
+  MaxEta = myvar
+  call MPI_ALLREDUCE(MinEta,myvar,1,MPI_SP,MPI_MIN,MPI_COMM_WORLD,ier)
+  MinEta = myvar
+  call MPI_ALLREDUCE(MaxU,myvar,1,MPI_SP,MPI_MAX,MPI_COMM_WORLD,ier)
+  MaxU = myvar
+  call MPI_ALLREDUCE(MaxV,myvar,1,MPI_SP,MPI_MAX,MPI_COMM_WORLD,ier)
+  MaxV = myvar
+  call MPI_ALLREDUCE(UTotalMax,myvar,1,MPI_SP,MPI_MAX,MPI_COMM_WORLD,ier)
+  UTotalMax = myvar
+  call MPI_ALLREDUCE(Fr,myvar,1,MPI_SP,MPI_MAX,MPI_COMM_WORLD,ier)
+  Fr = myvar
 # endif
 
 
 # if defined (PARALLEL)
-     if (myid.eq.0) then
+  if (myid.eq.0) then
 # endif
 
-! print screen
-     WRITE(*,*) '----------------- STATISTICS ----------------'
-     WRITE(*,*) ' TIME        DT'
-     WRITE(*,101) Time, DT
-     WRITE(*,*) ' MassVolume  Energy      MaxEta      MinEta      Max U       Max V '
-     WRITE(*,101)  MassVolume,Energy,MaxEta,MinEta,MaxU,MaxV
-     WRITE(*,*) ' MaxTotalU   PhaseS      Froude      WetDryMass'
-     WRITE(*,101) UTotalMax, Fr, UTotalMax/Fr, Dmass
-! print log file
-     WRITE(3,*) '----------------- STATISTICS ----------------'
-     WRITE(3,*) ' TIME        DT'
-     WRITE(3,101) Time, DT
-     WRITE(3,*) ' MassVolume  Energy      MaxEta      MinEta      Max U       Max V '
-     WRITE(3,101)  MassVolume,Energy,MaxEta,MinEta,MaxU,MaxV
-     WRITE(3,*) ' MaxTotalU   PhaseS      Froude      WetDryMass'
-     WRITE(3,101)  UTotalMax, Fr, UTotalMax/Fr, Dmass
+    ! print screen
+    WRITE(*,*) '----------------- STATISTICS ----------------'
+    WRITE(*,*) ' TIME        DT'
+    WRITE(*,101) Time, DT
+    WRITE(*,*) ' MassVolume  Energy      MaxEta      MinEta      Max U       Max V '
+    WRITE(*,101)  MassVolume,Energy,MaxEta,MinEta,MaxU,MaxV
+    WRITE(*,*) ' MaxTotalU   PhaseS      Froude      WetDryMass'
+    WRITE(*,101) UTotalMax, Fr, UTotalMax/Fr, Dmass
+    ! print log file
+    WRITE(3,*) '----------------- STATISTICS ----------------'
+    WRITE(3,*) ' TIME        DT'
+    WRITE(3,101) Time, DT
+    WRITE(3,*) ' MassVolume  Energy      MaxEta      MinEta      Max U       Max V '
+    WRITE(3,101)  MassVolume,Energy,MaxEta,MinEta,MaxU,MaxV
+    WRITE(3,*) ' MaxTotalU   PhaseS      Froude      WetDryMass'
+    WRITE(3,101)  UTotalMax, Fr, UTotalMax/Fr, Dmass
 # if defined (PARALLEL)
-     endif
+  endif
 # endif
 
-101  FORMAT(6E12.4)
+  101  FORMAT(6E12.4)
 
 
 END SUBROUTINE STATISTICS

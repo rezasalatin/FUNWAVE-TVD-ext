@@ -58,90 +58,90 @@ CONTAINS
 
 SUBROUTINE PutFileASCII_RUNUP(FILE,PHI)
 
-     IMPLICIT NONE
-     CHARACTER(LEN=80), INTENT(IN) :: FILE
-     REAL(SP),DIMENSION(Mloc,Nloc),INTENT(IN) :: PHI
-     INTEGER :: irank, lenx, leny, lenxy, ireq, jj
-     INTEGER, ALLOCATABLE :: iistas(:), iiends(:), jjstas(:), jjends(:)
-     INTEGER :: istatus(mpi_status_size)
-     INTEGER, DIMENSION(1,NGlob) :: runup_matrix
-     REAL(SP), ALLOCATABLE :: LocalPHI(:,:)
-     REAL(SP), ALLOCATABLE :: xx(:,:)
-     REAL(SP),DIMENSION( MGlob, NGlob ) :: PHIGLOB
+  IMPLICIT NONE
+  CHARACTER(LEN=80), INTENT(IN) :: FILE
+  REAL(SP),DIMENSION(Mloc,Nloc),INTENT(IN) :: PHI
+  INTEGER :: irank, lenx, leny, lenxy, ireq, jj
+  INTEGER, ALLOCATABLE :: iistas(:), iiends(:), jjstas(:), jjends(:)
+  INTEGER :: istatus(mpi_status_size)
+  INTEGER, DIMENSION(1,NGlob) :: runup_matrix
+  REAL(SP), ALLOCATABLE :: LocalPHI(:,:)
+  REAL(SP), ALLOCATABLE :: xx(:,:)
+  REAL(SP),DIMENSION( MGlob, NGlob ) :: PHIGLOB
 
-     ALLOCATE(LocalPHI(Mloc-2*Nghost, Nloc-2*Nghost))
-     LocalPHI=PHI(Ibeg:Iend,Jbeg:Jend)
+  ALLOCATE(LocalPHI(Mloc-2*Nghost, Nloc-2*Nghost))
+  LocalPHI=PHI(Ibeg:Iend,Jbeg:Jend)
 
-     allocate( iistas(nprocs), iiends(nprocs), jjstas(nprocs), jjends(nprocs) )
+  allocate( iistas(nprocs), iiends(nprocs), jjstas(nprocs), jjends(nprocs) )
 
-     call MPI_Gather( iista, 1, MPI_INTEGER, iistas, 1, MPI_INTEGER, &
-                      0, MPI_COMM_WORLD, ier )
-     call MPI_Gather( iiend, 1, MPI_INTEGER, iiends, 1, MPI_INTEGER, &
-                      0, MPI_COMM_WORLD, ier )
-     call MPI_Gather( jjsta, 1, MPI_INTEGER, jjstas, 1, MPI_INTEGER, &
-                      0, MPI_COMM_WORLD, ier )
-     call MPI_Gather( jjend, 1, MPI_INTEGER, jjends, 1, MPI_INTEGER, &
-                      0, MPI_COMM_WORLD, ier )
+  call MPI_Gather( iista, 1, MPI_INTEGER, iistas, 1, MPI_INTEGER, &
+  0, MPI_COMM_WORLD, ier )
+  call MPI_Gather( iiend, 1, MPI_INTEGER, iiends, 1, MPI_INTEGER, &
+  0, MPI_COMM_WORLD, ier )
+  call MPI_Gather( jjsta, 1, MPI_INTEGER, jjstas, 1, MPI_INTEGER, &
+  0, MPI_COMM_WORLD, ier )
+  call MPI_Gather( jjend, 1, MPI_INTEGER, jjends, 1, MPI_INTEGER, &
+  0, MPI_COMM_WORLD, ier )
 
-     if( myid == 0 ) then
-	 PHIGLOB( iista:iiend, jjsta:jjend ) = LocalPHI
-     endif
+  if( myid == 0 ) then
+    PHIGLOB( iista:iiend, jjsta:jjend ) = LocalPHI
+  endif
 
-     do irank=1, px*py-1
+  do irank=1, px*py-1
 
-	  if( myid == 0 ) then
-	    lenx = iiends(irank+1) - iistas(irank+1) + 1
-	    leny = jjends(irank+1) - jjstas(irank+1) + 1
-	    lenxy = lenx*leny
-	    allocate( xx(lenx, leny) )
+    if( myid == 0 ) then
+      lenx = iiends(irank+1) - iistas(irank+1) + 1
+      leny = jjends(irank+1) - jjstas(irank+1) + 1
+      lenxy = lenx*leny
+      allocate( xx(lenx, leny) )
 
-	    call mpi_irecv( xx, lenxy, mpi_sp, irank, 1, mpi_comm_world, ireq, ier )
-	    call mpi_wait( ireq, istatus, ier )
+      call mpi_irecv( xx, lenxy, mpi_sp, irank, 1, mpi_comm_world, ireq, ier )
+      call mpi_wait( ireq, istatus, ier )
 
-		PHIGLOB( iistas(irank+1):iiends(irank+1), jjstas(irank+1):jjends(irank+1) ) = xx
-		deallocate( xx )
+      PHIGLOB( iistas(irank+1):iiends(irank+1), jjstas(irank+1):jjends(irank+1) ) = xx
+      deallocate( xx )
 
-        elseif( myid == irank ) then
+    elseif( myid == irank ) then
 
-		lenxy = ( iiend-iista+1 )*( jjend-jjsta+1 )
-	    call mpi_isend( LocalPHI, lenxy, mpi_sp, 0, 1, mpi_comm_world, ireq, ier )
-	    call mpi_wait( ireq, istatus, ier )
+      lenxy = ( iiend-iista+1 )*( jjend-jjsta+1 )
+      call mpi_isend( LocalPHI, lenxy, mpi_sp, 0, 1, mpi_comm_world, ireq, ier )
+      call mpi_wait( ireq, istatus, ier )
 
-        endif
-     enddo
+    endif
+  enddo
 
-     deallocate(LocalPHI, iistas, iiends, jjstas, jjends)
+  deallocate(LocalPHI, iistas, iiends, jjstas, jjends)
 
-     if (myid.eq.0) then
+  if (myid.eq.0) then
     DO J=1,NGlob
-    DO I=MGlob,1,-1
-     IF(real(PHIGLOB(I,J)).eq.1.0) goto 2001
-    ENDDO
-2001  IF((I == MGlob).OR.(I == 1)) THEN
-         ! do nothing
-      ELSE
-         runup_matrix(1,J) = I
-      ENDIF
-    ENDDO
+      DO I=MGlob,1,-1
+        IF(real(PHIGLOB(I,J)).eq.1.0) goto 2001
+      ENDDO
+      2001  IF((I == MGlob).OR.(I == 1)) THEN
+      ! do nothing
+    ELSE
+      runup_matrix(1,J) = I
+    ENDIF
+  ENDDO
 
-    open(1, FILE=TRIM(FILE), status = 'unknown',POSITION='APPEND')
+  open(1, FILE=TRIM(FILE), status = 'unknown',POSITION='APPEND')
 
 # if defined(DEBUG)
-       DO jj=1,NGlob
-          write(1,'(I8)',advance="no") runup_matrix(1,jj)
-       ENDDO
+  DO jj=1,NGlob
+    write(1,'(I8)',advance="no") runup_matrix(1,jj)
+  ENDDO
 # else
-       write(1,'(20E16.5E4)',advance="no") time
-       DO jj=1,NGlob
-          write(1,'(I8)',advance="no") runup_matrix(1,jj)
-       ENDDO
+  write(1,'(20E16.5E4)',advance="no") time
+  DO jj=1,NGlob
+    write(1,'(I8)',advance="no") runup_matrix(1,jj)
+  ENDDO
 # endif
-       CLOSE(1)
-     endif
+  CLOSE(1)
+endif
 
 END SUBROUTINE PutfileASCII_RUNUP
 
 END MODULE PARALLEL_FIELD_IO_RUNUP
 
 # endif
- ! end parallel
+! end parallel

@@ -50,36 +50,36 @@
 !
 !-------------------------------------------------------------------------------------
 SUBROUTINE DERIVATIVE_Y_High(M,N,Ibeg,Iend,Jbeg,Jend,MASK,DY,Uin,Uout)
-     USE PARAM
-     IMPLICIT NONE
-     INTEGER,INTENT(IN) :: M,N,Ibeg,Iend,Jbeg,Jend
-     REAL(SP),DIMENSION(M,N),INTENT(IN) :: Uin
+  USE PARAM
+  IMPLICIT NONE
+  INTEGER,INTENT(IN) :: M,N,Ibeg,Iend,Jbeg,Jend
+  REAL(SP),DIMENSION(M,N),INTENT(IN) :: Uin
 # if defined (CARTESIAN)
-     REAL(SP),INTENT(IN) :: DY
+  REAL(SP),INTENT(IN) :: DY
 # else
-     REAL(SP),DIMENSION(M,N),INTENT(IN) :: DY
+  REAL(SP),DIMENSION(M,N),INTENT(IN) :: DY
 # endif
-     INTEGER,DIMENSION(M,N),INTENT(IN) :: MASK
-     REAL(SP),DIMENSION(M,N),INTENT(OUT) :: Uout
+  INTEGER,DIMENSION(M,N),INTENT(IN) :: MASK
+  REAL(SP),DIMENSION(M,N),INTENT(OUT) :: Uout
 
 
-! Chen, Salatin
-!!!!!!!!!!!!!!!!!!! Code Optimization
-!!!!!!!!!!!!!!!!!!! moving loop inside logical
+  ! Chen, Salatin
+  !!!!!!!!!!!!!!!!!!! Code Optimization
+  !!!!!!!!!!!!!!!!!!! moving loop inside logical
 # if defined (CARTESIAN)
-     DO J=Jbeg,Jend
-     DO I=Ibeg,Iend
-       Uout(I,J)= (Uin(I,J+2)+2.0_SP*Uin(I,J+1)    &
-                 -Uin(I,J-2)-2.0_SP*Uin(I,J-1))/DY/8.0_SP*MASK(I,J)
-     ENDDO
-     ENDDO
+  DO J=Jbeg,Jend
+    DO I=Ibeg,Iend
+      Uout(I,J)= (Uin(I,J+2)+2.0_SP*Uin(I,J+1)    &
+      -Uin(I,J-2)-2.0_SP*Uin(I,J-1))/DY/8.0_SP*MASK(I,J)
+    ENDDO
+  ENDDO
 # else
-     DO J=Jbeg,Jend
-     DO I=Ibeg,Iend
-       Uout(I,J)= (Uin(I,J+2)+2.0_SP*Uin(I,J+1)    &
-                 -Uin(I,J-2)-2.0_SP*Uin(I,J-1))/DY(I,J)/8.0_SP*MASK(I,J)
-     ENDDO
-     ENDDO
+  DO J=Jbeg,Jend
+    DO I=Ibeg,Iend
+      Uout(I,J)= (Uin(I,J+2)+2.0_SP*Uin(I,J+1)    &
+      -Uin(I,J-2)-2.0_SP*Uin(I,J-1))/DY(I,J)/8.0_SP*MASK(I,J)
+    ENDDO
+  ENDDO
 # endif
 
 
@@ -95,35 +95,35 @@ END SUBROUTINE DERIVATIVE_Y_High
 !
 !-------------------------------------------------------------------------------------
 SUBROUTINE DERIVATIVE_X_High(M,N,Ibeg,Iend,Jbeg,Jend,MASK,DX,Uin,Uout)
-     USE PARAM
-     IMPLICIT NONE
-     INTEGER,INTENT(IN) :: M,N,Ibeg,Iend,Jbeg,Jend
-     REAL(SP),DIMENSION(M,N),INTENT(IN) :: Uin
+  USE PARAM
+  IMPLICIT NONE
+  INTEGER,INTENT(IN) :: M,N,Ibeg,Iend,Jbeg,Jend
+  REAL(SP),DIMENSION(M,N),INTENT(IN) :: Uin
 # if defined (CARTESIAN)
-     REAL(SP),INTENT(IN) :: DX
+  REAL(SP),INTENT(IN) :: DX
 # else
-     REAL(SP),DIMENSION(M,N),INTENT(IN) :: DX
+  REAL(SP),DIMENSION(M,N),INTENT(IN) :: DX
 # endif
-     INTEGER,DIMENSION(M,N),INTENT(IN) :: MASK
-     REAL(SP),DIMENSION(M,N),INTENT(OUT) :: Uout
+  INTEGER,DIMENSION(M,N),INTENT(IN) :: MASK
+  REAL(SP),DIMENSION(M,N),INTENT(OUT) :: Uout
 
-! Chen, Salatin
-!!!!!!!!!!!!!!!!!!! Code Optimization
-!!!!!!!!!!!!!!!!!!! moving loop inside logical
+  ! Chen, Salatin
+  !!!!!!!!!!!!!!!!!!! Code Optimization
+  !!!!!!!!!!!!!!!!!!! moving loop inside logical
 # if defined (CARTESIAN)
-     DO J=Jbeg,Jend
-     DO I=Ibeg,Iend
-       Uout(I,J)= (Uin(I+2,J)+2.0_SP*Uin(I+1,J)    &
-                 -Uin(I-2,J)-2.0_SP*Uin(I-1,J))/DX/8.0_SP*MASK(I,J)
-     ENDDO
-     ENDDO
+  DO J=Jbeg,Jend
+    DO I=Ibeg,Iend
+      Uout(I,J)= (Uin(I+2,J)+2.0_SP*Uin(I+1,J)    &
+      -Uin(I-2,J)-2.0_SP*Uin(I-1,J))/DX/8.0_SP*MASK(I,J)
+    ENDDO
+  ENDDO
 # else
-     DO J=Jbeg,Jend
-     DO I=Ibeg,Iend
-       Uout(I,J)= (Uin(I+2,J)+2.0_SP*Uin(I+1,J)    &
-                 -Uin(I-2,J)-2.0_SP*Uin(I-1,J))/DX(I,J)/8.0_SP*MASK(I,J)
-     ENDDO
-     ENDDO
+  DO J=Jbeg,Jend
+    DO I=Ibeg,Iend
+      Uout(I,J)= (Uin(I+2,J)+2.0_SP*Uin(I+1,J)    &
+      -Uin(I-2,J)-2.0_SP*Uin(I-1,J))/DX(I,J)/8.0_SP*MASK(I,J)
+    ENDDO
+  ENDDO
 # endif
 
 
@@ -138,36 +138,36 @@ END SUBROUTINE DERIVATIVE_X_High
 !
 !-------------------------------------------------------------------------------------
 SUBROUTINE DERIVATIVE_Y(M,N,Ibeg,Iend,Jbeg,Jend,MASK,DY,Uin,Uout)
-     USE PARAM
-     IMPLICIT NONE
-     INTEGER,INTENT(IN) :: M,N,Ibeg,Iend,Jbeg,Jend
-     REAL(SP),DIMENSION(M,N),INTENT(IN) :: Uin
+  USE PARAM
+  IMPLICIT NONE
+  INTEGER,INTENT(IN) :: M,N,Ibeg,Iend,Jbeg,Jend
+  REAL(SP),DIMENSION(M,N),INTENT(IN) :: Uin
 # if defined (CARTESIAN)
-     REAL(SP),INTENT(IN) :: DY
+  REAL(SP),INTENT(IN) :: DY
 # else
-     REAL(SP),DIMENSION(M,N),INTENT(IN) :: DY
+  REAL(SP),DIMENSION(M,N),INTENT(IN) :: DY
 # endif
-     INTEGER,DIMENSION(M,N),INTENT(IN) :: MASK
-     REAL(SP),DIMENSION(M,N),INTENT(OUT) :: Uout
+  INTEGER,DIMENSION(M,N),INTENT(IN) :: MASK
+  REAL(SP),DIMENSION(M,N),INTENT(OUT) :: Uout
 
 
-! Chen, Salatin
-!!!!!!!!!!!!!!!!!!! Code Optimization
-!!!!!!!!!!!!!!!!!!! moving loop inside logical
+  ! Chen, Salatin
+  !!!!!!!!!!!!!!!!!!! Code Optimization
+  !!!!!!!!!!!!!!!!!!! moving loop inside logical
 # if defined (CARTESIAN)
-     DO J=Jbeg,Jend
-     DO I=Ibeg,Iend
-       Uout(I,J)= (Uin(I,J+1)   &
-                 -Uin(I,J-1))/DY/2.0_SP*MASK(I,J)
-     ENDDO
-     ENDDO
+  DO J=Jbeg,Jend
+    DO I=Ibeg,Iend
+      Uout(I,J)= (Uin(I,J+1)   &
+      -Uin(I,J-1))/DY/2.0_SP*MASK(I,J)
+    ENDDO
+  ENDDO
 # else
-     DO J=Jbeg,Jend
-     DO I=Ibeg,Iend
-       Uout(I,J)= (Uin(I,J+1)   &
-                 -Uin(I,J-1))/DY(I,J)/2.0_SP*MASK(I,J)
-     ENDDO
-     ENDDO
+  DO J=Jbeg,Jend
+    DO I=Ibeg,Iend
+      Uout(I,J)= (Uin(I,J+1)   &
+      -Uin(I,J-1))/DY(I,J)/2.0_SP*MASK(I,J)
+    ENDDO
+  ENDDO
 # endif
 
 END SUBROUTINE DERIVATIVE_Y
@@ -181,36 +181,36 @@ END SUBROUTINE DERIVATIVE_Y
 !
 !-------------------------------------------------------------------------------------
 SUBROUTINE DERIVATIVE_X(M,N,Ibeg,Iend,Jbeg,Jend,MASK,DX,Uin,Uout)
-     USE PARAM
-     IMPLICIT NONE
-     INTEGER,INTENT(IN) :: M,N,Ibeg,Iend,Jbeg,Jend
-     REAL(SP),DIMENSION(M,N),INTENT(IN) :: Uin
+  USE PARAM
+  IMPLICIT NONE
+  INTEGER,INTENT(IN) :: M,N,Ibeg,Iend,Jbeg,Jend
+  REAL(SP),DIMENSION(M,N),INTENT(IN) :: Uin
 # if defined (CARTESIAN)
-     REAL(SP),INTENT(IN) :: DX
+  REAL(SP),INTENT(IN) :: DX
 # else
-     REAL(SP),DIMENSION(M,N),INTENT(IN) :: DX
+  REAL(SP),DIMENSION(M,N),INTENT(IN) :: DX
 # endif
-     INTEGER,DIMENSION(M,N),INTENT(IN) :: MASK
-     REAL(SP),DIMENSION(M,N),INTENT(OUT) :: Uout
+  INTEGER,DIMENSION(M,N),INTENT(IN) :: MASK
+  REAL(SP),DIMENSION(M,N),INTENT(OUT) :: Uout
 
 
-! Chen, Salatin
-!!!!!!!!!!!!!!!!!!! Code Optimization
-!!!!!!!!!!!!!!!!!!! moving loop inside logical
+  ! Chen, Salatin
+  !!!!!!!!!!!!!!!!!!! Code Optimization
+  !!!!!!!!!!!!!!!!!!! moving loop inside logical
 # if defined (CARTESIAN)
-     DO J=Jbeg,Jend
-     DO I=Ibeg,Iend
-       Uout(I,J)= (Uin(I+1,J)    &
-                 -Uin(I-1,J))/DX/2.0_SP*MASK(I,J)
-     ENDDO
-     ENDDO
+  DO J=Jbeg,Jend
+    DO I=Ibeg,Iend
+      Uout(I,J)= (Uin(I+1,J)    &
+      -Uin(I-1,J))/DX/2.0_SP*MASK(I,J)
+    ENDDO
+  ENDDO
 # else
-     DO J=Jbeg,Jend
-     DO I=Ibeg,Iend
-       Uout(I,J)= (Uin(I+1,J)    &
-                 -Uin(I-1,J))/DX(I,J)/2.0_SP*MASK(I,J)
-     ENDDO
-     ENDDO
+  DO J=Jbeg,Jend
+    DO I=Ibeg,Iend
+      Uout(I,J)= (Uin(I+1,J)    &
+      -Uin(I-1,J))/DX(I,J)/2.0_SP*MASK(I,J)
+    ENDDO
+  ENDDO
 # endif
 
 END SUBROUTINE DERIVATIVE_X
@@ -223,36 +223,36 @@ END SUBROUTINE DERIVATIVE_X
 !
 !-------------------------------------------------------------------------------------
 SUBROUTINE DERIVATIVE_YY(M,N,Ibeg,Iend,Jbeg,Jend,MASK,DY,Uin,Uout)
-     USE PARAM
-     IMPLICIT NONE
-     INTEGER,INTENT(IN) :: M,N,Ibeg,Iend,Jbeg,Jend
-     REAL(SP),DIMENSION(M,N),INTENT(IN) :: Uin
+  USE PARAM
+  IMPLICIT NONE
+  INTEGER,INTENT(IN) :: M,N,Ibeg,Iend,Jbeg,Jend
+  REAL(SP),DIMENSION(M,N),INTENT(IN) :: Uin
 # if defined (CARTESIAN)
-     REAL(SP),INTENT(IN) :: DY
+  REAL(SP),INTENT(IN) :: DY
 # else
-     REAL(SP),DIMENSION(M,N),INTENT(IN) :: DY
+  REAL(SP),DIMENSION(M,N),INTENT(IN) :: DY
 # endif
-     INTEGER,DIMENSION(M,N),INTENT(IN) :: MASK
-     REAL(SP),DIMENSION(M,N),INTENT(OUT) :: Uout
+  INTEGER,DIMENSION(M,N),INTENT(IN) :: MASK
+  REAL(SP),DIMENSION(M,N),INTENT(OUT) :: Uout
 
 
-! Chen, Salatin
-!!!!!!!!!!!!!!!!!!! Code Optimization
-!!!!!!!!!!!!!!!!!!! moving loop inside logical
+  ! Chen, Salatin
+  !!!!!!!!!!!!!!!!!!! Code Optimization
+  !!!!!!!!!!!!!!!!!!! moving loop inside logical
 # if defined (CARTESIAN)
-      DO J=Jbeg,Jend
-      DO I=Ibeg,Iend
-       Uout(I,J)= (Uin(I,J+1)-2.0_SP*Uin(I,J) &
-                 +Uin(I,J-1))/DY/DY*MASK(I,J)
-      ENDDO
-      ENDDO
+  DO J=Jbeg,Jend
+    DO I=Ibeg,Iend
+      Uout(I,J)= (Uin(I,J+1)-2.0_SP*Uin(I,J) &
+      +Uin(I,J-1))/DY/DY*MASK(I,J)
+    ENDDO
+  ENDDO
 # else
-      DO J=Jbeg,Jend
-      DO I=Ibeg,Iend
-       Uout(I,J)= (Uin(I,J+1)-2.0_SP*Uin(I,J) &
-                 +Uin(I,J-1))/DY(I,J)/DY(I,J)*MASK(I,J)
-      ENDDO
-      ENDDO
+  DO J=Jbeg,Jend
+    DO I=Ibeg,Iend
+      Uout(I,J)= (Uin(I,J+1)-2.0_SP*Uin(I,J) &
+      +Uin(I,J-1))/DY(I,J)/DY(I,J)*MASK(I,J)
+    ENDDO
+  ENDDO
 # endif
 
 
@@ -266,39 +266,39 @@ END SUBROUTINE DERIVATIVE_YY
 !
 !-------------------------------------------------------------------------------------
 SUBROUTINE DERIVATIVE_XY(M,N,Ibeg,Iend,Jbeg,Jend,MASK,DX,DY,Uin,Uout)
-     USE PARAM
-     IMPLICIT NONE
-     INTEGER,INTENT(IN) :: M,N,Ibeg,Iend,Jbeg,Jend
-     REAL(SP),DIMENSION(M,N),INTENT(IN) :: Uin
+  USE PARAM
+  IMPLICIT NONE
+  INTEGER,INTENT(IN) :: M,N,Ibeg,Iend,Jbeg,Jend
+  REAL(SP),DIMENSION(M,N),INTENT(IN) :: Uin
 # if defined (CARTESIAN)
-     REAL(SP),INTENT(IN) :: DX,DY
+  REAL(SP),INTENT(IN) :: DX,DY
 # else
-     REAL(SP),DIMENSION(M,N),INTENT(IN) :: DX,DY
+  REAL(SP),DIMENSION(M,N),INTENT(IN) :: DX,DY
 # endif
-     INTEGER,DIMENSION(M,N),INTENT(IN) :: MASK
-     REAL(SP),DIMENSION(M,N),INTENT(OUT) :: Uout
+  INTEGER,DIMENSION(M,N),INTENT(IN) :: MASK
+  REAL(SP),DIMENSION(M,N),INTENT(OUT) :: Uout
 
 
-! Chen, Salatin
-!!!!!!!!!!!!!!!!!!! Code Optimization
-!!!!!!!!!!!!!!!!!!! moving loop inside logical
+  ! Chen, Salatin
+  !!!!!!!!!!!!!!!!!!! Code Optimization
+  !!!!!!!!!!!!!!!!!!! moving loop inside logical
 
 # if defined (CARTESIAN)
-      DO J=Jbeg,Jend
-      DO I=Ibeg,Iend
-       tmp1=(Uin(I+1,J+1)-Uin(I+1,J-1))/2.0_SP/DY
-       tmp2=(Uin(I-1,J+1)-Uin(I-1,J-1))/2.0_SP/DY
-       Uout(I,J)= (tmp1-tmp2)/2.0_SP/DX*MASK(I,J)
-      ENDDO
-      ENDDO
+  DO J=Jbeg,Jend
+    DO I=Ibeg,Iend
+      tmp1=(Uin(I+1,J+1)-Uin(I+1,J-1))/2.0_SP/DY
+      tmp2=(Uin(I-1,J+1)-Uin(I-1,J-1))/2.0_SP/DY
+      Uout(I,J)= (tmp1-tmp2)/2.0_SP/DX*MASK(I,J)
+    ENDDO
+  ENDDO
 # else
-      DO J=Jbeg,Jend
-      DO I=Ibeg,Iend
-       tmp1=(Uin(I+1,J+1)-Uin(I+1,J-1))/2.0_SP/DY(I,J)
-       tmp2=(Uin(I-1,J+1)-Uin(I-1,J-1))/2.0_SP/DY(I,J)
-       Uout(I,J)= (tmp1-tmp2)/2.0_SP/DX(I,J)*MASK(I,J)
-      ENDDO
-      ENDDO
+  DO J=Jbeg,Jend
+    DO I=Ibeg,Iend
+      tmp1=(Uin(I+1,J+1)-Uin(I+1,J-1))/2.0_SP/DY(I,J)
+      tmp2=(Uin(I-1,J+1)-Uin(I-1,J-1))/2.0_SP/DY(I,J)
+      Uout(I,J)= (tmp1-tmp2)/2.0_SP/DX(I,J)*MASK(I,J)
+    ENDDO
+  ENDDO
 # endif
 
 
@@ -313,38 +313,38 @@ END SUBROUTINE DERIVATIVE_XY
 !
 !-------------------------------------------------------------------------------------
 SUBROUTINE DERIVATIVE_XX(M,N,Ibeg,Iend,Jbeg,Jend,MASK,DX,Uin,Uout)
-     USE PARAM
-     IMPLICIT NONE
-     INTEGER,INTENT(IN) :: M,N,Ibeg,Iend,Jbeg,Jend
-     REAL(SP),DIMENSION(M,N),INTENT(IN) :: Uin
+  USE PARAM
+  IMPLICIT NONE
+  INTEGER,INTENT(IN) :: M,N,Ibeg,Iend,Jbeg,Jend
+  REAL(SP),DIMENSION(M,N),INTENT(IN) :: Uin
 # if defined (CARTESIAN)
-     REAL(SP),INTENT(IN) :: DX
+  REAL(SP),INTENT(IN) :: DX
 # else
-     REAL(SP),DIMENSION(M,N),INTENT(IN) :: DX
+  REAL(SP),DIMENSION(M,N),INTENT(IN) :: DX
 # endif
-     INTEGER,DIMENSION(M,N),INTENT(IN) :: MASK
-     REAL(SP),DIMENSION(M,N),INTENT(OUT) :: Uout
+  INTEGER,DIMENSION(M,N),INTENT(IN) :: MASK
+  REAL(SP),DIMENSION(M,N),INTENT(OUT) :: Uout
 
 
-! Chen, Salatin
-!!!!!!!!!!!!!!!!!!! Code Optimization
-!!!!!!!!!!!!!!!!!!! moving loop inside logical
+  ! Chen, Salatin
+  !!!!!!!!!!!!!!!!!!! Code Optimization
+  !!!!!!!!!!!!!!!!!!! moving loop inside logical
 
 # if defined (CARTESIAN)
-     DO J=Jbeg,Jend
-     DO I=Ibeg,Iend
-       Uout(I,J)= (Uin(I+1,J)-2.0_SP*Uin(I,J) &
-                 +Uin(I-1,J))/DX/DX*MASK(I,J)
-     ENDDO
-     ENDDO
+  DO J=Jbeg,Jend
+    DO I=Ibeg,Iend
+      Uout(I,J)= (Uin(I+1,J)-2.0_SP*Uin(I,J) &
+      +Uin(I-1,J))/DX/DX*MASK(I,J)
+    ENDDO
+  ENDDO
 # else
-     DO J=Jbeg,Jend
-     DO I=Ibeg,Iend
-       Uout(I,J)= (Uin(I+1,J)-2.0_SP*Uin(I,J) &
-                 +Uin(I-1,J))/DX(I,J)/DX(I,J)*MASK(I,J)
+  DO J=Jbeg,Jend
+    DO I=Ibeg,Iend
+      Uout(I,J)= (Uin(I+1,J)-2.0_SP*Uin(I,J) &
+      +Uin(I-1,J))/DX(I,J)/DX(I,J)*MASK(I,J)
 
-     ENDDO
-     ENDDO
+    ENDDO
+  ENDDO
 # endif
 
 
@@ -359,54 +359,54 @@ END SUBROUTINE DERIVATIVE_XX
 !
 !-------------------------------------------------------------------------------------
 SUBROUTINE DERIVATIVE_XY_HIGH(M,N,Ibeg,Iend,Jbeg,Jend,MASK,DX,DY,Uin,Uout)
-     USE PARAM
-     IMPLICIT NONE
-     INTEGER,INTENT(IN) :: M,N,Ibeg,Iend,Jbeg,Jend
-     REAL(SP),DIMENSION(M,N),INTENT(IN) :: Uin
+  USE PARAM
+  IMPLICIT NONE
+  INTEGER,INTENT(IN) :: M,N,Ibeg,Iend,Jbeg,Jend
+  REAL(SP),DIMENSION(M,N),INTENT(IN) :: Uin
 # if defined (CARTESIAN)
-     REAL(SP),INTENT(IN) :: DX,DY
+  REAL(SP),INTENT(IN) :: DX,DY
 # else
-     REAL(SP),DIMENSION(M,N),INTENT(IN) :: DX,DY
+  REAL(SP),DIMENSION(M,N),INTENT(IN) :: DX,DY
 # endif
-     INTEGER,DIMENSION(M,N),INTENT(IN) :: MASK
-     REAL(SP),DIMENSION(M,N),INTENT(OUT) :: Uout
+  INTEGER,DIMENSION(M,N),INTENT(IN) :: MASK
+  REAL(SP),DIMENSION(M,N),INTENT(OUT) :: Uout
 
 
-! Chen, Salatin
-!!!!!!!!!!!!!!!!!!! Code Optimization
-!!!!!!!!!!!!!!!!!!! moving loop inside logical
+  ! Chen, Salatin
+  !!!!!!!!!!!!!!!!!!! Code Optimization
+  !!!!!!!!!!!!!!!!!!! moving loop inside logical
 
 # if defined (CARTESIAN)
-    DO J=Jbeg,Jend
+  DO J=Jbeg,Jend
     DO I=Ibeg,Iend
-       tmp1=1.0_SP/12.0_SP/DY*(Uin(I-2,J-2)-8.0_SP*Uin(I-2,J-1) &
-                             +8.0_SP*Uin(I-2,J+1)-Uin(I-2,J+2))
-       tmp2=1.0_SP/12.0_SP/DY*(Uin(I-1,J-2)-8.0_SP*Uin(I-1,J-1) &
-                             +8.0_SP*Uin(I-1,J+1)-Uin(I-1,J+2))
-       tmp3=1.0_SP/12.0_SP/DY*(Uin(I+1,J-2)-8.0_SP*Uin(I+1,J-1) &
-                             +8.0_SP*Uin(I+1,J+1)-Uin(I+1,J+2))
-       tmp4=1.0_SP/12.0_SP/DY*(Uin(I+2,J-2)-8.0_SP*Uin(I+2,J-1) &
-                             +8.0_SP*Uin(I+2,J+1)-Uin(I+2,J+2))
-       Uout(I,J)=MASK(I,J)/12.0_SP/DX*(tmp1-8.0_SP*tmp2 &
-                             +8.0_SP*tmp3-tmp4)
-     ENDDO
-     ENDDO
+      tmp1=1.0_SP/12.0_SP/DY*(Uin(I-2,J-2)-8.0_SP*Uin(I-2,J-1) &
+      +8.0_SP*Uin(I-2,J+1)-Uin(I-2,J+2))
+      tmp2=1.0_SP/12.0_SP/DY*(Uin(I-1,J-2)-8.0_SP*Uin(I-1,J-1) &
+      +8.0_SP*Uin(I-1,J+1)-Uin(I-1,J+2))
+      tmp3=1.0_SP/12.0_SP/DY*(Uin(I+1,J-2)-8.0_SP*Uin(I+1,J-1) &
+      +8.0_SP*Uin(I+1,J+1)-Uin(I+1,J+2))
+      tmp4=1.0_SP/12.0_SP/DY*(Uin(I+2,J-2)-8.0_SP*Uin(I+2,J-1) &
+      +8.0_SP*Uin(I+2,J+1)-Uin(I+2,J+2))
+      Uout(I,J)=MASK(I,J)/12.0_SP/DX*(tmp1-8.0_SP*tmp2 &
+      +8.0_SP*tmp3-tmp4)
+    ENDDO
+  ENDDO
 # else
-     DO J=Jbeg,Jend
-     DO I=Ibeg,Iend
-! to assure symmetric, use locally constant dx and dy
-       tmp1=1.0_SP/12.0_SP/DY(I,J)*(Uin(I-2,J-2)-8.0_SP*Uin(I-2,J-1) &
-                             +8.0_SP*Uin(I-2,J+1)-Uin(I-2,J+2))
-       tmp2=1.0_SP/12.0_SP/DY(I,J)*(Uin(I-1,J-2)-8.0_SP*Uin(I-1,J-1) &
-                             +8.0_SP*Uin(I-1,J+1)-Uin(I-1,J+2))
-       tmp3=1.0_SP/12.0_SP/DY(I,J)*(Uin(I+1,J-2)-8.0_SP*Uin(I+1,J-1) &
-                             +8.0_SP*Uin(I+1,J+1)-Uin(I+1,J+2))
-       tmp4=1.0_SP/12.0_SP/DY(I,J)*(Uin(I+2,J-2)-8.0_SP*Uin(I+2,J-1) &
-                             +8.0_SP*Uin(I+2,J+1)-Uin(I+2,J+2))
-       Uout(I,J)=MASK(I,J)/12.0_SP/DX(I,J)*(tmp1-8.0_SP*tmp2 &
-                             +8.0_SP*tmp3-tmp4)
-     ENDDO
-     ENDDO
+  DO J=Jbeg,Jend
+    DO I=Ibeg,Iend
+      ! to assure symmetric, use locally constant dx and dy
+      tmp1=1.0_SP/12.0_SP/DY(I,J)*(Uin(I-2,J-2)-8.0_SP*Uin(I-2,J-1) &
+      +8.0_SP*Uin(I-2,J+1)-Uin(I-2,J+2))
+      tmp2=1.0_SP/12.0_SP/DY(I,J)*(Uin(I-1,J-2)-8.0_SP*Uin(I-1,J-1) &
+      +8.0_SP*Uin(I-1,J+1)-Uin(I-1,J+2))
+      tmp3=1.0_SP/12.0_SP/DY(I,J)*(Uin(I+1,J-2)-8.0_SP*Uin(I+1,J-1) &
+      +8.0_SP*Uin(I+1,J+1)-Uin(I+1,J+2))
+      tmp4=1.0_SP/12.0_SP/DY(I,J)*(Uin(I+2,J-2)-8.0_SP*Uin(I+2,J-1) &
+      +8.0_SP*Uin(I+2,J+1)-Uin(I+2,J+2))
+      Uout(I,J)=MASK(I,J)/12.0_SP/DX(I,J)*(tmp1-8.0_SP*tmp2 &
+      +8.0_SP*tmp3-tmp4)
+    ENDDO
+  ENDDO
 # endif
 
 END SUBROUTINE DERIVATIVE_XY_HIGH
@@ -420,37 +420,37 @@ END SUBROUTINE DERIVATIVE_XY_HIGH
 !
 !-------------------------------------------------------------------------------------
 SUBROUTINE DERIVATIVE_XX_HIGH(M,N,Ibeg,Iend,Jbeg,Jend,MASK,DX,Uin,Uout)
-     USE PARAM
-     IMPLICIT NONE
-     INTEGER,INTENT(IN) :: M,N,Ibeg,Iend,Jbeg,Jend
-     REAL(SP),DIMENSION(M,N),INTENT(IN) :: Uin
+  USE PARAM
+  IMPLICIT NONE
+  INTEGER,INTENT(IN) :: M,N,Ibeg,Iend,Jbeg,Jend
+  REAL(SP),DIMENSION(M,N),INTENT(IN) :: Uin
 # if defined (CARTESIAN)
-     REAL(SP),INTENT(IN) :: DX
+  REAL(SP),INTENT(IN) :: DX
 # else
-     REAL(SP),DIMENSION(M,N),INTENT(IN) :: DX
+  REAL(SP),DIMENSION(M,N),INTENT(IN) :: DX
 # endif
-     INTEGER,DIMENSION(M,N),INTENT(IN) :: MASK
-     REAL(SP),DIMENSION(M,N),INTENT(OUT) :: Uout
+  INTEGER,DIMENSION(M,N),INTENT(IN) :: MASK
+  REAL(SP),DIMENSION(M,N),INTENT(OUT) :: Uout
 
-! I assume no 2nd derivative
-! Chen, Salatin
-!!!!!!!!!!!!!!!!!!! Code Optimization
-!!!!!!!!!!!!!!!!!!! moving loop inside logical
+  ! I assume no 2nd derivative
+  ! Chen, Salatin
+  !!!!!!!!!!!!!!!!!!! Code Optimization
+  !!!!!!!!!!!!!!!!!!! moving loop inside logical
 
 # if defined (CARTESIAN)
-    DO J=Jbeg,Jend
+  DO J=Jbeg,Jend
     DO I=Ibeg,Iend
-       Uout(I,J) = MASK(I,J)*1.0_SP/12.0_SP/DX/DX*(-Uin(I-2,J)+16.0_SP*Uin(I-1,J)   &
-                -30.0_SP*Uin(I,J)+16.0_SP*Uin(I+1,J)-Uin(I+2,J))
+      Uout(I,J) = MASK(I,J)*1.0_SP/12.0_SP/DX/DX*(-Uin(I-2,J)+16.0_SP*Uin(I-1,J)   &
+      -30.0_SP*Uin(I,J)+16.0_SP*Uin(I+1,J)-Uin(I+2,J))
     ENDDO
-    ENDDO
+  ENDDO
 # else
-    DO J=Jbeg,Jend
+  DO J=Jbeg,Jend
     DO I=Ibeg,Iend
-       Uout(I,J) = MASK(I,J)*1.0_SP/12.0_SP/DX(I,J)/DX(I,J)*(-Uin(I-2,J)+16.0_SP*Uin(I-1,J)   &
-                -30.0_SP*Uin(I,J)+16.0_SP*Uin(I+1,J)-Uin(I+2,J))
+      Uout(I,J) = MASK(I,J)*1.0_SP/12.0_SP/DX(I,J)/DX(I,J)*(-Uin(I-2,J)+16.0_SP*Uin(I-1,J)   &
+      -30.0_SP*Uin(I,J)+16.0_SP*Uin(I+1,J)-Uin(I+2,J))
     ENDDO
-    ENDDO
+  ENDDO
 # endif
 
 END SUBROUTINE DERIVATIVE_XX_HIGH
@@ -464,36 +464,36 @@ END SUBROUTINE DERIVATIVE_XX_HIGH
 !
 ! --------------------------------------------------
 SUBROUTINE DERIVATIVE_YY_HIGH(M,N,Ibeg,Iend,Jbeg,Jend,MASK,DY,Uin,Uout)
-     USE PARAM
-     IMPLICIT NONE
-     INTEGER,INTENT(IN) :: M,N,Ibeg,Iend,Jbeg,Jend
-     REAL(SP),DIMENSION(M,N),INTENT(IN) :: Uin
+  USE PARAM
+  IMPLICIT NONE
+  INTEGER,INTENT(IN) :: M,N,Ibeg,Iend,Jbeg,Jend
+  REAL(SP),DIMENSION(M,N),INTENT(IN) :: Uin
 # if defined (CARTESIAN)
-     REAL(SP),INTENT(IN) :: DY
+  REAL(SP),INTENT(IN) :: DY
 # else
-     REAL(SP),DIMENSION(M,N),INTENT(IN) :: DY
+  REAL(SP),DIMENSION(M,N),INTENT(IN) :: DY
 # endif
-     INTEGER,DIMENSION(M,N),INTENT(IN) :: MASK
-     REAL(SP),DIMENSION(M,N),INTENT(OUT) :: Uout
+  INTEGER,DIMENSION(M,N),INTENT(IN) :: MASK
+  REAL(SP),DIMENSION(M,N),INTENT(OUT) :: Uout
 
-! Chen, Salatin
-!!!!!!!!!!!!!!!!!!! Code Optimization
-!!!!!!!!!!!!!!!!!!! moving loop inside logical
+  ! Chen, Salatin
+  !!!!!!!!!!!!!!!!!!! Code Optimization
+  !!!!!!!!!!!!!!!!!!! moving loop inside logical
 
 # if defined (CARTESIAN)
-   DO J=Jbeg,Jend
-   DO I=Ibeg,Iend
-       Uout(I,J) = MASK(I,J)*1.0_SP/12.0_SP/DY/DY*(-Uin(I,J-2)+16.0_SP*Uin(I,J-1)   &
-                -30.0_SP*Uin(I,J)+16.0_SP*Uin(I,J+1)-Uin(I,J+2))
-    ENDDO
-    ENDDO
-# else
-    DO J=Jbeg,Jend
+  DO J=Jbeg,Jend
     DO I=Ibeg,Iend
-       Uout(I,J) = MASK(I,J)*1.0_SP/12.0_SP/DY(I,J)/DY(I,J)*(-Uin(I,J-2)+16.0_SP*Uin(I,J-1)   &
-                -30.0_SP*Uin(I,J)+16.0_SP*Uin(I,J+1)-Uin(I+2,J+2))
+      Uout(I,J) = MASK(I,J)*1.0_SP/12.0_SP/DY/DY*(-Uin(I,J-2)+16.0_SP*Uin(I,J-1)   &
+      -30.0_SP*Uin(I,J)+16.0_SP*Uin(I,J+1)-Uin(I,J+2))
     ENDDO
+  ENDDO
+# else
+  DO J=Jbeg,Jend
+    DO I=Ibeg,Iend
+      Uout(I,J) = MASK(I,J)*1.0_SP/12.0_SP/DY(I,J)/DY(I,J)*(-Uin(I,J-2)+16.0_SP*Uin(I,J-1)   &
+      -30.0_SP*Uin(I,J)+16.0_SP*Uin(I,J+1)-Uin(I+2,J+2))
     ENDDO
+  ENDDO
 # endif
 
 END SUBROUTINE DERIVATIVE_YY_HIGH

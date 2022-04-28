@@ -52,155 +52,155 @@
 !-------------------------------------------------------------------------------------
 
 SUBROUTINE INDEX
-    USE GLOBAL
-    IMPLICIT NONE
-    INTEGER :: icp
+  USE GLOBAL
+  IMPLICIT NONE
+  INTEGER :: icp
 
-![--------------ykchoi 02/May/2017
-    INTEGER :: myidi, myidj, irank
-    INTEGER, ALLOCATABLE :: iistas(:), iiends(:), jjstas(:), jjends(:)
-!--------------ykchoi 02/May/2017]
+  ![--------------ykchoi 02/May/2017
+  INTEGER :: myidi, myidj, irank
+  INTEGER, ALLOCATABLE :: iistas(:), iiends(:), jjstas(:), jjends(:)
+  !--------------ykchoi 02/May/2017]
 
-! TEMP
+  ! TEMP
 # if defined (PARALLEL)
 
-    ALLOCATE(ProcessorID(PX,PY))
+  ALLOCATE(ProcessorID(PX,PY))
 
-    NumberProcessor = px*py
-    dims(1) = px
-    dims(2) = py
-    periods(1) = .false.
-    periods(2) = .false.
+  NumberProcessor = px*py
+  dims(1) = px
+  dims(2) = py
+  periods(1) = .false.
+  periods(2) = .false.
 
-! dont use periodic because our TRID solver is not based on
-!  the cyclic topology
-!    IF(PERIODIC) periods(2) = .true.
+  ! dont use periodic because our TRID solver is not based on
+  !  the cyclic topology
+  !    IF(PERIODIC) periods(2) = .true.
 
-    coords(1) = 0
-    coords(2) = 0
+  coords(1) = 0
+  coords(2) = 0
 
-![--------------ykchoi 04/May/2017
-   if( nprocs /= NumberProcessor) then
-     if( myid==0 ) then
-	 print *, '======================================================='
-       print *, '*** STOP :: Number of processors(',nprocs,') in MPIRUN /= Px*Py(',PX*PY,') ***'
-	 print *, '======================================================='
-     endif
-     call MPI_FINALIZE ( ier )
-   endif
-!--------------ykchoi 04/May/2017]
+  ![--------------ykchoi 04/May/2017
+  if( nprocs /= NumberProcessor) then
+    if( myid==0 ) then
+      print *, '======================================================='
+      print *, '*** STOP :: Number of processors(',nprocs,') in MPIRUN /= Px*Py(',PX*PY,') ***'
+      print *, '======================================================='
+    endif
+    call MPI_FINALIZE ( ier )
+  endif
+  !--------------ykchoi 04/May/2017]
 
-    call MPI_CART_CREATE( MPI_COMM_WORLD, ndims, dims, &
-         periods, reorder, comm2d, ier )
-    call MPI_CART_COORDS( comm2d, myid, 2, coords, ier)
+  call MPI_CART_CREATE( MPI_COMM_WORLD, ndims, dims, &
+  periods, reorder, comm2d, ier )
+  call MPI_CART_COORDS( comm2d, myid, 2, coords, ier)
 
-    npx = coords(1)
-    npy = coords(2)
+  npx = coords(1)
+  npy = coords(2)
 
-    call MPI_Cart_shift( comm2d, 0, 1, n_west, n_east, ier )
-    call MPI_Cart_shift( comm2d, 1, 1, n_suth, n_nrth, ier )
+  call MPI_Cart_shift( comm2d, 0, 1, n_west, n_east, ier )
+  call MPI_Cart_shift( comm2d, 1, 1, n_suth, n_nrth, ier )
 
-    icp=0
-    DO I=1,PX
+  icp=0
+  DO I=1,PX
     DO J=1,PY
       ProcessorID(I,J) = icp
-	![----ykchoi(04/May/2017)
-	if( myid == icp ) then
-	  myidi = I-1; myidj = J-1
-	endif
-	!----ykchoi]
+      ![----ykchoi(04/May/2017)
+      if( myid == icp ) then
+        myidi = I-1; myidj = J-1
+      endif
+      !----ykchoi]
       icp=icp+1
     ENDDO
-    ENDDO
+  ENDDO
 
-! check
-! print*,myid, n_west,n_east,n_suth,n_nrth,ProcessorID(1,1),ProcessorID(1,2)
-!      print*,myid,ProcessorID(1,1),ProcessorID(2,1),ProcessorID(1,2),ProcessorID(2,2)
-!      call MPI_FINALIZE ( ier )
+  ! check
+  ! print*,myid, n_west,n_east,n_suth,n_nrth,ProcessorID(1,1),ProcessorID(1,2)
+  !      print*,myid,ProcessorID(1,1),ProcessorID(2,1),ProcessorID(1,2),ProcessorID(2,2)
+  !      call MPI_FINALIZE ( ier )
 
 # else
   px=1
   py=1
 # endif
 
-! now for serial code
-![--------------ykchoi 04/May/2017
-    !Mloc=Mglob/px+2*Nghost
-    !Nloc=Nglob/py+2*Nghost
+  ! now for serial code
+  ![--------------ykchoi 04/May/2017
+  !Mloc=Mglob/px+2*Nghost
+  !Nloc=Nglob/py+2*Nghost
 
 # if defined (PARALLEL)
-    call grid_range_per_procs( 1, Mglob, px, myidi, iista, iiend )
-    call grid_range_per_procs( 1, Nglob, py, myidj, jjsta, jjend )
+  call grid_range_per_procs( 1, Mglob, px, myidi, iista, iiend )
+  call grid_range_per_procs( 1, Nglob, py, myidj, jjsta, jjend )
 
-    Mloc = (iiend-iista+1) + 2*Nghost
-    Nloc = (jjend-jjsta+1) + 2*Nghost
+  Mloc = (iiend-iista+1) + 2*Nghost
+  Nloc = (jjend-jjsta+1) + 2*Nghost
 
-    !===========for check
-    allocate( iistas(nprocs), iiends(nprocs), jjstas(nprocs), jjends(nprocs) )
-    call mpi_gather( iista, 1, mpi_integer, iistas, 1, mpi_integer, &
-                     0, mpi_comm_world, ier )
-    call mpi_gather( iiend, 1, mpi_integer, iiends, 1, mpi_integer, &
-                     0, mpi_comm_world, ier )
-    call mpi_gather( jjsta, 1, mpi_integer, jjstas, 1, mpi_integer, &
-                     0, mpi_comm_world, ier )
-    call mpi_gather( jjend, 1, mpi_integer, jjends, 1, mpi_integer, &
-                     0, mpi_comm_world, ier )
+  !===========for check
+  allocate( iistas(nprocs), iiends(nprocs), jjstas(nprocs), jjends(nprocs) )
+  call mpi_gather( iista, 1, mpi_integer, iistas, 1, mpi_integer, &
+  0, mpi_comm_world, ier )
+  call mpi_gather( iiend, 1, mpi_integer, iiends, 1, mpi_integer, &
+  0, mpi_comm_world, ier )
+  call mpi_gather( jjsta, 1, mpi_integer, jjstas, 1, mpi_integer, &
+  0, mpi_comm_world, ier )
+  call mpi_gather( jjend, 1, mpi_integer, jjends, 1, mpi_integer, &
+  0, mpi_comm_world, ier )
 
-    if( myid == 0 ) then
-      open(500, file='Grid_Range.out', status='unknown')
-	write(500,'(A)')'Core#  istart#  iend#  jstart#  jend#'
-	do irank=0,nprocs-1
-	   write(500,'(5(i6,1x))') irank, iistas(irank+1), iiends(irank+1), &
-	                                  jjstas(irank+1), jjends(irank+1)
-	enddo
-	close(500)
-    endif
-    deallocate( iistas, iiends, jjstas, jjends )
-    !=============================
+  if( myid == 0 ) then
+    open(500, file='Grid_Range.out', status='unknown')
+    write(500,'(A)')'Core#  istart#  iend#  jstart#  jend#'
+    do irank=0,nprocs-1
+      write(500,'(5(i6,1x))') irank, iistas(irank+1), iiends(irank+1), &
+      jjstas(irank+1), jjends(irank+1)
+    enddo
+    close(500)
+  endif
+  deallocate( iistas, iiends, jjstas, jjends )
+  !=============================
 
 # else
-    Mloc = Mglob + 2*Nghost
-    Nloc = Nglob + 2*Nghost
+  Mloc = Mglob + 2*Nghost
+  Nloc = Nglob + 2*Nghost
 
 # endif
-!--------------ykchoi 04/May/2017]
+  !--------------ykchoi 04/May/2017]
 
-    Mloc1=Mloc+1
-    Nloc1=Nloc+1
+  Mloc1=Mloc+1
+  Nloc1=Nloc+1
 
-    Ibeg=Nghost+1
-    Iend=Mloc-Nghost
-    Iend1=Mloc1-Nghost
-    Jbeg=Nghost+1
-    Jend=Nloc-Nghost
-    Jend1=Nloc1-Nghost
+  Ibeg=Nghost+1
+  Iend=Mloc-Nghost
+  Iend1=Mloc1-Nghost
+  Jbeg=Nghost+1
+  Jend=Nloc-Nghost
+  Jend1=Nloc1-Nghost
 
 END SUBROUTINE INDEX
 
 ![--------------ykchoi 04/May/2017
 subroutine grid_range_per_procs( n1, n2, nprocs, myid, stag, endg )
-!-------------------------------------------------------------------------------------
-!
-!    Grid_range_per_procs is subroutine to get iiend etc
-!
-!    HISTORY:
-!       05/10/2017 Fengyan Shi copied from Chois codes
-!
-!-------------------------------------------------------------------------------------
+  !-------------------------------------------------------------------------------------
+  !
+  !    Grid_range_per_procs is subroutine to get iiend etc
+  !
+  !    HISTORY:
+  !       05/10/2017 Fengyan Shi copied from Chois codes
+  !
+  !-------------------------------------------------------------------------------------
 
-    implicit none
-    integer, intent(in) :: n1, n2, nprocs, myid
-    integer, intent(out) :: stag, endg
+  implicit none
+  integer, intent(in) :: n1, n2, nprocs, myid
+  integer, intent(out) :: stag, endg
 
-    integer :: inum1, inum2
+  integer :: inum1, inum2
 
-    inum1 = int( ( n2 - n1 + 1 )/nprocs )
-    inum2 = mod( n2-n1+1, nprocs )
+  inum1 = int( ( n2 - n1 + 1 )/nprocs )
+  inum2 = mod( n2-n1+1, nprocs )
 
-    stag = myid*inum1 + n1 + min(myid, inum2)
-    endg = stag + inum1 - 1
+  stag = myid*inum1 + n1 + min(myid, inum2)
+  endg = stag + inum1 - 1
 
-    if( inum2 > myid ) endg=endg+1
+  if( inum2 > myid ) endg=endg+1
 endsubroutine grid_range_per_procs
 !--------------ykchoi 04/May/2017]
 
@@ -214,84 +214,84 @@ endsubroutine grid_range_per_procs
 !-------------------------------------------------------------------------------------
 
 SUBROUTINE ESTIMATE_DT(M,N,DX,DY,U,V,H,MinDepthFrc,DT,CFL,TIME)
-     USE PARAM
-     USE GLOBAL, ONLY : DT_fixed, FIXED_DT
+  USE PARAM
+  USE GLOBAL, ONLY : DT_fixed, FIXED_DT
 # if defined (PARALLEL)
-     USE GLOBAL, ONLY : ier,myid
+  USE GLOBAL, ONLY : ier,myid
 # endif
-     IMPLICIT NONE
-     INTEGER,INTENT(IN)::M,N
+  IMPLICIT NONE
+  INTEGER,INTENT(IN)::M,N
 # if defined (PARALLEL)
-     REAL(SP) :: myvar
+  REAL(SP) :: myvar
 # endif
 
 # if defined (CARTESIAN)
-     REAL(SP),INTENT(IN)::DX,DY
+  REAL(SP),INTENT(IN)::DX,DY
 # else
-     REAL(SP),DIMENSION(M,N),INTENT(IN)::DX,DY
+  REAL(SP),DIMENSION(M,N),INTENT(IN)::DX,DY
 # endif
-     REAL(SP),INTENT(IN),DIMENSION(M,N)::U,V,H
-     REAL(SP),INTENT(IN)::CFL,MinDepthFrc
-     REAL(SP),INTENT(OUT)::DT
-     REAL(SP),INTENT(INOUT)::TIME
-     REAL(SP) :: DT_tmp
+  REAL(SP),INTENT(IN),DIMENSION(M,N)::U,V,H
+  REAL(SP),INTENT(IN)::CFL,MinDepthFrc
+  REAL(SP),INTENT(OUT)::DT
+  REAL(SP),INTENT(INOUT)::TIME
+  REAL(SP) :: DT_tmp
 
-     TMP3=LARGE
-     DO J=1,N
-     DO I=1,M
-! x direction
+  TMP3=LARGE
+  DO J=1,N
+    DO I=1,M
+      ! x direction
       TMP1=ABS(U(I,J))+SQRT(GRAV*MAX(H(I,J),MinDepthFrc))
       IF(TMP1<SMALL)THEN
 # if defined (CARTESIAN)
-       TMP2=DX/SMALL
+        TMP2=DX/SMALL
 # else
-       TMP2=DX(I,J)/SMALL
+        TMP2=DX(I,J)/SMALL
 # endif
       ELSE
 # if defined (CARTESIAN)
-       TMP2=DX/TMP1
+        TMP2=DX/TMP1
 # else
-       TMP2=DX(I,J)/TMP1
+        TMP2=DX(I,J)/TMP1
 # endif
       ENDIF
       IF(TMP2<TMP3)TMP3=TMP2
-! y direction
+      ! y direction
       TMP1=ABS(V(I,J))+SQRT(GRAV*MAX(H(I,J),MinDepthFrc))
       IF(TMP1<SMALL)THEN
 # if defined (CARTESIAN)
-       TMP2=DY/SMALL
+        TMP2=DY/SMALL
 # else
-       TMP2=DY(I,J)/SMALL
+        TMP2=DY(I,J)/SMALL
 # endif
       ELSE
 # if defined (CARTESIAN)
-       TMP2=DY/TMP1
+        TMP2=DY/TMP1
 # else
-       TMP2=DY(I,J)/TMP1
+        TMP2=DY(I,J)/TMP1
 # endif
       ENDIF
       IF(TMP2<TMP3)TMP3=TMP2
-     ENDDO
-     ENDDO
+    ENDDO
+  ENDDO
 # if defined (PARALLEL)
-     call MPI_ALLREDUCE (TMP3,myvar,1,MPI_SP,MPI_MIN,&
-          MPI_COMM_WORLD,ier)
-     TMP3 = myvar
+  call MPI_ALLREDUCE (TMP3,myvar,1,MPI_SP,MPI_MIN,&
+  MPI_COMM_WORLD,ier)
+  TMP3 = myvar
 # endif
-     DT_tmp=CFL*TMP3
+  DT_tmp=CFL*TMP3
 
-    IF(FIXED_DT)THEN
+  IF(FIXED_DT)THEN
 
-      DT = DT_fixed
-      DO WHILE (DT > DT_tmp)
-        DT=DT/2.0_SP
-      ENDDO
-    ELSE
-     DT = DT_tmp
-    ENDIF
+    DT = DT_fixed
+    DO WHILE (DT > DT_tmp)
+      DT=DT/2.0_SP
+    ENDDO
+  ELSE
+    DT = DT_tmp
+  ENDIF
 
-! TEMP
-     TIME=TIME+DT
+  ! TEMP
+  TIME=TIME+DT
 
 END SUBROUTINE ESTIMATE_DT
 
@@ -305,142 +305,142 @@ END SUBROUTINE ESTIMATE_DT
 !
 !-------------------------------------------------------------------------------------
 SUBROUTINE MAX_MIN_PROPERTY
-    USE GLOBAL
+  USE GLOBAL
 # if defined (METEO)
-    USE METEO_MODULE
+  USE METEO_MODULE
 # endif
-    IMPLICIT NONE
-    REAL(SP) :: maxv, MaxAbsEta,omega_0
+  IMPLICIT NONE
+  REAL(SP) :: maxv, MaxAbsEta,omega_0
 
-      DO J=1,Nloc
-      DO I=1,Mloc
+  DO J=1,Nloc
+    DO I=1,Mloc
 # if defined (METEO)
-       IF(OUT_Hmax.OR.WindForce)THEN
+      IF(OUT_Hmax.OR.WindForce)THEN
 # else
-       IF(OUT_Hmax)THEN
+        IF(OUT_Hmax)THEN
 # endif
-        IF(MASK(I,J).GT.0)THEN
-        IF(Eta(I,J).GT.HeightMax(I,J)) HeightMax(I,J)=Eta(I,J)
+          IF(MASK(I,J).GT.0)THEN
+            IF(Eta(I,J).GT.HeightMax(I,J)) HeightMax(I,J)=Eta(I,J)
+          ENDIF
         ENDIF
-       ENDIF
 
-       IF(OUT_Hmin)THEN
-        IF(MASK(I,J).GT.0)THEN
-        IF(Eta(I,J).LT.HeightMin(I,J)) HeightMin(I,J)=Eta(I,J)
+        IF(OUT_Hmin)THEN
+          IF(MASK(I,J).GT.0)THEN
+            IF(Eta(I,J).LT.HeightMin(I,J)) HeightMin(I,J)=Eta(I,J)
+          ENDIF
         ENDIF
-       ENDIF
 
-       IF(OUT_Umax)THEN
-        IF(MASK(I,J).GT.0)THEN
-          maxv=SQRT(U(I,J)*U(I,J)+V(I,J)*V(I,J))
-          IF(maxV.GT.VelocityMax(I,J)) VelocityMax(I,J)=maxV
+        IF(OUT_Umax)THEN
+          IF(MASK(I,J).GT.0)THEN
+            maxv=SQRT(U(I,J)*U(I,J)+V(I,J)*V(I,J))
+            IF(maxV.GT.VelocityMax(I,J)) VelocityMax(I,J)=maxV
+          ENDIF
         ENDIF
-       ENDIF
 
-       IF(OUT_MFmax)THEN
-        IF(MASK(I,J).GT.0)THEN
-          maxv=(U(I,J)*U(I,J)+V(I,J)*V(I,J))*(H(I,J))
-          IF(maxv.GT.MomentumFluxMax(I,J)) MomentumFluxMax(I,J)=maxv
+        IF(OUT_MFmax)THEN
+          IF(MASK(I,J).GT.0)THEN
+            maxv=(U(I,J)*U(I,J)+V(I,J)*V(I,J))*(H(I,J))
+            IF(maxv.GT.MomentumFluxMax(I,J)) MomentumFluxMax(I,J)=maxv
+          ENDIF
         ENDIF
-       ENDIF
 
 
       ENDDO
-      ENDDO
+    ENDDO
 
-      IF(OUT_VORmax) THEN
+    IF(OUT_VORmax) THEN
 # if defined (CARTESIAN)
-   ! the vorticity has been calculated in dispersion.F
-# else
-     CALL DERIVATIVE_X(Mloc,Nloc,Ibeg,Iend,Jbeg,Jend,MASK9,DX,V,Vx)
-     CALL DERIVATIVE_Y(Mloc,Nloc,Ibeg,Iend,Jbeg,Jend,MASK9,DY,U,Uy)
-     DO J=Jbeg,Jend
-     DO I=Ibeg,Iend
-        omega_0=ABS(Vx(I,J)-Uy(I,J))
-        IF(omega_0.GT.VorticityMax(I,J)) THEN
-          VorticityMax(I,J)=omega_0
-        ENDIF
-     ENDDO
-     ENDDO
-# endif
-      ENDIF ! max vorticity
-
-
-! Chen, Salatin, calculatin of vorticity
-# if defined (CARTESIAN)
-   ! the vorticity has been calculated in dispersion.F
+      ! the vorticity has been calculated in dispersion.F
 # else
       CALL DERIVATIVE_X(Mloc,Nloc,Ibeg,Iend,Jbeg,Jend,MASK9,DX,V,Vx)
       CALL DERIVATIVE_Y(Mloc,Nloc,Ibeg,Iend,Jbeg,Jend,MASK9,DY,U,Uy)
-      Vor_Instant=Vx-Uy
+      DO J=Jbeg,Jend
+        DO I=Ibeg,Iend
+          omega_0=ABS(Vx(I,J)-Uy(I,J))
+          IF(omega_0.GT.VorticityMax(I,J)) THEN
+            VorticityMax(I,J)=omega_0
+          ENDIF
+        ENDDO
+      ENDDO
+# endif
+    ENDIF ! max vorticity
+
+
+    ! Chen, Salatin, calculatin of vorticity
+# if defined (CARTESIAN)
+    ! the vorticity has been calculated in dispersion.F
+# else
+    CALL DERIVATIVE_X(Mloc,Nloc,Ibeg,Iend,Jbeg,Jend,MASK9,DX,V,Vx)
+    CALL DERIVATIVE_Y(Mloc,Nloc,Ibeg,Iend,Jbeg,Jend,MASK9,DY,U,Uy)
+    Vor_Instant=Vx-Uy
 # endif
 
 # if defined (PARALLEL)
-      IF(OUT_VORmax) THEN
-       CALL phi_exch(VorticityMax)
-      ENDIF
+    IF(OUT_VORmax) THEN
+      CALL phi_exch(VorticityMax)
+    ENDIF
 # endif
 
 
-END SUBROUTINE MAX_MIN_PROPERTY
+  END SUBROUTINE MAX_MIN_PROPERTY
 
-!-------------------------------------------------------------------------------------
-!
-!    CHECK_BLOWUP is subroutine to check numerical stability
-!
-!    HISTORY:
-!        01/23/2015 Young-Kwang Choi
-!        02/15/2016 Fengyan Shi, added the threshold to 100*max_depth
-!
-!-------------------------------------------------------------------------------------
-SUBROUTINE CHECK_BLOWUP
+  !-------------------------------------------------------------------------------------
+  !
+  !    CHECK_BLOWUP is subroutine to check numerical stability
+  !
+  !    HISTORY:
+  !        01/23/2015 Young-Kwang Choi
+  !        02/15/2016 Fengyan Shi, added the threshold to 100*max_depth
+  !
+  !-------------------------------------------------------------------------------------
+  SUBROUTINE CHECK_BLOWUP
     USE GLOBAL
     IMPLICIT NONE
-![ykchoi 15.01.23.
-     REAL(SP) :: MaxAbsEta
+    ![ykchoi 15.01.23.
+    REAL(SP) :: MaxAbsEta
 # if defined (PARALLEL)
-     REAL(SP)::myvar_tmp
+    REAL(SP)::myvar_tmp
 # endif
 
-	MaxAbsEta=MAXVAL( abs(Eta(Ibeg:Iend,Jbeg:Jend)) )
+    MaxAbsEta=MAXVAL( abs(Eta(Ibeg:Iend,Jbeg:Jend)) )
 # if defined (PARALLEL)
-      CALL MPI_ALLREDUCE(MaxAbsEta,myvar_tmp,1,MPI_SP,MPI_MAX,MPI_COMM_WORLD,ier)
-      MaxAbsEta = myvar_tmp
+    CALL MPI_ALLREDUCE(MaxAbsEta,myvar_tmp,1,MPI_SP,MPI_MAX,MPI_COMM_WORLD,ier)
+    MaxAbsEta = myvar_tmp
 # endif
 
-	if (MaxAbsEta > EtaBlowVal) then
+    if (MaxAbsEta > EtaBlowVal) then
 # if defined (PARALLEL)
-	   if (myid.eq.0) then
+      if (myid.eq.0) then
 # endif
-	      WRITE(*,*) "========================================="
-		  WRITE(*,*) "BlowUp Time, MaxAbsEta=", Time, MaxAbsEta
-	      WRITE(*,*) "========================================="
+        WRITE(*,*) "========================================="
+        WRITE(*,*) "BlowUp Time, MaxAbsEta=", Time, MaxAbsEta
+        WRITE(*,*) "========================================="
 # if defined (PARALLEL)
-	   endif
+      endif
 # endif
-	   ICOUNT=99998;
-	   CALL PREVIEW
+      ICOUNT=99998;
+      CALL PREVIEW
 
 # if defined (PARALLEL)
-     call MPI_FINALIZE ( ier )
+      call MPI_FINALIZE ( ier )
 # else
-     STOP
+      STOP
 # endif
 
-	endif
+    endif
 
 
-END SUBROUTINE CHECK_BLOWUP
+  END SUBROUTINE CHECK_BLOWUP
 
-!-------------------------------------------------------------------------------------
-!
-!   wall_time_secs is used to calculate current wall time
-!
-!   HISTORY:
-!   Gangfeng Ma, 09/12/2011
-!
-!-------------------------------------------------------------------------------------
-    SUBROUTINE wall_time_secs(tcurrent)
+  !-------------------------------------------------------------------------------------
+  !
+  !   wall_time_secs is used to calculate current wall time
+  !
+  !   HISTORY:
+  !   Gangfeng Ma, 09/12/2011
+  !
+  !-------------------------------------------------------------------------------------
+  SUBROUTINE wall_time_secs(tcurrent)
     IMPLICIT NONE
     INTEGER, dimension(8) :: walltime
     real, INTENT(OUT) :: tcurrent
@@ -457,23 +457,23 @@ END SUBROUTINE CHECK_BLOWUP
     years = real(walltime(1))
 
     if((months.eq.1).or.(months.eq.3).or.(months.eq.5).or.  &
-          (months.eq.7).or.(months.eq.8).or.(months.eq.10).or.  &
-          (months.eq.12)) then
-      mscale = 31.0
-    elseif((months.eq.4).or.(months.eq.6).or.  &
-          (months.eq.9).or.(months.eq.11)) then
-      mscale = 30.0
-    elseif(years.eq.4*int(years/4)) then
-      mscale = 29.0
-    else
-      mscale = 28.0
-    endif
+    (months.eq.7).or.(months.eq.8).or.(months.eq.10).or.  &
+    (months.eq.12)) then
+    mscale = 31.0
+  elseif((months.eq.4).or.(months.eq.6).or.  &
+    (months.eq.9).or.(months.eq.11)) then
+    mscale = 30.0
+  elseif(years.eq.4*int(years/4)) then
+    mscale = 29.0
+  else
+    mscale = 28.0
+  endif
 
-    tcurrent = months*mscale*24.0*60.0*60.0+days*24.0*60.0*60.0+  &
-         hrs*60.0*60.0+60.0*mins+secs+msecs/1000.0
+  tcurrent = months*mscale*24.0*60.0*60.0+days*24.0*60.0*60.0+  &
+  hrs*60.0*60.0+60.0*mins+secs+msecs/1000.0
 
-    return
-    end SUBROUTINE wall_time_secs
+  return
+end SUBROUTINE wall_time_secs
 
 #if defined (FILTERING)
 SUBROUTINE SHAPIRO_3(M,N,Nghost,MASK,VAR_IN_OUT)
@@ -491,42 +491,42 @@ SUBROUTINE SHAPIRO_3(M,N,Nghost,MASK,VAR_IN_OUT)
   INTEGER :: I,J
 
 
-! x direction
+  ! x direction
   DO J=1,N
-  DO I=1+Nghost,M-Nghost
-    IF(MASK(I,J)==1) THEN
-      p0=VAR_IN_OUT(I,J)
-      pp1=VAR_IN_OUT(I+1,J)*MASK(I+1,J)+(1.0-MASK(I+1,J))*p0
-      pp2=VAR_IN_OUT(I+2,J)*MASK(I+2,J)+(1.0-MASK(I+2,J))*p0
-      pp3=VAR_IN_OUT(I+3,J)*MASK(I+3,J)+(1.0-MASK(I+3,J))*p0
-      pn1=VAR_IN_OUT(I-1,J)*MASK(I-1,J)+(1.0-MASK(I-1,J))*p0
-      pn2=VAR_IN_OUT(I-2,J)*MASK(I-2,J)+(1.0-MASK(I-2,J))*p0
-      pn3=VAR_IN_OUT(I-3,J)*MASK(I-3,J)+(1.0-MASK(I-3,J))*p0
+    DO I=1+Nghost,M-Nghost
+      IF(MASK(I,J)==1) THEN
+        p0=VAR_IN_OUT(I,J)
+        pp1=VAR_IN_OUT(I+1,J)*MASK(I+1,J)+(1.0-MASK(I+1,J))*p0
+        pp2=VAR_IN_OUT(I+2,J)*MASK(I+2,J)+(1.0-MASK(I+2,J))*p0
+        pp3=VAR_IN_OUT(I+3,J)*MASK(I+3,J)+(1.0-MASK(I+3,J))*p0
+        pn1=VAR_IN_OUT(I-1,J)*MASK(I-1,J)+(1.0-MASK(I-1,J))*p0
+        pn2=VAR_IN_OUT(I-2,J)*MASK(I-2,J)+(1.0-MASK(I-2,J))*p0
+        pn3=VAR_IN_OUT(I-3,J)*MASK(I-3,J)+(1.0-MASK(I-3,J))*p0
 
-      VAR(I,J) = a1*p0+a2*(pp1+pn1)+a3*(pp2+pn2)+a4*(pp3+pn3)
+        VAR(I,J) = a1*p0+a2*(pp1+pn1)+a3*(pp2+pn2)+a4*(pp3+pn3)
 
-    ENDIF
+      ENDIF
+    ENDDO
   ENDDO
-  ENDDO
 
 
-! y direction
+  ! y direction
 
   DO J=1+Nghost,N-Nghost
-  DO I=1,M
-    IF(MASK(I,J)==1) THEN
-      p0=VAR(I,J)
-      pp1=VAR(I,J+1)*MASK(I,J+1)+(1.0-MASK(I,J+1))*p0
-      pp2=VAR(I,J+2)*MASK(I,J+2)+(1.0-MASK(I,J+2))*p0
-      pp3=VAR(I,J+3)*MASK(I,J+3)+(1.0-MASK(I,J+3))*p0
-      pn1=VAR(I,J-1)*MASK(I,J-1)+(1.0-MASK(I,J-1))*p0
-      pn2=VAR(I,J-2)*MASK(I,J-2)+(1.0-MASK(I,J-2))*p0
-      pn3=VAR(I,J-3)*MASK(I,J-3)+(1.0-MASK(I,J-3))*p0
+    DO I=1,M
+      IF(MASK(I,J)==1) THEN
+        p0=VAR(I,J)
+        pp1=VAR(I,J+1)*MASK(I,J+1)+(1.0-MASK(I,J+1))*p0
+        pp2=VAR(I,J+2)*MASK(I,J+2)+(1.0-MASK(I,J+2))*p0
+        pp3=VAR(I,J+3)*MASK(I,J+3)+(1.0-MASK(I,J+3))*p0
+        pn1=VAR(I,J-1)*MASK(I,J-1)+(1.0-MASK(I,J-1))*p0
+        pn2=VAR(I,J-2)*MASK(I,J-2)+(1.0-MASK(I,J-2))*p0
+        pn3=VAR(I,J-3)*MASK(I,J-3)+(1.0-MASK(I,J-3))*p0
 
-      VAR_IN_OUT(I,J) = a1*p0+a2*(pp1+pn1)+a3*(pp2+pn2)+a4*(pp3+pn3)
+        VAR_IN_OUT(I,J) = a1*p0+a2*(pp1+pn1)+a3*(pp2+pn2)+a4*(pp3+pn3)
 
-    ENDIF
-  ENDDO
+      ENDIF
+    ENDDO
   ENDDO
 
 
