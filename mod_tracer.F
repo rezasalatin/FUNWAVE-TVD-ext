@@ -194,7 +194,7 @@ SUBROUTINE GET_XY_POSITION
     y1=Y_TRACK(I)
 
     search_count=0
-    300       CONTINUE  ! re-search
+300   CONTINUE  ! re-search
     search_count=search_count+1
 
     IF(.NOT.STOP_SEARCH(I)) THEN
@@ -327,7 +327,7 @@ SUBROUTINE GET_XY_POSITION
       IN_CELL(I) = .FALSE.
       FOUND_IN_DOMAIN(I) = 0
 
-      120       continue
+120   continue
 
 
 # if defined (PARALLEL)

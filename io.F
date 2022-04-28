@@ -2242,8 +2242,8 @@ IF(WaveMaker(1:3)=='ABS'.OR.WaveMaker(1:11)=='LEFT_BC_IRR') THEN
       READ(1,*,END=991)(Phase_LEFT(J,I),J=1,NumFreq)
     ENDDO
     CLOSE(1)
-    881  INPUT_PHASE = .TRUE.
-    991  CONTINUE
+881   INPUT_PHASE = .TRUE.
+991   CONTINUE
 
     DO J=1,NumFreq
       DO I=1,NumDir
@@ -4096,7 +4096,7 @@ SUBROUTINE PREVIEW
   WRITE(*,102)'PRINTING FILE NO.', icount, ' TIME/TOTAL: ', TIME,'/',Total_Time
 # endif
 
-  102     FORMAT(A20,I6,A14,F12.3,A2,F12.3)
+102     FORMAT(A20,I6,A14,F12.3,A2,F12.3)
 
   !ykchoi
   !itmp1=mod(icount/1000,10)
@@ -4179,7 +4179,7 @@ SUBROUTINE PREVIEW
     call PutFile(TMP_NAME,Int2Flo)
   ENDIF
 
-  210   FORMAT(5000I3)
+210   FORMAT(5000I3)
 
   IF(OUT_P)THEN
     TMP_NAME = TRIM(FDIR)//'p_'//TRIM(FILE_NAME)
@@ -4335,7 +4335,7 @@ SUBROUTINE PREVIEW
     call PutFile(TMP_NAME,nu_vis_v_r)
   ENDIF
 
-  101   continue
+101   continue
 
 END SUBROUTINE PREVIEW
 
@@ -4367,7 +4367,7 @@ SUBROUTINE PREVIEW_MEAN
   WRITE(*,102)'PRINTING MEAN FILE', icount_mean
 # endif
 
-  102     FORMAT(A20,I6)
+102     FORMAT(A20,I6)
 
   itmp1=mod(icount_mean/10000,10)
   itmp2=mod(icount_mean/1000,10)
@@ -4425,7 +4425,7 @@ SUBROUTINE PREVIEW_MEAN_UV
   WRITE(*,102)'PRINTING MEAN FILE', icount_mean_uv
 # endif
 
-  102     FORMAT(A20,I6)
+102     FORMAT(A20,I6)
 
   itmp1=mod(icount_mean_uv/10000,10)
   itmp2=mod(icount_mean_uv/1000,10)
@@ -4642,7 +4642,7 @@ SUBROUTINE PutFile(FILE,PHI)
     WRITE(1,FORMAT_LEN)(real(PHI(I,J)),I=Nghost+1,Mloc-Nghost,OUTPUT_RES)
   ENDDO
 # endif
-  100  FORMAT(5000E16.6)
+100  FORMAT(5000E16.6)
   !100   FORMAT(FORMAT_LEN)
   CLOSE(1)
 END SUBROUTINE PutFile
@@ -4832,7 +4832,7 @@ SUBROUTINE PutFile_Runup(FILE,PHI)
     DO I=Mloc,1,-1
       IF(PHI(I,J).eq.1.0) goto 208
     ENDDO
-    208      IF((I == Mloc).OR.(I == 0)) THEN
+208   IF((I == Mloc).OR.(I == 0)) THEN
     ! do nothing
   ELSE
     runup_matrix(1,J) = I

@@ -111,7 +111,7 @@ SUBROUTINE COUPLING_INITIAL
     READ(11,*)
 
   ENDIF ! n_coupling_east
-  119      FORMAT(5E16.6)
+119      FORMAT(5E16.6)
 
   ! west
   IF(N_COUPLING_WEST.GT.0)THEN
@@ -358,7 +358,7 @@ SUBROUTINE OneWayCoupling
   USE GLOBAL
   IMPLICIT NONE
 
-  119      FORMAT(5E16.6)  ! this is a fixed format for I/O
+119   FORMAT(5E16.6)  ! this is a fixed format for I/O
 
   ! determine time slot
 
@@ -428,7 +428,7 @@ SUBROUTINE OneWayCoupling
 
   ENDIF  ! time>time_2 and time_1
 
-  120 CONTINUE
+120   CONTINUE
 
   tmp2=ZERO
   tmp1=ZERO

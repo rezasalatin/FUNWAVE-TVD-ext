@@ -368,7 +368,7 @@ SUBROUTINE VESSEL_FORCING
     ENDIF
 
 
-    120 CONTINUE  ! no more data for vessel Kves
+120   CONTINUE  ! no more data for vessel Kves
 
 
   ENDDO  ! end Kves

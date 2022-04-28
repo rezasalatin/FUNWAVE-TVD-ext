@@ -130,7 +130,7 @@ SUBROUTINE INITIAL_WAVE
         Eta(i,j)=zero
       endif
 
-      200  continue
+200   continue
 
       goto 100
       ! dam break
@@ -139,7 +139,7 @@ SUBROUTINE INITIAL_WAVE
       else
         Eta(i,j)=0.0_SP
       endif
-      100   continue
+100   continue
       ! gausian
       !         r=sqrt((xx(i,j)-x_c)**2+(yy(i,j)-y_c)**2)
       !         Eta(i,j)=a*exp(-r**2/2./sigma**2)
@@ -155,7 +155,7 @@ SUBROUTINE INITIAL_WAVE
       Eta(I,J)=1.0_SP
     ENDDO
   ENDDO
-  213  continue
+213   continue
 
 END SUBROUTINE INITIAL_WAVE
 
@@ -602,7 +602,7 @@ SUBROUTINE INITIAL_RECTANGULAR(M,N,Nghost,DX,DY,Xc,Yc,WID,AMP,Eta)
         !--------Newton-Rapsons method to solve x ( >1 )for the above equation
         ite = 0
         x=1.2_SP
-        1        fx  = r+x*(q+x*(p+x))
+1       fx  = r+x*(q+x*(p+x))
         fpx = q+x*(2.0_SP*p+3.0_SP*x)
         x = x-fx/fpx
 

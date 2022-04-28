@@ -117,7 +117,7 @@ SUBROUTINE PutFileASCII_RUNUP(FILE,PHI)
       DO I=MGlob,1,-1
         IF(real(PHIGLOB(I,J)).eq.1.0) goto 2001
       ENDDO
-      2001  IF((I == MGlob).OR.(I == 1)) THEN
+2001  IF((I == MGlob).OR.(I == 1)) THEN
       ! do nothing
     ELSE
       runup_matrix(1,J) = I

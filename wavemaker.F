@@ -366,7 +366,7 @@ SUBROUTINE WAVEMAKER_INITIALIZATION
 # endif
     INPUT_WAVE_PHASE = .TRUE.
 
-    1100    CONTINUE
+1100  CONTINUE
 
     ! remove bad components caused by conversion from other programs like
     ! SWAN or measurements only consider the 2D array of spectral data
@@ -840,7 +840,7 @@ SUBROUTINE WK_NEW_WAVEMAKER_2D_SPECTRAL_DATA &
       tmp1 = SQRT((tmp3-SQRT(tmp3*tmp3-4.0_SP*tmp1*tmp2)) &
       /(2.0_SP*tmp1))/MAX(SMALL,H_gen)    ! wkn
       Theta_temp = Dire(nfre)
-      1001        IF(Theta_temp.GT.ZERO)THEN
+1001  IF(Theta_temp.GT.ZERO)THEN
       tmp3=ZERO
       I=0
       Do WHILE (tmp3<Theta_temp)
@@ -897,7 +897,7 @@ SUBROUTINE WK_NEW_WAVEMAKER_2D_SPECTRAL_DATA &
       tmp3 = Theta_temp
     ENDIF
 
-    10001       Hmo_output = WAVE_COMP(nfre,1)*2.0_SP*SQRT(2.0_SP)
+10001       Hmo_output = WAVE_COMP(nfre,1)*2.0_SP*SQRT(2.0_SP)
 
 # if defined (PARALLEL)
     if(myid==0)then
@@ -1215,14 +1215,14 @@ SUBROUTINE CALCULATE_DATA2D_Cm_Sm
     Wave_Number_Ser(I) = 2.0*pi/Wave_Length
 
     Iter = 0
-    55   Fk = Grav*Wave_Number_Ser(I)*tanh(Wave_Number_Ser(I)*Dep_Ser)-Segma_Ser(I)**2
+55   Fk = Grav*Wave_Number_Ser(I)*tanh(Wave_Number_Ser(I)*Dep_Ser)-Segma_Ser(I)**2
     if(abs(Fk)<=1.0e-8.or.Iter>1000) goto 65
     Fkdif = Grav*Wave_Number_Ser(I)*Dep_Ser*(1.0-tanh(Wave_Number_Ser(I)*Dep_Ser)**2)+  &
     Grav*tanh(Wave_Number_ser(I)*Dep_Ser)
     Wave_Number_Ser(I) = Wave_Number_Ser(I)-Fk/Fkdif
     Iter = Iter+1
     goto 55
-    65   continue
+65    continue
     Wave_Length = 2.0*pi/Wave_Number_Ser(I)
 
   ENDDO ! end NumCompSer
@@ -1577,7 +1577,7 @@ SUBROUTINE CALCULATE_TMA_Cm_Sm &
       endif
 
     enddo
-    100     continue
+100   continue
 
     ! sometimes Freq=0 happens, 02/08/2012
     IF(Freq(kff).eq.0.0)THEN
@@ -2196,7 +2196,7 @@ SUBROUTINE WK_WAVEMAKER_IRREGULAR_WAVE &
       endif
 
     enddo
-    100     continue
+100   continue
 
     ! sometimes Freq=0 happens, 02/08/2012
     IF(Freq(kff).eq.0.0)THEN
@@ -2492,7 +2492,7 @@ SUBROUTINE WK_NEW_WAVEMAKER_IRREGULAR_WAVE &
       endif
 
     enddo
-    100     continue
+100   continue
 
     ! sometimes Freq=0 happens, 02/08/2012
     IF(Freq(kff).eq.0.0)THEN
@@ -3105,7 +3105,7 @@ SUBROUTINE WK_NEW_EQUAL_DFREQ_IRREGULAR_WAVE &
     ! for periodic boundary conditions
     ! ________________
     Theta_temp = Theta(kf);
-    1000     IF(PERIODIC)THEN
+1000  IF(PERIODIC)THEN
     tmp1=wkn
     IF(Theta_temp.GT.ZERO)THEN
       tmp3=ZERO

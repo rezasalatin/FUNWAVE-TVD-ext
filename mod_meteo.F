@@ -530,7 +530,7 @@ SUBROUTINE Contant_Wind_Field_Setup
   DO I=1,NumTimeWindData
     READ(2,*,END=111)TimeWind(I),WU(I),WV(I)
   ENDDO
-  111    CONTINUE
+111    CONTINUE
   CLOSE(2)
 
 END SUBROUTINE Contant_Wind_Field_Setup
@@ -600,7 +600,7 @@ SUBROUTINE Holland_Model_Forcing
   A_storm = A_storm2*tmp1 + A_storm1*tmp2
   B_storm = B_storm2*tmp1 + B_storm1*tmp2
 
-  120 CONTINUE  ! no more data for vessel Kves
+120   CONTINUE  ! no more data for vessel Kves
 
   ! sourceX and sourceY
 
@@ -898,7 +898,7 @@ SUBROUTINE Slide_Model_Forcing
   Xstorm = Xstorm2*tmp1 +Xstorm1*tmp2
   Ystorm = Ystorm2*tmp1 +Ystorm1*tmp2
 
-  120 CONTINUE  ! no more data for vessel Kves
+120   CONTINUE  ! no more data for vessel Kves
 
   ! sourceX and sourceY
 
@@ -1119,7 +1119,7 @@ SUBROUTINE MeteoGausian_Forcing
   SigmaY= SigmaY2*tmp1 + SigmaY1*tmp2
   Theta = (Theta2*tmp1 + Theta1*tmp2)*PI/180.0_SP
 
-  120 CONTINUE  ! no more data for vessel Kves
+120   CONTINUE  ! no more data for vessel Kves
 
 # if defined (LINEAR_JUMP)
 
