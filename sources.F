@@ -406,8 +406,8 @@ SUBROUTINE SourceTerms
 # if defined (MIXING)
       !nu_smg_effectx(I,J) = tempX(I,J)
       !nu_smg_effecty(I,J) = tempY(I,J)
-      SourceX(I,J) = SourceX(I,J) ! + tempX
-      SourceY(I,J) = SourceY(I,J) ! + tempY
+      SourceX(I,J) = SourceX(I,J) ! + tempX(I,J)
+      SourceY(I,J) = SourceY(I,J) ! + tempY(I,J)
 # endif
 
       ! eddy viscosity breaking
@@ -428,7 +428,6 @@ SUBROUTINE SourceTerms
           0.5_SP/DY*(P(I,J+1)+P(I+1,J+1)-P(I,J)-P(I+1,J)) &
           -0.5_SP*(nu_vis(I,J-1)+nu_vis(I,J))* &
           0.5_SP/DY*(P(I,J)+P(I+1,J)-P(I,J-1)-P(I+1,J-1)) )
-          SourceX(I,J) = SourceX(I,J) + tempX_vis(I,J)
 
           nu_smg_effectx(I,J) = tempX_vis(I,J)
 
@@ -442,7 +441,6 @@ SUBROUTINE SourceTerms
           0.5_SP/DX*(Q(I+1,J)+Q(I+1,J+1)-Q(I,J)-Q(I,J+1)) &
           -0.5_SP*(nu_vis(I-1,J)+nu_vis(I,J))* &
           0.5_SP/DX*(Q(I,J)+Q(I,J+1)-Q(I-1,J)-Q(I-1,J+1)) )
-          SourceY(I,J) = SourceY(I,J) + tempY_vis(I,J)
 
         !ELSE
 
@@ -456,7 +454,6 @@ SUBROUTINE SourceTerms
           *1.0_SP/DY*(HU(I,J+1)-HU(I,J)) &
           -(nu_vis(I,J-1)+nu_vis(I,J)) &
           *1.0_SP/DY*(HU(I,J)-HU(I,J-1)) )
-          SourceX(I,J) = SourceX(I,J) + tempX_vis(I,J)
 
           nu_smg_effecty(I,J) = tempX_vis(I,J)
 
@@ -470,8 +467,10 @@ SUBROUTINE SourceTerms
           *1.0_SP/DY*(HV(I,J+1)-HV(I,J)) &
           -(nu_vis(I,J-1)+nu_vis(I,J)) &
           *1.0_SP/DY*(HV(I,J)-HV(I,J-1)) )
-          SourceY(I,J) = SourceY(I,J) + tempY_vis(I,J)
+
         !ENDIF ! end pq_scheme
+        SourceX(I,J) = SourceX(I,J) + tempX_vis(I,J)
+        SourceY(I,J) = SourceY(I,J) + tempY_vis(I,J)
       ENDIF  ! end eddy viscosity breaking
       ! else Cartesian
 # else
