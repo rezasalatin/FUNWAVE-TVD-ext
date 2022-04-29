@@ -403,8 +403,8 @@ SUBROUTINE SourceTerms
 # endif
 
 # if defined (MIXING)
-      !nu_smg_effectx(I,J) = tempX(I,J)
-      !nu_smg_effecty(I,J) = tempY(I,J)
+      nu_smg_effectx(I,J) = tempX(I,J)
+      nu_smg_effecty(I,J) = tempY(I,J)
       SourceX(I,J) = SourceX(I,J) ! + tempX
       SourceY(I,J) = SourceY(I,J) ! + tempY
 # endif
@@ -468,8 +468,6 @@ SUBROUTINE SourceTerms
           SourceY(I,J) = SourceY(I,J) + tempY_vis(I,J)
         ENDIF ! end pq_scheme
       ENDIF  ! end eddy viscosity breaking
-
-      nu_smg_effectx(I,J) = tempX_vis(I,J)
       ! else Cartesian
 # else
 
