@@ -296,9 +296,7 @@ SUBROUTINE phi_exch_variable_length (PHI,Mloc,Nloc,Ibeg,Iend,Jbeg,Jend,Nghost)
   endif
 
 END SUBROUTINE phi_exch_variable_length
-
 # endif
-
 
 # if defined(PARALLEL)
 !-------------------------------------------------------------------------------------
