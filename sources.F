@@ -229,6 +229,7 @@ SUBROUTINE SourceTerms
   ! depth gradient term
   DO J=Jbeg,Jend
     DO I=Ibeg,Iend
+
       tempX(I,J) = 1.0_SP/DX*( &
       0.5_SP*(nu_smg(I,J)+nu_smg(I+1,J)) &
       *1.0_SP/DX*(P(I+1,J)-P(I,J))  &
@@ -258,10 +259,6 @@ SUBROUTINE SourceTerms
       -nu_smg(I-1,J)*0.5_SP/DY*(P(I-1,J+1)-P(I-1,J-1)))
     ENDDO
   ENDDO
-
-  VTYPE=2 ! symetric in both direction
-  CALL PHI_COLL(Mloc,Nloc,Ibeg,Iend,Jbeg,Jend,Nghost,tempX,VTYPE)
-  CALL PHI_COLL(Mloc,Nloc,Ibeg,Iend,Jbeg,Jend,Nghost,tempY,VTYPE)
 
   ! Mixing
 # endif
@@ -407,8 +404,8 @@ SUBROUTINE SourceTerms
 # endif
 
 # if defined (MIXING)
-      nu_smg_effectx(I,J) = tempX(I,J)
-      nu_smg_effecty(I,J) = tempY(I,J)
+      !nu_smg_effectx(I,J) = tempX(I,J)
+      !nu_smg_effecty(I,J) = tempY(I,J)
       SourceX(I,J) = SourceX(I,J) ! + tempX
       SourceY(I,J) = SourceY(I,J) ! + tempY
 # endif
@@ -418,7 +415,7 @@ SUBROUTINE SourceTerms
       ! new variable :: WAVEMAKER_VIS
       !IF(VISCOSITY_BREAKING.OR.DIFFUSION_SPONGE)THEN
       IF(VISCOSITY_BREAKING.OR.DIFFUSION_SPONGE.OR.WAVEMAKER_VIS)THEN
-        IF(PQ_scheme)THEN
+        !IF(PQ_scheme)THEN
           ! it turns out P and Q are not exchanged at processor
           ! interface. it affects edges, make PQ_scheme=false
           tempX_vis(I,J) = 0.5_SP/DX*( &
@@ -433,6 +430,8 @@ SUBROUTINE SourceTerms
           0.5_SP/DY*(P(I,J)+P(I+1,J)-P(I,J-1)-P(I+1,J-1)) )
           SourceX(I,J) = SourceX(I,J) + tempX_vis(I,J)
 
+          nu_smg_effectx(I,J) = tempX_vis(I,J)
+
           tempY_vis(I,J) = 0.5_SP/DY*( &
           nu_vis(I,J+1)* &
           1.0_SP/DY*(Q(I,J+2)-Q(I,J+1)) &
@@ -445,7 +444,7 @@ SUBROUTINE SourceTerms
           0.5_SP/DX*(Q(I,J)+Q(I,J+1)-Q(I-1,J)-Q(I-1,J+1)) )
           SourceY(I,J) = SourceY(I,J) + tempY_vis(I,J)
 
-        ELSE
+        !ELSE
 
           tempX_vis(I,J) = 0.5_SP/DX*( &
           (nu_vis(I+1,J)+nu_vis(I,J)) &
@@ -459,6 +458,8 @@ SUBROUTINE SourceTerms
           *1.0_SP/DY*(HU(I,J)-HU(I,J-1)) )
           SourceX(I,J) = SourceX(I,J) + tempX_vis(I,J)
 
+          nu_smg_effecty(I,J) = tempX_vis(I,J)
+
           tempY_vis(I,J) = 0.5_SP/DX*( &
           (nu_vis(I+1,J)+nu_vis(I,J)) &
           *1.0_SP/DX*(HV(I+1,J)-HV(I,J)) &
@@ -470,7 +471,7 @@ SUBROUTINE SourceTerms
           -(nu_vis(I,J-1)+nu_vis(I,J)) &
           *1.0_SP/DY*(HV(I,J)-HV(I,J-1)) )
           SourceY(I,J) = SourceY(I,J) + tempY_vis(I,J)
-        ENDIF ! end pq_scheme
+        !ENDIF ! end pq_scheme
       ENDIF  ! end eddy viscosity breaking
       ! else Cartesian
 # else
