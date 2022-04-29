@@ -227,8 +227,8 @@ SUBROUTINE SourceTerms
   nu_smg = C_smg**2*DX*DY*temp_smg
 
   ! depth gradient term
-  DO J=Jbeg-1,Jend+1
-    DO I=Ibeg-1,Iend+1
+  DO J=Jbeg,Jend
+    DO I=Ibeg,Iend
       tempX(I,J) = 1.0_SP/DX*( &
       0.5_SP*(nu_smg(I,J)+nu_smg(I+1,J)) &
       *1.0_SP/DX*(P(I+1,J)-P(I,J))  &
@@ -266,8 +266,8 @@ SUBROUTINE SourceTerms
 
 
   ! depth gradient term
-  DO J=Jbeg-1,Jend+1
-    DO I=Ibeg-1,Iend+1
+  DO J=Jbeg,Jend
+    DO I=Ibeg,Iend
 # if defined (CARTESIAN)
       ! second order, move the second term to left-hand side
       SourceX(I,J)=GRAV*(Eta(I,J))/DX*(Depthx(I+1,J)-Depthx(I,J)) &
