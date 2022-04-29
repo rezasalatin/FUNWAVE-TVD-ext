@@ -632,10 +632,6 @@ SUBROUTINE PHI_COLL_VARIABLE_LENGTH(Mloc,Nloc,Ibeg,Iend,Jbeg,Jend,&
   endif
 # endif
 
-# if defined (PARALLEL)
-  call phi_exch (PHI)
-# endif
-
 END SUBROUTINE PHI_COLL_VARIABLE_LENGTH
 
 !-------------------------------------------------------------------------------------
