@@ -632,6 +632,9 @@ SUBROUTINE PHI_COLL_VARIABLE_LENGTH(Mloc,Nloc,Ibeg,Iend,Jbeg,Jend,&
   endif
 # endif
 
+# if defined (PARALLEL)
+  call phi_exch (PHI)
+# endif
 
 END SUBROUTINE PHI_COLL_VARIABLE_LENGTH
 
@@ -873,440 +876,440 @@ SUBROUTINE PHI_COLL(Mloc,Nloc,Ibeg,Iend,Jbeg,Jend,Nghost,PHI,VTYPE)
 
   ENDIF ! end vtype=1
 
-          ! ---------------------------- VTYPE = 2 -------------------------------
-          ! x is asymmetric - y is symmetric
-          ! for u
-          IF(VTYPE==2) THEN  ! for u (x-mirror condition)
-            ! x-direction
+  ! ---------------------------- VTYPE = 2 -------------------------------
+  ! x is asymmetric - y is symmetric
+  ! for u
+  IF(VTYPE==2) THEN  ! for u (x-mirror condition)
+    ! x-direction
 # if defined (PARALLEL)
-            if ( n_west .eq. MPI_PROC_NULL ) then
+    if ( n_west .eq. MPI_PROC_NULL ) then
 # endif
 # if defined (COUPLING)
-              IF(.NOT.IN_DOMAIN_WEST)THEN
+      IF(.NOT.IN_DOMAIN_WEST)THEN
 # endif
-                IF(WaveMaker(1:11)=='LEFT_BC_IRR')THEN
-                  ! do nothing
-                ELSE
-                  DO J=Jbeg,Jend
-                    DO K=1,Nghost
-                      PHI(K,J)=-PHI(Ibeg+Nghost-K,J)
-                    ENDDO
-                  ENDDO
-                ENDIF ! end left_bc wavemaker
+        IF(WaveMaker(1:11)=='LEFT_BC_IRR')THEN
+          ! do nothing
+        ELSE
+          DO J=Jbeg,Jend
+            DO K=1,Nghost
+              PHI(K,J)=-PHI(Ibeg+Nghost-K,J)
+            ENDDO
+          ENDDO
+        ENDIF ! end left_bc wavemaker
 # if defined (COUPLING)
-              ENDIF
+      ENDIF
 # endif
 # if defined (PARALLEL)
-            endif
+    endif
 # endif
 
 # if defined (PARALLEL)
-            if ( n_east .eq. MPI_PROC_NULL ) then
+    if ( n_east .eq. MPI_PROC_NULL ) then
 # endif
 # if defined (COUPLING)
-              IF(.NOT.IN_DOMAIN_EAST)THEN
+      IF(.NOT.IN_DOMAIN_EAST)THEN
 # endif
-                DO J=Jbeg,Jend
-                  DO K=1,Nghost
-                    PHI(Iend+K,J)=-PHI(Iend-K+1,J)
-                  ENDDO
-                ENDDO
+        DO J=Jbeg,Jend
+          DO K=1,Nghost
+            PHI(Iend+K,J)=-PHI(Iend-K+1,J)
+          ENDDO
+        ENDDO
 # if defined (COUPLING)
-              ENDIF
+      ENDIF
 # endif
 # if defined (PARALLEL)
-            endif
+    endif
 # endif
 
 
-            ! y-direction and corners
+    ! y-direction and corners
 # if defined (CARTESIAN)
-            IF(.NOT.PERIODIC)THEN
+    IF(.NOT.PERIODIC)THEN
 # endif
 # if defined (PARALLEL)
-              if ( n_suth .eq. MPI_PROC_NULL ) then
+      if ( n_suth .eq. MPI_PROC_NULL ) then
 # endif
 # if defined (COUPLING)
-                IF(.NOT.IN_DOMAIN_SOUTH)THEN
+        IF(.NOT.IN_DOMAIN_SOUTH)THEN
 # endif
-                  DO I=1,Mloc
-                    DO K=1,Nghost
-                      PHI(I,K)=PHI(I,Jbeg+Nghost-K)
-                    ENDDO
-                  ENDDO
+          DO I=1,Mloc
+            DO K=1,Nghost
+              PHI(I,K)=PHI(I,Jbeg+Nghost-K)
+            ENDDO
+          ENDDO
 # if defined (COUPLING)
-                ENDIF
+        ENDIF
 # endif
 # if defined (PARALLEL)
-              endif
+      endif
 # endif
 
 # if defined (PARALLEL)
-              if ( n_nrth .eq. MPI_PROC_NULL ) then
+      if ( n_nrth .eq. MPI_PROC_NULL ) then
 # endif
 # if defined (COUPLING)
-                IF(.NOT.IN_DOMAIN_NORTH)THEN
+        IF(.NOT.IN_DOMAIN_NORTH)THEN
 # endif
-                  DO I=1,Mloc
-                    DO K=1,Nghost
-                      PHI(I,Jend+K)=PHI(I,Jend-K+1)
-                    ENDDO
-                  ENDDO
+          DO I=1,Mloc
+            DO K=1,Nghost
+              PHI(I,Jend+K)=PHI(I,Jend-K+1)
+            ENDDO
+          ENDDO
 # if defined (COUPLING)
-                ENDIF
+        ENDIF
 # endif
 # if defined (PARALLEL)
-              endif
+      endif
 # endif
 
 # if defined (CARTESIAN)
-            ENDIF
+    ENDIF
 # endif
 
-          ENDIF ! end vtype=2
+  ENDIF ! end vtype=2
 
-          ! ---------------------------- VTYPE = 3 -------------------------------
-          ! x is symmetric - y is asymmetric
-          IF(VTYPE==3) THEN ! for v (y-mirror condition)
-            ! for v
-            ! x-direction
+  ! ---------------------------- VTYPE = 3 -------------------------------
+  ! x is symmetric - y is asymmetric
+  IF(VTYPE==3) THEN ! for v (y-mirror condition)
+    ! for v
+    ! x-direction
 # if defined (PARALLEL)
-            if ( n_west .eq. MPI_PROC_NULL ) then
+    if ( n_west .eq. MPI_PROC_NULL ) then
 # endif
 # if defined (COUPLING)
-              IF(.NOT.IN_DOMAIN_WEST)THEN
+      IF(.NOT.IN_DOMAIN_WEST)THEN
 # endif
 
-                IF(WaveMaker(1:11)=='LEFT_BC_IRR')THEN
-                  ! do nothing
-                ELSE
-                  DO J=Jbeg,Jend
-                    DO K=1,Nghost
-                      PHI(K,J)=PHI(Ibeg+Nghost-K,J)
-                    ENDDO
-                  ENDDO
-                ENDIF ! end left_bc wavemaker
+        IF(WaveMaker(1:11)=='LEFT_BC_IRR')THEN
+          ! do nothing
+        ELSE
+          DO J=Jbeg,Jend
+            DO K=1,Nghost
+              PHI(K,J)=PHI(Ibeg+Nghost-K,J)
+            ENDDO
+          ENDDO
+        ENDIF ! end left_bc wavemaker
 
 # if defined (COUPLING)
-              ENDIF
+      ENDIF
 # endif
 # if defined (PARALLEL)
-            endif
+    endif
 # endif
 
 # if defined (PARALLEL)
-            if ( n_east .eq. MPI_PROC_NULL ) then
+    if ( n_east .eq. MPI_PROC_NULL ) then
 # endif
 # if defined (COUPLING)
-              IF(.NOT.IN_DOMAIN_EAST)THEN
+      IF(.NOT.IN_DOMAIN_EAST)THEN
 # endif
-                DO J=Jbeg,Jend
-                  DO K=1,Nghost
-                    PHI(Iend+K,J)=PHI(Iend-K+1,J)
-                  ENDDO
-                ENDDO
+        DO J=Jbeg,Jend
+          DO K=1,Nghost
+            PHI(Iend+K,J)=PHI(Iend-K+1,J)
+          ENDDO
+        ENDDO
 # if defined (COUPLING)
-              ENDIF
+      ENDIF
 # endif
 # if defined (PARALLEL)
-            endif
+    endif
 # endif
 
-            ! y-direction and corners
+    ! y-direction and corners
 # if defined (CARTESIAN)
-            IF(.NOT.PERIODIC)THEN
+    IF(.NOT.PERIODIC)THEN
 # endif
-              ! end cartesian
+      ! end cartesian
 # if defined (PARALLEL)
-              if ( n_suth .eq. MPI_PROC_NULL ) then
+      if ( n_suth .eq. MPI_PROC_NULL ) then
 # endif
 # if defined (COUPLING)
-                IF(.NOT.IN_DOMAIN_SOUTH)THEN
+        IF(.NOT.IN_DOMAIN_SOUTH)THEN
 # endif
-                  DO I=1,Mloc
-                    DO K=1,Nghost
-                      PHI(I,K)=-PHI(I,Jbeg+Nghost-K)
-                    ENDDO
-                  ENDDO
+          DO I=1,Mloc
+            DO K=1,Nghost
+              PHI(I,K)=-PHI(I,Jbeg+Nghost-K)
+            ENDDO
+          ENDDO
 # if defined (COUPLING)
-                ENDIF
+        ENDIF
 # endif
 # if defined (PARALLEL)
-              endif
+      endif
 # endif
 
 # if defined (PARALLEL)
-              if ( n_nrth .eq. MPI_PROC_NULL ) then
+      if ( n_nrth .eq. MPI_PROC_NULL ) then
 # endif
 # if defined (COUPLING)
-                IF(.NOT.IN_DOMAIN_NORTH)THEN
+        IF(.NOT.IN_DOMAIN_NORTH)THEN
 # endif
-                  DO I=1,Mloc
-                    DO K=1,Nghost
-                      PHI(I,Jend+K)=-PHI(I,Jend-K+1)
-                    ENDDO
-                  ENDDO
+          DO I=1,Mloc
+            DO K=1,Nghost
+              PHI(I,Jend+K)=-PHI(I,Jend-K+1)
+            ENDDO
+          ENDDO
 # if defined (COUPLING)
-                ENDIF
+        ENDIF
 # endif
 # if defined (PARALLEL)
-              endif
+      endif
 # endif
 # if defined (CARTESIAN)
-            ENDIF
+    ENDIF
 # endif
 
-          ENDIF ! end vtype=3
+  ENDIF ! end vtype=3
 
-          ! ---------------------------- VTYPE = 4 -------------------------------
-          ! all ghost points equal to zero
-          ! for cross-derivatives
-          IF(VTYPE==4) THEN ! VTYPE==4 for u and v cross-mirror
-            ! x-direction
+  ! ---------------------------- VTYPE = 4 -------------------------------
+  ! all ghost points equal to zero
+  ! for cross-derivatives
+  IF(VTYPE==4) THEN ! VTYPE==4 for u and v cross-mirror
+    ! x-direction
 # if defined (PARALLEL)
-            if ( n_west .eq. MPI_PROC_NULL ) then
+    if ( n_west .eq. MPI_PROC_NULL ) then
 # endif
 # if defined (COUPLING)
-              IF(.NOT.IN_DOMAIN_WEST)THEN
+      IF(.NOT.IN_DOMAIN_WEST)THEN
 # endif
-                DO J=Jbeg,Jend
-                  DO K=1,Nghost
-                    PHI(K,J)=ZERO
-                  ENDDO
-                ENDDO
+        DO J=Jbeg,Jend
+          DO K=1,Nghost
+            PHI(K,J)=ZERO
+          ENDDO
+        ENDDO
 # if defined (COUPLING)
-              ENDIF
+      ENDIF
 # endif
 # if defined (PARALLEL)
-            endif
-# endif
-
-# if defined (PARALLEL)
-            if ( n_east .eq. MPI_PROC_NULL ) then
-# endif
-# if defined (COUPLING)
-              IF(.NOT.IN_DOMAIN_EAST)THEN
-# endif
-                DO J=Jbeg,Jend
-                  DO K=1,Nghost
-                    PHI(Iend+K,J)=ZERO
-                  ENDDO
-                ENDDO
-# if defined (COUPLING)
-              ENDIF
-# endif
-# if defined (PARALLEL)
-            endif
-# endif
-
-            ! y-direction and corners, this one is not an exact solution
-# if defined (PARALLEL)
-            if ( n_suth .eq. MPI_PROC_NULL ) then
-# endif
-# if defined (COUPLING)
-              IF(.NOT.IN_DOMAIN_SOUTH)THEN
-# endif
-                DO I=1,Mloc
-                  DO K=1,Nghost
-                    PHI(I,K)=ZERO
-                  ENDDO
-                ENDDO
-# if defined (COUPLING)
-              ENDIF
-# endif
-# if defined (PARALLEL)
-            endif
+    endif
 # endif
 
 # if defined (PARALLEL)
-            if ( n_nrth .eq. MPI_PROC_NULL ) then
+    if ( n_east .eq. MPI_PROC_NULL ) then
 # endif
 # if defined (COUPLING)
-              IF(.NOT.IN_DOMAIN_NORTH)THEN
+      IF(.NOT.IN_DOMAIN_EAST)THEN
 # endif
-                DO I=1,Mloc
-                  DO K=1,Nghost
-                    PHI(I,Jend+K)=ZERO
-                  ENDDO
-                ENDDO
+        DO J=Jbeg,Jend
+          DO K=1,Nghost
+            PHI(Iend+K,J)=ZERO
+          ENDDO
+        ENDDO
 # if defined (COUPLING)
-              ENDIF
+      ENDIF
 # endif
 # if defined (PARALLEL)
-            endif
+    endif
 # endif
 
-          ENDIF ! end vtype=4
-
-          ! ---------------------------- VTYPE = 5 -------------------------------
-          ! like VTYPE 1 but does not exclude LEFT_BC_IRR for x-dir
-          ! and does not include if CARTESIAN if periodic for the y-dir
-
-          ! for symmetric
-          IF(VTYPE==5)THEN
-            ! x-direction
+    ! y-direction and corners, this one is not an exact solution
 # if defined (PARALLEL)
-            if ( n_west .eq. MPI_PROC_NULL ) then
+    if ( n_suth .eq. MPI_PROC_NULL ) then
 # endif
 # if defined (COUPLING)
-              IF(.NOT.IN_DOMAIN_WEST)THEN
+      IF(.NOT.IN_DOMAIN_SOUTH)THEN
 # endif
-                DO J=Jbeg,Jend
-                  DO K=1,Nghost
-                    PHI(K,J)=PHI(Ibeg+Nghost-K,J)
-                  ENDDO
-                ENDDO
+        DO I=1,Mloc
+          DO K=1,Nghost
+            PHI(I,K)=ZERO
+          ENDDO
+        ENDDO
 # if defined (COUPLING)
-              ENDIF
+      ENDIF
 # endif
 # if defined (PARALLEL)
-            endif
+    endif
 # endif
 
 # if defined (PARALLEL)
-            if ( n_east .eq. MPI_PROC_NULL ) then
+    if ( n_nrth .eq. MPI_PROC_NULL ) then
 # endif
 # if defined (COUPLING)
-              IF(.NOT.IN_DOMAIN_EAST)THEN
+      IF(.NOT.IN_DOMAIN_NORTH)THEN
 # endif
-                DO J=Jbeg,Jend
-                  DO K=1,Nghost
-                    PHI(Iend+K,J)=PHI(Iend-K+1,J)
-                  ENDDO
-                ENDDO
+        DO I=1,Mloc
+          DO K=1,Nghost
+            PHI(I,Jend+K)=ZERO
+          ENDDO
+        ENDDO
 # if defined (COUPLING)
-              ENDIF
+      ENDIF
 # endif
 # if defined (PARALLEL)
-            endif
+    endif
 # endif
 
-            ! y-direction and corners
+  ENDIF ! end vtype=4
 
-# if defined (PARALLEL)
-            if ( n_suth .eq. MPI_PROC_NULL ) then
-# endif
-# if defined (COUPLING)
-              IF(.NOT.IN_DOMAIN_SOUTH)THEN
-# endif
-                DO I=1,Mloc
-                  DO K=1,Nghost
-                    PHI(I,K)=PHI(I,Jbeg+Nghost-K)
-                  ENDDO
-                ENDDO
-# if defined (COUPLING)
-              ENDIF
-# endif
-# if defined (PARALLEL)
-            endif
-# endif
+  ! ---------------------------- VTYPE = 5 -------------------------------
+  ! like VTYPE 1 but does not exclude LEFT_BC_IRR for x-dir
+  ! and does not include if CARTESIAN if periodic for the y-dir
 
+  ! for symmetric
+  IF(VTYPE==5)THEN
+    ! x-direction
 # if defined (PARALLEL)
-            if ( n_nrth .eq. MPI_PROC_NULL ) then
+    if ( n_west .eq. MPI_PROC_NULL ) then
 # endif
 # if defined (COUPLING)
-              IF(.NOT.IN_DOMAIN_NORTH)THEN
+      IF(.NOT.IN_DOMAIN_WEST)THEN
 # endif
-                DO I=1,Mloc
-                  DO K=1,Nghost
-                    PHI(I,Jend+K)=PHI(I,Jend-K+1)
-                  ENDDO
-                ENDDO
+        DO J=Jbeg,Jend
+          DO K=1,Nghost
+            PHI(K,J)=PHI(Ibeg+Nghost-K,J)
+          ENDDO
+        ENDDO
 # if defined (COUPLING)
-              ENDIF
+      ENDIF
 # endif
 # if defined (PARALLEL)
-            endif
-# endif
-
-          ENDIF ! end vtype=5
-
-          ! ---------------------------- VTYPE = 6 -------------------------------
-          ! like VTYPE 2 but does not exclude LEFT_BC_IRR for x-dir
-          ! and does not include if CARTESIAN if periodic for the y-dir
-
-          ! for anti-symmetric
-          IF(VTYPE==6)THEN
-            ! x-direction
-# if defined (PARALLEL)
-            if ( n_west .eq. MPI_PROC_NULL ) then
-# endif
-# if defined (COUPLING)
-              IF(.NOT.IN_DOMAIN_WEST)THEN
-# endif
-                DO J=Jbeg,Jend
-                  DO K=1,Nghost
-                    PHI(K,J)=-PHI(Ibeg+Nghost-K,J)
-                  ENDDO
-                ENDDO
-# if defined (COUPLING)
-              ENDIF
-# endif
-# if defined (PARALLEL)
-            endif
+    endif
 # endif
 
 # if defined (PARALLEL)
-            if ( n_east .eq. MPI_PROC_NULL ) then
+    if ( n_east .eq. MPI_PROC_NULL ) then
 # endif
 # if defined (COUPLING)
-              IF(.NOT.IN_DOMAIN_EAST)THEN
+      IF(.NOT.IN_DOMAIN_EAST)THEN
 # endif
-                DO J=Jbeg,Jend
-                  DO K=1,Nghost
-                    PHI(Iend+K,J)=-PHI(Iend-K+1,J)
-                  ENDDO
-                ENDDO
+        DO J=Jbeg,Jend
+          DO K=1,Nghost
+            PHI(Iend+K,J)=PHI(Iend-K+1,J)
+          ENDDO
+        ENDDO
 # if defined (COUPLING)
-              ENDIF
+      ENDIF
 # endif
 # if defined (PARALLEL)
-            endif
+    endif
 # endif
 
-            ! y-direction and corners
-# if defined (PARALLEL)
-            if ( n_suth .eq. MPI_PROC_NULL ) then
-# endif
-# if defined (COUPLING)
-              IF(.NOT.IN_DOMAIN_SOUTH)THEN
-# endif
-                DO I=1,Mloc
-                  DO K=1,Nghost
-                    PHI(I,K)=-PHI(I,Jbeg+Nghost-K)
-                  ENDDO
-                ENDDO
-# if defined (COUPLING)
-              ENDIF
-# endif
-# if defined (PARALLEL)
-            endif
-# endif
+    ! y-direction and corners
 
 # if defined (PARALLEL)
-            if ( n_nrth .eq. MPI_PROC_NULL ) then
+    if ( n_suth .eq. MPI_PROC_NULL ) then
 # endif
 # if defined (COUPLING)
-              IF(.NOT.IN_DOMAIN_NORTH)THEN
+      IF(.NOT.IN_DOMAIN_SOUTH)THEN
 # endif
-                DO I=1,Mloc
-                  DO K=1,Nghost
-                    PHI(I,Jend+K)=-PHI(I,Jend-K+1)
-                  ENDDO
-                ENDDO
+        DO I=1,Mloc
+          DO K=1,Nghost
+            PHI(I,K)=PHI(I,Jbeg+Nghost-K)
+          ENDDO
+        ENDDO
 # if defined (COUPLING)
-              ENDIF
+      ENDIF
 # endif
 # if defined (PARALLEL)
-            endif
+    endif
 # endif
-
-          ENDIF ! end vtype=6
-
-          ! ---------------------------- END OF VTYPE ----------------------------
 
 # if defined (PARALLEL)
-          call phi_exch (PHI)
+    if ( n_nrth .eq. MPI_PROC_NULL ) then
+# endif
+# if defined (COUPLING)
+      IF(.NOT.IN_DOMAIN_NORTH)THEN
+# endif
+        DO I=1,Mloc
+          DO K=1,Nghost
+            PHI(I,Jend+K)=PHI(I,Jend-K+1)
+          ENDDO
+        ENDDO
+# if defined (COUPLING)
+      ENDIF
+# endif
+# if defined (PARALLEL)
+    endif
 # endif
 
-        END SUBROUTINE PHI_COLL
+  ENDIF ! end vtype=5
+
+  ! ---------------------------- VTYPE = 6 -------------------------------
+  ! like VTYPE 2 but does not exclude LEFT_BC_IRR for x-dir
+  ! and does not include if CARTESIAN if periodic for the y-dir
+
+  ! for anti-symmetric
+  IF(VTYPE==6)THEN
+    ! x-direction
+# if defined (PARALLEL)
+    if ( n_west .eq. MPI_PROC_NULL ) then
+# endif
+# if defined (COUPLING)
+      IF(.NOT.IN_DOMAIN_WEST)THEN
+# endif
+        DO J=Jbeg,Jend
+          DO K=1,Nghost
+            PHI(K,J)=-PHI(Ibeg+Nghost-K,J)
+          ENDDO
+        ENDDO
+# if defined (COUPLING)
+      ENDIF
+# endif
+# if defined (PARALLEL)
+    endif
+# endif
+
+# if defined (PARALLEL)
+    if ( n_east .eq. MPI_PROC_NULL ) then
+# endif
+# if defined (COUPLING)
+      IF(.NOT.IN_DOMAIN_EAST)THEN
+# endif
+        DO J=Jbeg,Jend
+          DO K=1,Nghost
+            PHI(Iend+K,J)=-PHI(Iend-K+1,J)
+          ENDDO
+        ENDDO
+# if defined (COUPLING)
+      ENDIF
+# endif
+# if defined (PARALLEL)
+    endif
+# endif
+
+    ! y-direction and corners
+# if defined (PARALLEL)
+    if ( n_suth .eq. MPI_PROC_NULL ) then
+# endif
+# if defined (COUPLING)
+      IF(.NOT.IN_DOMAIN_SOUTH)THEN
+# endif
+        DO I=1,Mloc
+          DO K=1,Nghost
+            PHI(I,K)=-PHI(I,Jbeg+Nghost-K)
+          ENDDO
+        ENDDO
+# if defined (COUPLING)
+      ENDIF
+# endif
+# if defined (PARALLEL)
+    endif
+# endif
+
+# if defined (PARALLEL)
+    if ( n_nrth .eq. MPI_PROC_NULL ) then
+# endif
+# if defined (COUPLING)
+      IF(.NOT.IN_DOMAIN_NORTH)THEN
+# endif
+        DO I=1,Mloc
+          DO K=1,Nghost
+            PHI(I,Jend+K)=-PHI(I,Jend-K+1)
+          ENDDO
+        ENDDO
+# if defined (COUPLING)
+      ENDIF
+# endif
+# if defined (PARALLEL)
+    endif
+# endif
+
+  ENDIF ! end vtype=6
+
+  ! ---------------------------- END OF VTYPE ----------------------------
+
+# if defined (PARALLEL)
+  call phi_exch (PHI)
+# endif
+
+END SUBROUTINE PHI_COLL
