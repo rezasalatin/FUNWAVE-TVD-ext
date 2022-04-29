@@ -429,7 +429,7 @@ SUBROUTINE SourceTerms
           -0.5_SP*(nu_vis(I,J-1)+nu_vis(I,J))* &
           0.5_SP/DY*(P(I,J)+P(I+1,J)-P(I,J-1)-P(I+1,J-1)) )
 
-          nu_smg_effectx(I,J) = tempX_vis(I,J)
+          nu_smg_effectx(I,J) = P(I,J)
 
           tempY_vis(I,J) = 0.5_SP/DY*( &
           nu_vis(I,J+1)* &
@@ -455,7 +455,7 @@ SUBROUTINE SourceTerms
           -(nu_vis(I,J-1)+nu_vis(I,J)) &
           *1.0_SP/DY*(HU(I,J)-HU(I,J-1)) )
 
-          nu_smg_effecty(I,J) = tempX_vis(I,J)
+          nu_smg_effecty(I,J) = HU(I,J)
 
           tempY_vis(I,J) = 0.5_SP/DX*( &
           (nu_vis(I+1,J)+nu_vis(I,J)) &
