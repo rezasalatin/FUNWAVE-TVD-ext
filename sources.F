@@ -259,7 +259,7 @@ SUBROUTINE SourceTerms
     ENDDO
   ENDDO
 
-  VTYPE=1 ! symetric in both direction
+  VTYPE=2 ! symetric in both direction
   CALL PHI_COLL(Mloc,Nloc,Ibeg,Iend,Jbeg,Jend,Nghost,tempX,VTYPE)
   CALL PHI_COLL(Mloc,Nloc,Ibeg,Iend,Jbeg,Jend,Nghost,tempY,VTYPE)
 
