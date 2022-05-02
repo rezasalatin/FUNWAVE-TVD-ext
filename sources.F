@@ -266,7 +266,7 @@ SUBROUTINE SourceTerms
   DO J=Jbeg,Jend
     DO I=Ibeg,Iend
       ! Viscosity Breaking
-      IF(.NOT.PQ_scheme)THEN
+      IF(PQ_scheme)THEN
         ! it turns out P and Q are not exchanged at processor
         ! interface. it affects edges, make PQ_scheme=false
         tempX_vis(I,J) = 0.5_SP/DX*( &
