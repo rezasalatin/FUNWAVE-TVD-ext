@@ -218,18 +218,16 @@ SUBROUTINE SourceTerms
 
 107   format(500f12.6)
 
+
 # if defined (CARTESIAN)
 # if defined (MIXING)
-
   ! Sub-grid-scale Turbulence
   ! Horizontal Eddy viscosity
   temp_smg = SQRT(2.0*uMAx**2+2.0*vMAy**2+(uMAy+vMAx)*(uMAy+vMAx))
   nu_smg = C_smg**2*DX*DY*temp_smg
-
   ! depth gradient term
   DO J=Jbeg,Jend
     DO I=Ibeg,Iend
-
       ! Smagorinsky
       tempX(I,J) = 1.0_SP/DX*( &
       0.5_SP*(nu_smg(I,J)+nu_smg(I+1,J)) &
@@ -258,7 +256,15 @@ SUBROUTINE SourceTerms
       + 1.0_SP/DX*( &
       nu_smg(I+1,J)*0.5_SP/DY*(P(I+1,J+1)-P(I+1,J-1)) &
       -nu_smg(I-1,J)*0.5_SP/DY*(P(I-1,J+1)-P(I-1,J-1)))
+    ENDDO
+  ENDDO
+  nu_smg_effectx = tempX
+  ! end if Mixing
+# endif
 
+  ! depth gradient term
+  DO J=Jbeg,Jend
+    DO I=Ibeg,Iend
       ! Viscosity Breaking
       IF(.NOT.PQ_scheme)THEN
         ! it turns out P and Q are not exchanged at processor
@@ -311,12 +317,9 @@ SUBROUTINE SourceTerms
       ENDIF ! end pq_scheme
     ENDDO
   ENDDO
-
-  ! Mixing
+  nu_smg_effecty = tempX_vis
+  ! end if Cartesian
 # endif
-  ! Cartesian
-# endif
-
 
   ! depth gradient term
   DO J=Jbeg,Jend
@@ -456,8 +459,6 @@ SUBROUTINE SourceTerms
 # endif
 
 # if defined (MIXING)
-      nu_smg_effectx(I,J) = tempX(I,J)
-      nu_smg_effecty(I,J) = tempX_vis(I,J)
       SourceX(I,J) = SourceX(I,J) ! + tempX(I,J)
       SourceY(I,J) = SourceY(I,J) ! + tempY(I,J)
 # endif
