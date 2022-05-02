@@ -226,8 +226,8 @@ SUBROUTINE SourceTerms
   temp_smg = SQRT(2.0*uMAx**2+2.0*vMAy**2+(uMAy+vMAx)*(uMAy+vMAx))
   nu_smg = C_smg**2*DX*DY*temp_smg
   ! depth gradient term
-  DO J=Jbeg,Jend
-    DO I=Ibeg,Iend
+  DO J=Jbeg-1,Jend+1
+    DO I=Ibeg-1,Iend+1
       ! Smagorinsky
       tempX(I,J) = 1.0_SP/DX*( &
       0.5_SP*(nu_smg(I,J)+nu_smg(I+1,J)) &
