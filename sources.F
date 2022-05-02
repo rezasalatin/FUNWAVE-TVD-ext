@@ -260,7 +260,7 @@ SUBROUTINE SourceTerms
       -nu_smg(I-1,J)*0.5_SP/DY*(P(I-1,J+1)-P(I-1,J-1)))
 
       ! Viscosity Breaking
-      IF(PQ_scheme)THEN
+      IF(.NOT.PQ_scheme)THEN
         ! it turns out P and Q are not exchanged at processor
         ! interface. it affects edges, make PQ_scheme=false
         tempX_vis(I,J) = 0.5_SP/DX*( &
@@ -456,6 +456,8 @@ SUBROUTINE SourceTerms
 # endif
 
 # if defined (MIXING)
+      nu_smg_effectx(I,J) = tempX(I,J)
+      nu_smg_effecty(I,J) = tempX_vis(I,J)
       SourceX(I,J) = SourceX(I,J) ! + tempX(I,J)
       SourceY(I,J) = SourceY(I,J) ! + tempY(I,J)
 # endif
