@@ -1291,8 +1291,8 @@ SUBROUTINE CONSTRUCTION_HO
   ! Salatin
   DO J=Jbeg,Jend
     DO I=Ibeg,Iend
-      nu_smg_effectx(I,J) = HU(I-3,J)
-      nu_smg_effecty(I,J) = HUxL(I-3,J)
+      nu_smg_effectx(I,J) = HU(I,J-3)
+      nu_smg_effecty(I,J) = HUxL(I,J-3)
     ENDDO
   ENDDO
 
