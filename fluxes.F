@@ -482,13 +482,13 @@ SUBROUTINE CONSTRUCTION
   PR=HUxR
 # endif
 
-! Salatin
-DO J=Jbeg,Jend
-  DO I=Ibeg,Iend
-    nu_smg_effectx(I,J) = PL(I-3,J)
-    nu_smg_effecty(I,J) = PR(I-3,J)
+  ! Salatin
+  DO J=Jbeg,Jend
+    DO I=Ibeg,Iend
+      nu_smg_effectx(I,J) = HxR(I-3,J)
+      nu_smg_effecty(I,J) = HUxL(I-3,J)
+    ENDDO
   ENDDO
-ENDDO
 
 # endif
 
