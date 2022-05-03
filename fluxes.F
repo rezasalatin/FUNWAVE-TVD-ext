@@ -482,6 +482,8 @@ SUBROUTINE CONSTRUCTION
   PR=HUxR
 # endif
 
+  print *, 'hello, this is before the loop'
+
   ! Salatin
   DO J=Jbeg,Jend
     DO I=Ibeg,Iend
