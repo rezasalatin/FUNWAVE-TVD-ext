@@ -482,16 +482,6 @@ SUBROUTINE CONSTRUCTION
   PR=HUxR
 # endif
 
-  print *, 'hello, this is before the loop'
-
-  ! Salatin
-  DO J=Jbeg,Jend
-    DO I=Ibeg,Iend
-      nu_smg_effectx(I,J) = HxR(I-3,J)
-      nu_smg_effecty(I,J) = HUxL(I-3,J)
-    ENDDO
-  ENDDO
-
 # endif
 
 
@@ -823,6 +813,16 @@ SUBROUTINE CONSTRUCTION_HO_minmod
 
   PR(1:Mloc1,1:Nloc)=HUxR(1:Mloc1,1:Nloc) &
   + Gamma1*MASK9u(1:Mloc1,1:Nloc)*HxR(1:Mloc1,1:Nloc)*U4xR(1:Mloc1,1:Nloc)
+
+
+  print *, 'hello, this is before the loop'
+  ! Salatin
+  DO J=Jbeg,Jend
+    DO I=Ibeg,Iend
+      nu_smg_effectx(I,J) = HUxL(I-3,J)
+      nu_smg_effecty(I,J) = HxL(I-3,J)
+    ENDDO
+  ENDDO
 
   FxL(1:Mloc1,1:Nloc)=Gamma3*PL(1:Mloc1,1:Nloc)*(UxL(1:Mloc1,1:Nloc)  &
   +Gamma1*MASK9u(1:Mloc1,1:Nloc)*U4xL(1:Mloc1,1:Nloc)) &
