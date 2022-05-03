@@ -588,8 +588,6 @@ SUBROUTINE PHI_COLL_VARIABLE_LENGTH(Mloc,Nloc,Ibeg,Iend,Jbeg,Jend,&
   endif
 # endif
 
-  print *, "Hi, this step is done"
-
 # if defined (PARALLEL)
   if ( n_east .eq. MPI_PROC_NULL ) then
 # endif
