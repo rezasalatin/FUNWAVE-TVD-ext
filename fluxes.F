@@ -101,10 +101,10 @@ SUBROUTINE FLUX_AT_INTERFACE
   USE GLOBAL
 
   ! for averaging approach for predictor
-  P=0.5_SP*(PR+PL)
+  P= 0.5_SP*(PR+PL)
   Fx=0.5_SP*(FxR+FxL)
   Gx=0.5_SP*(GxR+GxL)
-  Q=0.5_SP*(QR+QL)
+  Q= 0.5_SP*(QR+QL)
   Fy=0.5_SP*(FyR+FyL)
   Gy=0.5_SP*(GyR+GyL)
 
@@ -697,7 +697,7 @@ SUBROUTINE CONSTRUCT_Y(M,N,N1,DY,Vin,Din,OutL,OutR,Kappa)
     OutR(I,N1)=OutL(I,N1)
 
   ENDDO
-  !ykchoi]
+  !ykchoi
 
 
 END SUBROUTINE CONSTRUCT_Y
