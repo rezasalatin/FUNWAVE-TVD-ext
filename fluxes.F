@@ -1300,16 +1300,16 @@ SUBROUTINE CONSTRUCTION_HO
   Nloc61 = Nloc6 + 1
 
   print *, "hi, we are at fluxes line 1302"
-  !CALL CONSTRUCT_HO_X(Mloc,Nloc,Mloc1,Ibeg,Iend,Jbeg,Jend,MASK,U,UxL,UxR)
-  !CALL CONSTRUCT_HO_X(Mloc,Nloc,Mloc1,Ibeg,Iend,Jbeg,Jend,MASK,V,VxL,VxR)
-  !CALL CONSTRUCT_HO_X(Mloc,Nloc,Mloc1,Ibeg,Iend,Jbeg,Jend,MASK,HU,HUxL,HUxR)
-  !CALL CONSTRUCT_HO_X(Mloc,Nloc,Mloc1,Ibeg,Iend,Jbeg,Jend,MASK,HV,HVxL,HVxR)
-  !CALL CONSTRUCT_HO_X(Mloc,Nloc,Mloc1,Ibeg,Iend,Jbeg,Jend,MASK,Eta,EtaRxL,EtaRxR)
-  CALL CONSTRUCT_HO_X(Mloc6,Nloc6,Mloc61,Ibeg6,Iend6,Jbeg6,Jend6,MASK_HO,U_HO,UxL,UxR)
-  CALL CONSTRUCT_HO_X(Mloc6,Nloc6,Mloc61,Ibeg6,Iend6,Jbeg6,Jend6,MASK_HO,V_HO,VxL,VxR)
-  CALL CONSTRUCT_HO_X(Mloc6,Nloc6,Mloc61,Ibeg6,Iend6,Jbeg6,Jend6,MASK_HO,HU_HO,HUxL,HUxR)
-  CALL CONSTRUCT_HO_X(Mloc6,Nloc6,Mloc61,Ibeg6,Iend6,Jbeg6,Jend6,MASK_HO,HV_HO,HVxL,HVxR)
-  CALL CONSTRUCT_HO_X(Mloc6,Nloc6,Mloc61,Ibeg6,Iend6,Jbeg6,Jend6,MASK_HO,Eta_HO,EtaRxL,EtaRxR)
+  CALL CONSTRUCT_HO_X(Mloc,Nloc,Mloc1,Ibeg,Iend,Jbeg,Jend,MASK,U,UxL,UxR)
+  CALL CONSTRUCT_HO_X(Mloc,Nloc,Mloc1,Ibeg,Iend,Jbeg,Jend,MASK,V,VxL,VxR)
+  CALL CONSTRUCT_HO_X(Mloc,Nloc,Mloc1,Ibeg,Iend,Jbeg,Jend,MASK,HU,HUxL,HUxR)
+  CALL CONSTRUCT_HO_X(Mloc,Nloc,Mloc1,Ibeg,Iend,Jbeg,Jend,MASK,HV,HVxL,HVxR)
+  CALL CONSTRUCT_HO_X(Mloc,Nloc,Mloc1,Ibeg,Iend,Jbeg,Jend,MASK,Eta,EtaRxL,EtaRxR)
+  !CALL CONSTRUCT_HO_X(Mloc6,Nloc6,Mloc61,Ibeg6,Iend6,Jbeg6,Jend6,MASK_HO,U_HO,UxL,UxR)
+  !CALL CONSTRUCT_HO_X(Mloc6,Nloc6,Mloc61,Ibeg6,Iend6,Jbeg6,Jend6,MASK_HO,V_HO,VxL,VxR)
+  !CALL CONSTRUCT_HO_X(Mloc6,Nloc6,Mloc61,Ibeg6,Iend6,Jbeg6,Jend6,MASK_HO,HU_HO,HUxL,HUxR)
+  !CALL CONSTRUCT_HO_X(Mloc6,Nloc6,Mloc61,Ibeg6,Iend6,Jbeg6,Jend6,MASK_HO,HV_HO,HVxL,HVxR)
+  !CALL CONSTRUCT_HO_X(Mloc6,Nloc6,Mloc61,Ibeg6,Iend6,Jbeg6,Jend6,MASK_HO,Eta_HO,EtaRxL,EtaRxR)
 
   ! Salatin
   !DO J=Jbeg,Jend
@@ -1397,16 +1397,16 @@ SUBROUTINE CONSTRUCTION_HO
 # endif
 
   ! construct in y-direction
-  !CALL CONSTRUCT_HO_Y(Mloc,Nloc,Nloc1,Ibeg,Iend,Jbeg,Jend,MASK,U,UyL,UyR)
-  !CALL CONSTRUCT_HO_Y(Mloc,Nloc,Nloc1,Ibeg,Iend,Jbeg,Jend,MASK,V,VyL,VyR)
-  !CALL CONSTRUCT_HO_Y(Mloc,Nloc,Nloc1,Ibeg,Iend,Jbeg,Jend,MASK,HV,HVyL,HVyR)
-  !CALL CONSTRUCT_HO_Y(Mloc,Nloc,Nloc1,Ibeg,Iend,Jbeg,Jend,MASK,HU,HUyL,HUyR)
-  !CALL CONSTRUCT_HO_Y(Mloc,Nloc,Nloc1,Ibeg,Iend,Jbeg,Jend,MASK,Eta,EtaRyL,EtaRyR)
-  CALL CONSTRUCT_HO_Y(Mloc6,Nloc6,Nloc61,Ibeg6,Iend6,Jbeg6,Jend6,MASK_HO,U_HO,UyL,UyR)
-  CALL CONSTRUCT_HO_Y(Mloc6,Nloc6,Nloc61,Ibeg6,Iend6,Jbeg6,Jend6,MASK_HO,V_HO,VyL,VyR)
-  CALL CONSTRUCT_HO_Y(Mloc6,Nloc6,Nloc61,Ibeg6,Iend6,Jbeg6,Jend6,MASK_HO,HV_HO,HVyL,HVyR)
-  CALL CONSTRUCT_HO_Y(Mloc6,Nloc6,Nloc61,Ibeg6,Iend6,Jbeg6,Jend6,MASK_HO,HU_HO,HUyL,HUyR)
-  CALL CONSTRUCT_HO_Y(Mloc6,Nloc6,Nloc61,Ibeg6,Iend6,Jbeg6,Jend6,MASK_HO,Eta_HO,EtaRyL,EtaRyR)
+  CALL CONSTRUCT_HO_Y(Mloc,Nloc,Nloc1,Ibeg,Iend,Jbeg,Jend,MASK,U,UyL,UyR)
+  CALL CONSTRUCT_HO_Y(Mloc,Nloc,Nloc1,Ibeg,Iend,Jbeg,Jend,MASK,V,VyL,VyR)
+  CALL CONSTRUCT_HO_Y(Mloc,Nloc,Nloc1,Ibeg,Iend,Jbeg,Jend,MASK,HV,HVyL,HVyR)
+  CALL CONSTRUCT_HO_Y(Mloc,Nloc,Nloc1,Ibeg,Iend,Jbeg,Jend,MASK,HU,HUyL,HUyR)
+  CALL CONSTRUCT_HO_Y(Mloc,Nloc,Nloc1,Ibeg,Iend,Jbeg,Jend,MASK,Eta,EtaRyL,EtaRyR)
+  !CALL CONSTRUCT_HO_Y(Mloc6,Nloc6,Nloc61,Ibeg6,Iend6,Jbeg6,Jend6,MASK_HO,U_HO,UyL,UyR)
+  !CALL CONSTRUCT_HO_Y(Mloc6,Nloc6,Nloc61,Ibeg6,Iend6,Jbeg6,Jend6,MASK_HO,V_HO,VyL,VyR)
+  !CALL CONSTRUCT_HO_Y(Mloc6,Nloc6,Nloc61,Ibeg6,Iend6,Jbeg6,Jend6,MASK_HO,HV_HO,HVyL,HVyR)
+  !CALL CONSTRUCT_HO_Y(Mloc6,Nloc6,Nloc61,Ibeg6,Iend6,Jbeg6,Jend6,MASK_HO,HU_HO,HUyL,HUyR)
+  !CALL CONSTRUCT_HO_Y(Mloc6,Nloc6,Nloc61,Ibeg6,Iend6,Jbeg6,Jend6,MASK_HO,Eta_HO,EtaRyL,EtaRyR)
 
   HyL=EtaRyL+Depthy
   HyR=EtaRyR+Depthy
