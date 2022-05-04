@@ -450,6 +450,7 @@ SUBROUTINE EXCHANGE
   VTYPE=1
   CALL PHI_COLL(Mloc,Nloc,Ibeg,Iend,Jbeg,Jend,Nghost,&
   Eta,VTYPE,PERIODIC)
+  print *, "hi we are at bc line 453"
   CALL PHI_COLL_HO(Mloc,Nloc,Ibeg,Iend,Jbeg,Jend,Nghost,&
   Eta,Eta_HO,VTYPE,PERIODIC)
 

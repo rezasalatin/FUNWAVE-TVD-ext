@@ -1299,7 +1299,7 @@ SUBROUTINE CONSTRUCTION_HO
   Mloc61 = Mloc6 + 1
   Nloc61 = Nloc6 + 1
 
-  print *, "hi, we got to fluxes construct-ho-x"
+  print *, "hi, we are at fluxes line 1302"
   CALL CONSTRUCT_HO_X(Mloc6,Nloc6,Mloc61,Ibeg6,Iend6,Jbeg6,Jend6,MASK_HO,U_HO,UxL,UxR)
   CALL CONSTRUCT_HO_X(Mloc6,Nloc6,Mloc61,Ibeg6,Iend6,Jbeg6,Jend6,MASK_HO,V_HO,VxL,VxR)
   CALL CONSTRUCT_HO_X(Mloc6,Nloc6,Mloc61,Ibeg6,Iend6,Jbeg6,Jend6,MASK_HO,HU_HO,HUxL,HUxR)
