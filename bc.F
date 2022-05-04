@@ -1413,14 +1413,15 @@ SUBROUTINE PHI_COLL_HO(Mloc,Nloc,Ibeg,Iend,Jbeg,Jend,Nghost, &
   REAL(sp) :: myvar,mybeta
 # endif
 
-  INTEGER :: Nghost6,Ibeg6,Iend6,Jbeg6,Jend6,Mloc6
+  INTEGER :: Nghost6,Ibeg6,Iend6,Jbeg6,Jend6,Mloc6,Nloc6
   ! change some variables because we have increased ghost points to 6
   Nghost6 = Nghost+3
   Ibeg6 = Ibeg+3
   Iend6 = Iend+3
   Jbeg6 = Jbeg+3
   Jend6 = Jend+3
-  Mloc6 = Mloc+3
+  Mloc6 = Mloc+6
+  Nloc6 = Nloc+6
 
   ! periodic first because it is not related to VTYPE
 # if defined (CARTESIAN)
@@ -1448,7 +1449,7 @@ SUBROUTINE PHI_COLL_HO(Mloc,Nloc,Ibeg,Iend,Jbeg,Jend,Nghost, &
           call MPI_IRECV(xx,len,MPI_SP,ProcessorID(II,1),0, &
             MPI_COMM_WORLD,req(1),ier)
           call MPI_WAITALL(1,req,status,ier)
-          DO I=1,Mloc
+          DO I=1,Mloc6
             DO J=1,Nghost6
               PHIout(I,Jend6+J)=xx(I,J)
             ENDDO
@@ -1471,7 +1472,7 @@ SUBROUTINE PHI_COLL_HO(Mloc,Nloc,Ibeg,Iend,Jbeg,Jend,Nghost, &
         if(myid==ProcessorID(II,1))then
           call MPI_IRECV(xx,len,MPI_SP,ProcessorID(II,PY),0,MPI_COMM_WORLD,req(1),ier)
           call MPI_WAITALL(1,req,status,ier)
-          DO I=1,Mloc
+          DO I=1,Mloc6
             DO J=1,Nghost6
               PHIout(I,J)=xx(I,J)
             ENDDO
