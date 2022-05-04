@@ -453,6 +453,7 @@ SUBROUTINE EXCHANGE
   print *, "hi we are at bc line 453"
   CALL PHI_COLL_HO(Mloc,Nloc,Ibeg,Iend,Jbeg,Jend,Nghost,&
   Eta,Eta_HO,VTYPE,PERIODIC)
+  print *, "hi we are at bc line 456"
 
   IF(VISCOSITY_BREAKING) THEN
     CALL PHI_COLL(Mloc,Nloc,Ibeg,Iend,Jbeg,Jend,Nghost,&
