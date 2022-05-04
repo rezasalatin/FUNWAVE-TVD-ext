@@ -94,6 +94,9 @@ SUBROUTINE ALLOCATE_VARIABLES
   ! original variables at notes
   Fx(Mloc1,Nloc),Fy(Mloc,Nloc1),&
   U(Mloc,Nloc),V(Mloc,Nloc), HU(Mloc,Nloc),HV(Mloc,Nloc),&
+  U_HO(Mloc+6,Nloc+6),V_HO(Mloc+6,Nloc+6),&
+  HU_HO(Mloc+6,Nloc+6),HV_HO(Mloc+6,Nloc+6),&
+  MASK_HO(Mloc+6,Nloc+6),&
   Gx(Mloc1,Nloc),Gy(Mloc,Nloc1), &
   P(Mloc1,Nloc),Q(Mloc,Nloc1), &
   SxL(Mloc1,Nloc),SxR(Mloc1,Nloc), &
@@ -478,6 +481,10 @@ SUBROUTINE INITIALIZATION
   V=0.0_SP
   HU=0.0_SP
   HV=0.0_SP
+  U_HO=0.0_SP
+  V_HO=0.0_SP
+  HU_HO=0.0_SP
+  HV_HO=0.0_SP
   Fx=0.0_SP
   Fy=0.0_SP
   Gx=0.0_SP
@@ -506,6 +513,7 @@ SUBROUTINE INITIALIZATION
   PLOT_COUNT_STATION=0.0_SP
   HOTSTART_COUNT=ZERO
   MASK=1
+  MASK_HO = 1
   MASK_STRUC=1
   SCREEN_COUNT=ZERO
   SPONGE=1.0_SP

@@ -167,7 +167,143 @@ SUBROUTINE phi_exch (PHI)
 
 END SUBROUTINE phi_exch
 # endif
+!-------------------------------------------------------------------------------------
+# if defined (PARALLEL)
+!-------------------------------------------------------------------------------------
+!
+!    phi_exch_HO is the subroutine to exchange variable at processor
+!    interface where 6 ghost points are needed
+!
+!    HISTORY:
+!      05/04/2022 Reza Salatin
+!
+!-------------------------------------------------------------------------------------
+SUBROUTINE phi_exch_HO (PHI)
+  USE PARAM
+  USE GLOBAL
+  IMPLICIT NONE
+  REAL(SP),INTENT(INOUT) :: PHI(Mloc+6,Nloc+6)
+  INTEGER,DIMENSION(MPI_STATUS_SIZE,4) :: status
+  INTEGER,DIMENSION(4) :: req
+  INTEGER :: nreq,len
+  REAL(SP),DIMENSION(Mloc+6,Nghost+3) :: rNmsg,sNmsg,rSmsg,sSmsg
+  REAL(SP),DIMENSION(Nloc+6,Nghost+3) :: rWmsg,sWmsg,rEmsg,sEmsg
+  INTEGER :: Mloc6,Nloc6,Nghost6,Ibeg6,Iend6,Jbeg6,Jend6
 
+  ! change some variables because we have increased ghost points to 6
+  Mloc6 = Mloc + 6
+  Nloc6 = Nloc + 6
+  Nghost6 = Nghost + 3
+  Ibeg6 = Ibeg+3
+  Iend6 = Iend+3
+  Jbeg6 = Jbeg+3
+  Jend6 = Jend+3
+
+  ! for east-west
+
+  len = Nloc6 * Nghost6
+
+  nreq = 0
+  if ( n_west .ne. MPI_PROC_NULL ) then
+    nreq = nreq + 1
+    call MPI_IRECV( rWmsg, len, MPI_SP, &
+    n_west, 0, comm2d, req(nreq), ier )
+    do j = 1, Nloc6
+      do i = 1, Nghost6
+        sWmsg(j,i) = PHI(Ibeg6+i-1,j)
+      enddo
+    enddo
+    nreq = nreq +1
+    call MPI_ISEND( sWmsg, len, MPI_SP, &
+    n_west, 1, comm2d, req(nreq), ier )
+  endif
+
+  if ( n_east .ne. MPI_PROC_NULL ) then
+    nreq = nreq + 1
+    call MPI_IRECV( rEmsg, len, MPI_SP, &
+    n_east, 1, comm2d, req(nreq), ier )
+    do j = 1, Nloc6
+      do i = 1, Nghost6
+        sEmsg(j,i) = PHI(Iend6-i+1,j)
+      enddo
+    enddo
+    nreq = nreq +1
+    call MPI_ISEND( sEmsg, len, MPI_SP, &
+    n_east, 0, comm2d, req(nreq), ier )
+  endif
+
+  call MPI_WAITALL( nreq, req, status, ier )
+
+  if ( n_west .ne. MPI_PROC_NULL ) then
+    do j = 1, Nloc6
+      do i = 1, Nghost6
+        PHI(Ibeg6-i,j) = rWmsg(j,i)
+      enddo
+    enddo
+  endif
+
+  if ( n_east .ne. MPI_PROC_NULL ) then
+    do j = 1, Nloc6
+      do i = 1, Nghost6
+        PHI(Iend6+i,j) = rEmsg(j,i)
+      enddo
+    enddo
+  endif
+
+  ! for nrth-suth
+
+  len = Mloc6 * Nghost6
+
+  nreq = 0
+  if ( n_suth .ne. MPI_PROC_NULL ) then
+    nreq = nreq + 1
+    call MPI_IRECV( rSmsg, len, MPI_SP, &
+    n_suth, 0, comm2d, req(nreq), ier )
+    do i = 1, Mloc6
+      do j = 1, Nghost6
+        sSmsg(i,j) = PHI(i,Jbeg6+j-1)
+      enddo
+    enddo
+    nreq = nreq +1
+    call MPI_ISEND( sSmsg, len, MPI_SP, &
+    n_suth, 1, comm2d, req(nreq), ier )
+  endif
+
+  if ( n_nrth .ne. MPI_PROC_NULL ) then
+    nreq = nreq + 1
+    call MPI_IRECV( rNmsg, len, MPI_SP, &
+    n_nrth, 1, comm2d, req(nreq), ier )
+    do i = 1, Mloc6
+      do j = 1, Nghost6
+        sNmsg(i,j) = PHI(i,Jend6-j+1)
+      enddo
+    enddo
+    nreq = nreq + 1
+    call MPI_ISEND( sNmsg, len, MPI_SP, &
+    n_nrth, 0, comm2d, req(nreq), ier )
+  endif
+
+  call MPI_WAITALL( nreq, req, status, ier )
+
+  if ( n_suth .ne. MPI_PROC_NULL ) then
+    do i = 1, Mloc6
+      do j = 1, Nghost6
+        PHI(i,Jbeg6-j) = rSmsg(i,j)
+      enddo
+    enddo
+  endif
+
+  if ( n_nrth .ne. MPI_PROC_NULL ) then
+    do i = 1, Mloc6
+      do j = 1, Nghost6
+        PHI(i,Jend6+j) = rNmsg(i,j)
+      enddo
+    enddo
+  endif
+
+END SUBROUTINE phi_exch_HO
+# endif
+!-------------------------------------------------------------------------------------
 # if defined(PARALLEL)
 !-------------------------------------------------------------------------------------
 !

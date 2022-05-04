@@ -227,6 +227,7 @@ U0,V0,Ut,Vt,Utx,Vty,Utxx,Utxy,Vtxy,Vtyy,&
 DUtxx,DUtxy,DVtxy,DVtyy,DUtx,DVty,&
 ! original variables
 Fx,Fy,U,V,HU,HV,&
+U_HO,V_HO,HU_HO,HV_HO,MASK_HO,&
 Gx,Gy,P,Q,SourceX,SourceY,Int2Flo, &
 tmp4preview,HeightMax,HeightMin,VelocityMax,&
 MomentumFluxMax,VorticityMax

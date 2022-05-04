@@ -1267,10 +1267,15 @@ END FUNCTION MINMOD_LIMITER
 ! Erduran et al. (2005)
 !   08/31/21016  fyshi changed the subroutine name HO_vanleer to HO
 !                to make a consistency
+! Salatin May 5, 2022
+! increased ghost points to 6 to get correct results for P, Q
+! previously, values at ghost points were zero
+! I did not do this for U4, and V4 (will do it later)
 ! ---------------------------------------------------------------------------------------
 SUBROUTINE CONSTRUCTION_HO
   USE GLOBAL
   IMPLICIT NONE
+  INTEGER :: Mloc6,Nloc6,Nghost6,Ibeg6,Iend6,Jbeg6,Jend6,Mloc61,Nloc61
 
   REAL(SP),ALLOCATABLE :: MASK9u(:,:), MASK9v(:,:)
   ALLOCATE( MASK9u(1:Mloc1,1:Nloc), MASK9v(1:Mloc,1:Nloc1) )
@@ -1282,11 +1287,22 @@ SUBROUTINE CONSTRUCTION_HO
   MASK9v(1:Mloc,Nloc1)=MASK9(1:Mloc,Nloc)
 
   ! construct in x-direction
-  CALL CONSTRUCT_HO_X(Mloc,Nloc,Mloc1,Ibeg,Iend,Jbeg,Jend,MASK,U,UxL,UxR)
-  CALL CONSTRUCT_HO_X(Mloc,Nloc,Mloc1,Ibeg,Iend,Jbeg,Jend,MASK,V,VxL,VxR)
-  CALL CONSTRUCT_HO_X(Mloc,Nloc,Mloc1,Ibeg,Iend,Jbeg,Jend,MASK,HU,HUxL,HUxR)
-  CALL CONSTRUCT_HO_X(Mloc,Nloc,Mloc1,Ibeg,Iend,Jbeg,Jend,MASK,HV,HVxL,HVxR)
-  CALL CONSTRUCT_HO_X(Mloc,Nloc,Mloc1,Ibeg,Iend,Jbeg,Jend,MASK,Eta,EtaRxL,EtaRxR)
+  ! Reza Salatin May 5, 2022
+  ! change some variables because we have increased ghost points to 6
+  Mloc6 = Mloc + 6
+  Nloc6 = Nloc + 6
+  Nghost6 = Nghost + 3
+  Ibeg6 = Ibeg+3
+  Iend6 = Iend+3
+  Jbeg6 = Jbeg+3
+  Jend6 = Jend+3
+  Mloc61 = Mloc6 + 1
+  Nloc61 = Nloc6 + 1
+  CALL CONSTRUCT_HO_X(Mloc6,Nloc6,Mloc61,Ibeg6,Iend6,Jbeg6,Jend6,MASK_HO,U_HO,UxL,UxR)
+  CALL CONSTRUCT_HO_X(Mloc6,Nloc6,Mloc61,Ibeg6,Iend6,Jbeg6,Jend6,MASK_HO,V_HO,VxL,VxR)
+  CALL CONSTRUCT_HO_X(Mloc6,Nloc6,Mloc61,Ibeg6,Iend6,Jbeg6,Jend6,MASK_HO,HU_HO,HUxL,HUxR)
+  CALL CONSTRUCT_HO_X(Mloc6,Nloc6,Mloc61,Ibeg6,Iend6,Jbeg6,Jend6,MASK_HO,HV_HO,HVxL,HVxR)
+  CALL CONSTRUCT_HO_X(Mloc6,Nloc6,Mloc61,Ibeg6,Iend6,Jbeg6,Jend6,MASK_HO,Eta_HO,EtaRxL,EtaRxR)
 
   ! Salatin
   DO J=Jbeg,Jend
@@ -1302,8 +1318,8 @@ SUBROUTINE CONSTRUCTION_HO
 # if defined (CARTESIAN)
   IF(DISPERSION)THEN
 
-    CALL CONSTRUCT_HO_X(Mloc,Nloc,Mloc1,Ibeg,Iend,Jbeg,Jend,MASK,U4,U4xL,U4xR)
-    CALL CONSTRUCT_HO_X(Mloc,Nloc,Mloc1,Ibeg,Iend,Jbeg,Jend,MASK,V4,V4xL,V4xR)
+    CALL CONSTRUCT_HO_X(Mloc6,Nloc6,Mloc61,Ibeg6,Iend6,Jbeg6,Jend6,MASK_HO,U4_HO,U4xL,U4xR)
+    CALL CONSTRUCT_HO_X(Mloc6,Nloc6,Mloc61,Ibeg6,Iend6,Jbeg6,Jend6,MASK_HO,V4_HO,V4xL,V4xR)
 
   ENDIF
 
@@ -1327,8 +1343,8 @@ SUBROUTINE CONSTRUCTION_HO
 # if defined(ZALPHA)
   IF(DISPERSION)THEN
 
-    CALL CONSTRUCT_HO_X(Mloc,Nloc,Mloc1,Ibeg,Iend,Jbeg,Jend,MASK,U4,U4xL,U4xR)
-    CALL CONSTRUCT_HO_X(Mloc,Nloc,Mloc1,Ibeg,Iend,Jbeg,Jend,MASK,V4,V4xL,V4xR)
+    CALL CONSTRUCT_HO_X(Mloc6,Nloc6,Mloc61,Ibeg6,Iend6,Jbeg6,Jend6,MASK_HO,U4_HO,U4xL,U4xR)
+    CALL CONSTRUCT_HO_X(Mloc6,Nloc6,Mloc61,Ibeg6,Iend6,Jbeg6,Jend6,MASK_HO,V4_HO,V4xL,V4xR)
 
   ENDIF
 
@@ -1378,11 +1394,11 @@ SUBROUTINE CONSTRUCTION_HO
 # endif
 
   ! construct in y-direction
-  CALL CONSTRUCT_HO_Y(Mloc,Nloc,Nloc1,Ibeg,Iend,Jbeg,Jend,MASK,U,UyL,UyR)
-  CALL CONSTRUCT_HO_Y(Mloc,Nloc,Nloc1,Ibeg,Iend,Jbeg,Jend,MASK,V,VyL,VyR)
-  CALL CONSTRUCT_HO_Y(Mloc,Nloc,Nloc1,Ibeg,Iend,Jbeg,Jend,MASK,HV,HVyL,HVyR)
-  CALL CONSTRUCT_HO_Y(Mloc,Nloc,Nloc1,Ibeg,Iend,Jbeg,Jend,MASK,HU,HUyL,HUyR)
-  CALL CONSTRUCT_HO_Y(Mloc,Nloc,Nloc1,Ibeg,Iend,Jbeg,Jend,MASK,Eta,EtaRyL,EtaRyR)
+  CALL CONSTRUCT_HO_Y(Mloc6,Nloc6,Nloc61,Ibeg6,Iend6,Jbeg6,Jend6,MASK_HO,U_HO,UyL,UyR)
+  CALL CONSTRUCT_HO_Y(Mloc6,Nloc6,Nloc61,Ibeg6,Iend6,Jbeg6,Jend6,MASK_HO,V_HO,VyL,VyR)
+  CALL CONSTRUCT_HO_Y(Mloc6,Nloc6,Nloc61,Ibeg6,Iend6,Jbeg6,Jend6,MASK_HO,HV_HO,HVyL,HVyR)
+  CALL CONSTRUCT_HO_Y(Mloc6,Nloc6,Nloc61,Ibeg6,Iend6,Jbeg6,Jend6,MASK_HO,HU_HO,HUyL,HUyR)
+  CALL CONSTRUCT_HO_Y(Mloc6,Nloc6,Nloc61,Ibeg6,Iend6,Jbeg6,Jend6,MASK_HO,Eta_HO,EtaRyL,EtaRyR)
 
   HyL=EtaRyL+Depthy
   HyR=EtaRyR+Depthy
@@ -1390,8 +1406,8 @@ SUBROUTINE CONSTRUCTION_HO
 # if defined (CARTESIAN)
   IF(DISPERSION)THEN
 
-    CALL CONSTRUCT_HO_Y(Mloc,Nloc,Nloc1,Ibeg,Iend,Jbeg,Jend,MASK,V4,V4yL,V4yR)
-    CALL CONSTRUCT_HO_Y(Mloc,Nloc,Nloc1,Ibeg,Iend,Jbeg,Jend,MASK,U4,U4yL,U4yR)
+    CALL CONSTRUCT_HO_Y(Mloc6,Nloc6,Nloc61,Ibeg6,Iend6,Jbeg6,Jend6,MASK_HO,V4_HO,V4yL,V4yR)
+    CALL CONSTRUCT_HO_Y(Mloc6,Nloc6,Nloc61,Ibeg6,Iend6,Jbeg6,Jend6,MASK_HO,U4_HO,U4yL,U4yR)
 
   ENDIF
 
@@ -1416,8 +1432,8 @@ SUBROUTINE CONSTRUCTION_HO
 # if defined (ZALPHA)
   IF(DISPERSION)THEN
 
-    CALL CONSTRUCT_HO_Y(Mloc,Nloc,Nloc1,Ibeg,Iend,Jbeg,Jend,MASK,V4,V4yL,V4yR)
-    CALL CONSTRUCT_HO_Y(Mloc,Nloc,Nloc1,Ibeg,Iend,Jbeg,Jend,MASK,U4,U4yL,U4yR)
+    CALL CONSTRUCT_HO_Y(Mloc6,Nloc6,Nloc61,Ibeg6,Iend6,Jbeg6,Jend6,MASK_HO,V4_HO,V4yL,V4yR)
+    CALL CONSTRUCT_HO_Y(Mloc6,Nloc6,Nloc61,Ibeg6,Iend6,Jbeg6,Jend6,MASK_HO,U4_HO,U4yL,U4yR)
 
   ENDIF
 
@@ -1482,7 +1498,8 @@ SUBROUTINE CONSTRUCT_HO_X(M,N,M1,Ibeg,Iend,Jbeg,Jend,MASK,Vin,OutL,OutR)
 
   REAL(SP),INTENT(IN),DIMENSION(M,N) :: Vin
   INTEGER,INTENT(IN),DIMENSION(M,N) :: MASK
-  REAL(SP),INTENT(OUT),DIMENSION(M1,N) :: OutL,OutR
+  REAL(SP),DIMENSION(M1,N) :: tempL,tempR
+  REAL(SP),INTENT(OUT),DIMENSION(M1-6,N-6) :: OutL,OutR
 
   REAL(SP),DIMENSION(M,N) :: Din
   REAL(SP) :: TXP1,TXP2,TXP3,DVP1,DVP2,DVP3
@@ -1562,7 +1579,7 @@ SUBROUTINE CONSTRUCT_HO_X(M,N,M1,Ibeg,Iend,Jbeg,Jend,MASK,Vin,OutL,OutR)
       VAN2 = 0.0_SP;
       IF( abs(1.0 + RAT) > SMALL ) VAN2 = ( RAT + ABS(RAT) )/( 1.0_SP + RAT)
 
-      OutL(I,J) = Vin(I-1,J) + ( 1.0_SP/6.0_SP )*( VAN1*TMP1 + 2.0_SP*VAN2*TMP2 )
+      tempL(I,J) = Vin(I-1,J) + ( 1.0_SP/6.0_SP )*( VAN1*TMP1 + 2.0_SP*VAN2*TMP2 )
 
       !!!!!!!!!!!!!!!
 
@@ -1578,10 +1595,13 @@ SUBROUTINE CONSTRUCT_HO_X(M,N,M1,Ibeg,Iend,Jbeg,Jend,MASK,Vin,OutL,OutR)
       VAN2 = 0.0_SP;
       IF( abs(1.0 + RAT) > SMALL ) VAN2 = ( RAT + ABS(RAT) )/( 1.0_SP + RAT)
 
-      OutR(I,J) = Vin(I,J) - ( 1.0_SP/6.0_SP )*( 2.0_SP*VAN1*TMP1 + VAN2*TMP2 )
+      tempR(I,J) = Vin(I,J) - ( 1.0_SP/6.0_SP )*( 2.0_SP*VAN1*TMP1 + VAN2*TMP2 )
     ENDDO
 
   ENDDO
+
+  OutL = tempL(1+3:M1-3,1+3:N-3)
+  OutR = tempR(1+3:M1-3,1+3:N-3)
 
 END SUBROUTINE CONSTRUCT_HO_X
 
@@ -1597,7 +1617,8 @@ SUBROUTINE CONSTRUCT_HO_Y(M,N,N1,Ibeg,Iend,Jbeg,Jend,MASK,Vin,OutL,OutR)
 
   REAL(SP),INTENT(IN),DIMENSION(M,N) :: Vin
   INTEGER,INTENT(IN),DIMENSION(M,N) :: MASK
-  REAL(SP),INTENT(OUT),DIMENSION(M,N1) :: OutL,OutR
+  REAL(SP),DIMENSION(M,N1) :: tempL,tempR
+  REAL(SP),INTENT(OUT),DIMENSION(M-6,N1-6) :: OutL,OutR
 
   REAL(SP),DIMENSION(M,N) :: Din
   REAL(SP) :: TYP1,TYP2,TYP3,DVP1,DVP2,DVP3
@@ -1677,7 +1698,7 @@ SUBROUTINE CONSTRUCT_HO_Y(M,N,N1,Ibeg,Iend,Jbeg,Jend,MASK,Vin,OutL,OutR)
       VAN2 = 0.0_SP;
       IF( abs(1.0 + RAT) > SMALL ) VAN2 = ( RAT + ABS(RAT) )/( 1.0_SP + RAT)
 
-      OutL(I,J) = Vin(I,J-1) + ( 1.0_SP/6.0_SP )*( VAN1*TMP1 + 2.0_SP*VAN2*TMP2 )
+      tempL(I,J) = Vin(I,J-1) + ( 1.0_SP/6.0_SP )*( VAN1*TMP1 + 2.0_SP*VAN2*TMP2 )
 
       !!!!!!!!!!!!!!!
 
@@ -1693,9 +1714,12 @@ SUBROUTINE CONSTRUCT_HO_Y(M,N,N1,Ibeg,Iend,Jbeg,Jend,MASK,Vin,OutL,OutR)
       VAN2 = 0.0_SP;
       IF( abs(1.0 + RAT) > SMALL ) VAN2 = ( RAT + ABS(RAT) )/( 1.0_SP + RAT)
 
-      OutR(I,J) = Vin(I,J) - ( 1.0_SP/6.0_SP )*( 2.0_SP*VAN1*TMP1 + VAN2*TMP2 )
+      tempR(I,J) = Vin(I,J) - ( 1.0_SP/6.0_SP )*( 2.0_SP*VAN1*TMP1 + VAN2*TMP2 )
     ENDDO
 
   ENDDO
+
+  OutL = tempL(1+3:M-3,1+3:N1-3)
+  OutR = tempR(1+3:M-3,1+3:N1-3)
 
 END SUBROUTINE CONSTRUCT_HO_Y
