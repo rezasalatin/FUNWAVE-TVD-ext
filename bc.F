@@ -453,9 +453,9 @@ SUBROUTINE EXCHANGE
   CALL PHI_COLL_HO(Mloc,Nloc,Ibeg,Iend,Jbeg,Jend,Nghost,&
   Eta,Eta_HO,VTYPE,PERIODIC)
   ! Salatin
-  nu_smg_effectx = Eta
-  nu_smg_effecty = Eta_HO
-  print *, "hi we are at bc line 456"
+  !nu_smg_effectx = Eta
+  !nu_smg_effecty = Eta_HO
+  print *, "hi we are at bc line 450"
 
   IF(VISCOSITY_BREAKING) THEN
     CALL PHI_COLL(Mloc,Nloc,Ibeg,Iend,Jbeg,Jend,Nghost,&
