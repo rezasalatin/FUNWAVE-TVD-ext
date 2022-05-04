@@ -96,7 +96,7 @@ SUBROUTINE ALLOCATE_VARIABLES
   U(Mloc,Nloc),V(Mloc,Nloc), HU(Mloc,Nloc),HV(Mloc,Nloc),&
   U_HO(Mloc+6,Nloc+6),V_HO(Mloc+6,Nloc+6),&
   HU_HO(Mloc+6,Nloc+6),HV_HO(Mloc+6,Nloc+6),&
-  MASK_HO(Mloc+6,Nloc+6),&
+  MASK_HO(Mloc+6,Nloc+6),Eta_HO(Mloc+6,Nloc+6),&
   Gx(Mloc1,Nloc),Gy(Mloc,Nloc1), &
   P(Mloc1,Nloc),Q(Mloc,Nloc1), &
   SxL(Mloc1,Nloc),SxR(Mloc1,Nloc), &
@@ -485,6 +485,7 @@ SUBROUTINE INITIALIZATION
   V_HO=0.0_SP
   HU_HO=0.0_SP
   HV_HO=0.0_SP
+  Eta_HO=0.0_SP
   Fx=0.0_SP
   Fy=0.0_SP
   Gx=0.0_SP

@@ -442,6 +442,7 @@ SUBROUTINE EXCHANGE
   INTEGER :: VTYPE
 # if defined (CARTESIAN)
   REAL(SP),DIMENSION(Mloc,Nloc) :: rMASK
+  REAL(SP),DIMENSION(Mloc+6,Nloc+6) :: rMASK_HO
 # endif
 
 # if defined (CARTESIAN)
