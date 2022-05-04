@@ -1407,14 +1407,12 @@ SUBROUTINE PHI_COLL_HO(Mloc,Nloc,Ibeg,Iend,Jbeg,Jend,Nghost, &
   INTEGER,DIMENSION(1) :: req
   INTEGER :: nreq,len,ll,l,II,JJ
   integer,dimension(MPI_STATUS_SIZE,1) :: status
-  REAL(SP),DIMENSION(Mloc,Nghost+3) :: xx,send2d
+  REAL(SP),DIMENSION(Mloc+6,Nghost+3) :: xx,send2d
   REAL(sp) :: myvar,mybeta
 # endif
 
-  INTEGER :: Mloc6,Nloc6,Nghost6,Ibeg6,Iend6,Jbeg6,Jend6
+  INTEGER :: Nghost6,Ibeg6,Iend6,Jbeg6,Jend6
   ! change some variables because we have increased ghost points to 6
-  Mloc6 = Mloc + 6
-  Nloc6 = Nloc + 6
   Nghost6 = Nghost + 3
   Ibeg6 = Ibeg+3
   Iend6 = Iend+3
