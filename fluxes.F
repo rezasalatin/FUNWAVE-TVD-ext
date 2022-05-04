@@ -1306,11 +1306,7 @@ SUBROUTINE CONSTRUCTION_HO
   CALL CONSTRUCT_HO_X(Mloc6,Nloc6,Mloc61,Ibeg6,Iend6,Jbeg6,Jend6,MASK_HO,HV_HO,HVxL,HVxR)
   CALL CONSTRUCT_HO_X(Mloc6,Nloc6,Mloc61,Ibeg6,Iend6,Jbeg6,Jend6,MASK_HO,Eta_HO,EtaRxL,EtaRxR)
 
-  ! Salatin
-  !nu_smg_effectx = Eta_HO
-  nu_smg_effecty = Eta_HO
   print *, "hi we are at fluxes line 1310"
-
   ! Salatin
   !DO J=Jbeg,Jend
   !  DO I=Ibeg,Iend

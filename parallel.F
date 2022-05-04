@@ -191,18 +191,16 @@ SUBROUTINE phi_exch_HO (PHI)
   INTEGER :: Mloc6,Nloc6,Nghost6,Ibeg6,Iend6,Jbeg6,Jend6
 
   ! change some variables because we have increased ghost points to 6
-  Mloc6 = Mloc + 6
-  Nloc6 = Nloc + 6
-  Nghost6 = Nghost + 3
+  Mloc6 = Mloc+6
+  Nloc6 = Nloc+6
+  Nghost6 = Nghost+3
   Ibeg6 = Ibeg+3
   Iend6 = Iend+3
   Jbeg6 = Jbeg+3
   Jend6 = Jend+3
 
   ! for east-west
-
   len = Nloc6 * Nghost6
-
   nreq = 0
   if ( n_west .ne. MPI_PROC_NULL ) then
     nreq = nreq + 1
