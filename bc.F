@@ -1415,11 +1415,22 @@ SUBROUTINE PHI_COLL_HO(Mloc,Nloc,Ibeg,Iend,Jbeg,Jend,Nghost, &
 
   INTEGER :: Nghost6,Ibeg6,Iend6,Jbeg6,Jend6
   ! change some variables because we have increased ghost points to 6
-  Nghost6 = Nghost + 3
+  Nghost6 = Nghost+3
   Ibeg6 = Ibeg+3
   Iend6 = Iend+3
   Jbeg6 = Jbeg+3
   Jend6 = Jend+3
+
+  print *, 'Nghost is ',Nghost6
+  print *, 'Ibeg is ',Ibeg
+  print *, 'Ibeg6 is ',Ibeg6
+  print *, 'Iend is ',Iend
+  print *, 'Iend6 is ',Iend6
+  print *, 'Jbeg is ',Jbeg
+  print *, 'Jbeg6 is ',Jbeg6
+  print *, 'Jend is ',Jend
+  print *, 'Jend6 is ',Jend6
+
 
   ! periodic first because it is not related to VTYPE
 # if defined (CARTESIAN)
