@@ -455,7 +455,7 @@ SUBROUTINE EXCHANGE
   Eta,VTYPE,PERIODIC)
 
   ! Salatin
-  nu_smg_effecty = Eta
+  nu_smg_effectx = Eta
 
   CALL PHI_COLL_HO(Mloc,Nloc,Ibeg,Iend,Jbeg,Jend,Nghost,&
   Eta,Eta_HO,VTYPE,PERIODIC)
