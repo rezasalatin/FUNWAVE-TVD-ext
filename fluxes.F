@@ -1288,14 +1288,6 @@ SUBROUTINE CONSTRUCTION_HO
   CALL CONSTRUCT_HO_X(Mloc,Nloc,Mloc1,Ibeg-3,Iend+3,Jbeg-3,Jend+3,MASK,HV,HVxL,HVxR)
   CALL CONSTRUCT_HO_X(Mloc,Nloc,Mloc1,Ibeg-3,Iend+3,Jbeg-3,Jend+3,MASK,Eta,EtaRxL,EtaRxR)
 
-  ! Salatin
-  DO J=Jbeg,Jend
-    DO I=Ibeg,Iend
-      nu_smg_effectx(I,J) = HU(I,J-3)
-      nu_smg_effecty(I,J) = HUxL(I,J-3)
-    ENDDO
-  ENDDO
-
   HxL=EtaRxL+Depthx
   HxR=EtaRxR+Depthx
 

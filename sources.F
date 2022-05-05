@@ -260,8 +260,8 @@ SUBROUTINE SourceTerms
     ENDDO
   ENDDO
   ! Salatin
-  !nu_smg_effectx = tempX
-  !nu_smg_effecty = tempY
+  nu_smg_effectx = tempX
+  nu_smg_effecty = tempY
   ! end if Mixing
 # endif
 
