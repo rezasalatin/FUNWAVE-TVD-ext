@@ -449,22 +449,14 @@ SUBROUTINE EXCHANGE
   ! ---------------------------- VTYPE = 1 -------------------------------
   VTYPE=1
   ! Salatin
-  DO J=Jbeg,Jend
-    DO I=Ibeg,Iend
-      nu_smg_effectx(I,J) = Eta(I,J)
-    ENDDO
-  ENDDO
+  nu_smg_effecty = Eta
 
   CALL PHI_COLL(Mloc,Nloc,Ibeg,Iend,Jbeg,Jend,Nghost,&
   Eta,VTYPE,PERIODIC)
 
   ! Salatin
-  DO J=Jbeg,Jend
-    DO I=Ibeg,Iend
-      nu_smg_effecty(I,J) = Eta(I,J)
-    ENDDO
-  ENDDO
-  
+  nu_smg_effecty = Eta
+
   CALL PHI_COLL_HO(Mloc,Nloc,Ibeg,Iend,Jbeg,Jend,Nghost,&
   Eta,Eta_HO,VTYPE,PERIODIC)
 
