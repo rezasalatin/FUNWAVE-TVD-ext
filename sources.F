@@ -66,7 +66,7 @@ SUBROUTINE SourceTerms
 
   IMPLICIT NONE
   REAL,DIMENSION(Mloc,Nloc) :: nu_vis
-  LOGICAL :: PQ_scheme = .FALSE.
+  LOGICAL :: PQ_scheme = .TRUE.
   REAL(SP) :: xmk,ymk,Dxg,Dyg,WK_Source
   INTEGER :: kd,kf
   REAL(SP) :: AA                          ! for all WK's (optimized)
