@@ -448,12 +448,8 @@ SUBROUTINE EXCHANGE
 # if defined (CARTESIAN)
   ! ---------------------------- VTYPE = 1 -------------------------------
   VTYPE=1
-  ! Salatin
-  nu_smg_effecty = Eta
-
   CALL PHI_COLL(Mloc,Nloc,Ibeg,Iend,Jbeg,Jend,Nghost,&
   Eta,VTYPE,PERIODIC)
-
   ! Salatin
   nu_smg_effectx = Eta
 
@@ -461,12 +457,12 @@ SUBROUTINE EXCHANGE
   Eta,Eta_HO,VTYPE,PERIODIC)
 
   ! Salatin
-  !DO J=Jbeg,Jend
-  !  DO I=Ibeg,Iend
+  DO J=Jbeg,Jend
+    DO I=Ibeg,Iend
   !    nu_smg_effectx(I,J) = Eta(I,J)
-  !    nu_smg_effecty(I,J) = Eta_HO(I+3,J+3)
-  !  ENDDO
-  !ENDDO
+      nu_smg_effecty(I,J) = Eta_HO(I+3,J+3)
+    ENDDO
+  ENDDO
 
   print *, "hi we are at bc line 450"
 
