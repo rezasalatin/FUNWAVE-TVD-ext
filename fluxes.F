@@ -1282,11 +1282,11 @@ SUBROUTINE CONSTRUCTION_HO
   MASK9v(1:Mloc,Nloc1)=MASK9(1:Mloc,Nloc)
 
   ! construct in x-direction
-  CALL CONSTRUCT_HO_X(Mloc,Nloc,Mloc1,Ibeg,Iend,Jbeg,Jend,MASK,U,UxL,UxR)
-  CALL CONSTRUCT_HO_X(Mloc,Nloc,Mloc1,Ibeg,Iend,Jbeg,Jend,MASK,V,VxL,VxR)
-  CALL CONSTRUCT_HO_X(Mloc,Nloc,Mloc1,Ibeg,Iend,Jbeg,Jend,MASK,HU,HUxL,HUxR)
-  CALL CONSTRUCT_HO_X(Mloc,Nloc,Mloc1,Ibeg,Iend,Jbeg,Jend,MASK,HV,HVxL,HVxR)
-  CALL CONSTRUCT_HO_X(Mloc,Nloc,Mloc1,Ibeg,Iend,Jbeg,Jend,MASK,Eta,EtaRxL,EtaRxR)
+  CALL CONSTRUCT_HO_X(Mloc,Nloc,Mloc1,Ibeg-3,Iend+3,Jbeg-3,Jend+3,MASK,U,UxL,UxR)
+  CALL CONSTRUCT_HO_X(Mloc,Nloc,Mloc1,Ibeg-3,Iend+3,Jbeg-3,Jend+3,MASK,V,VxL,VxR)
+  CALL CONSTRUCT_HO_X(Mloc,Nloc,Mloc1,Ibeg-3,Iend+3,Jbeg-3,Jend+3,MASK,HU,HUxL,HUxR)
+  CALL CONSTRUCT_HO_X(Mloc,Nloc,Mloc1,Ibeg-3,Iend+3,Jbeg-3,Jend+3,MASK,HV,HVxL,HVxR)
+  CALL CONSTRUCT_HO_X(Mloc,Nloc,Mloc1,Ibeg-3,Iend+3,Jbeg-3,Jend+3,MASK,Eta,EtaRxL,EtaRxR)
 
   ! Salatin
   DO J=Jbeg,Jend
@@ -1302,8 +1302,8 @@ SUBROUTINE CONSTRUCTION_HO
 # if defined (CARTESIAN)
   IF(DISPERSION)THEN
 
-    CALL CONSTRUCT_HO_X(Mloc,Nloc,Mloc1,Ibeg,Iend,Jbeg,Jend,MASK,U4,U4xL,U4xR)
-    CALL CONSTRUCT_HO_X(Mloc,Nloc,Mloc1,Ibeg,Iend,Jbeg,Jend,MASK,V4,V4xL,V4xR)
+    CALL CONSTRUCT_HO_X(Mloc,Nloc,Mloc1,Ibeg-3,Iend+3,Jbeg-3,Jend+3,MASK,U4,U4xL,U4xR)
+    CALL CONSTRUCT_HO_X(Mloc,Nloc,Mloc1,Ibeg-3,Iend+3,Jbeg-3,Jend+3,MASK,V4,V4xL,V4xR)
 
   ENDIF
 
@@ -1327,8 +1327,8 @@ SUBROUTINE CONSTRUCTION_HO
 # if defined(ZALPHA)
   IF(DISPERSION)THEN
 
-    CALL CONSTRUCT_HO_X(Mloc,Nloc,Mloc1,Ibeg,Iend,Jbeg,Jend,MASK,U4,U4xL,U4xR)
-    CALL CONSTRUCT_HO_X(Mloc,Nloc,Mloc1,Ibeg,Iend,Jbeg,Jend,MASK,V4,V4xL,V4xR)
+    CALL CONSTRUCT_HO_X(Mloc,Nloc,Mloc1,Ibeg-3,Iend+3,Jbeg-3,Jend+3,MASK,U4,U4xL,U4xR)
+    CALL CONSTRUCT_HO_X(Mloc,Nloc,Mloc1,Ibeg-3,Iend+3,Jbeg-3,Jend+3,MASK,V4,V4xL,V4xR)
 
   ENDIF
 
@@ -1378,11 +1378,11 @@ SUBROUTINE CONSTRUCTION_HO
 # endif
 
   ! construct in y-direction
-  CALL CONSTRUCT_HO_Y(Mloc,Nloc,Nloc1,Ibeg,Iend,Jbeg,Jend,MASK,U,UyL,UyR)
-  CALL CONSTRUCT_HO_Y(Mloc,Nloc,Nloc1,Ibeg,Iend,Jbeg,Jend,MASK,V,VyL,VyR)
-  CALL CONSTRUCT_HO_Y(Mloc,Nloc,Nloc1,Ibeg,Iend,Jbeg,Jend,MASK,HV,HVyL,HVyR)
-  CALL CONSTRUCT_HO_Y(Mloc,Nloc,Nloc1,Ibeg,Iend,Jbeg,Jend,MASK,HU,HUyL,HUyR)
-  CALL CONSTRUCT_HO_Y(Mloc,Nloc,Nloc1,Ibeg,Iend,Jbeg,Jend,MASK,Eta,EtaRyL,EtaRyR)
+  CALL CONSTRUCT_HO_Y(Mloc,Nloc,Nloc1,Ibeg-3,Iend+3,Jbeg-3,Jend+3,MASK,U,UyL,UyR)
+  CALL CONSTRUCT_HO_Y(Mloc,Nloc,Nloc1,Ibeg-3,Iend+3,Jbeg-3,Jend+3,MASK,V,VyL,VyR)
+  CALL CONSTRUCT_HO_Y(Mloc,Nloc,Nloc1,Ibeg-3,Iend+3,Jbeg-3,Jend+3,MASK,HV,HVyL,HVyR)
+  CALL CONSTRUCT_HO_Y(Mloc,Nloc,Nloc1,Ibeg-3,Iend+3,Jbeg-3,Jend+3,MASK,HU,HUyL,HUyR)
+  CALL CONSTRUCT_HO_Y(Mloc,Nloc,Nloc1,Ibeg-3,Iend+3,Jbeg-3,Jend+3,MASK,Eta,EtaRyL,EtaRyR)
 
   HyL=EtaRyL+Depthy
   HyR=EtaRyR+Depthy
@@ -1390,8 +1390,8 @@ SUBROUTINE CONSTRUCTION_HO
 # if defined (CARTESIAN)
   IF(DISPERSION)THEN
 
-    CALL CONSTRUCT_HO_Y(Mloc,Nloc,Nloc1,Ibeg,Iend,Jbeg,Jend,MASK,V4,V4yL,V4yR)
-    CALL CONSTRUCT_HO_Y(Mloc,Nloc,Nloc1,Ibeg,Iend,Jbeg,Jend,MASK,U4,U4yL,U4yR)
+    CALL CONSTRUCT_HO_Y(Mloc,Nloc,Nloc1,Ibeg-3,Iend+3,Jbeg-3,Jend+3,MASK,V4,V4yL,V4yR)
+    CALL CONSTRUCT_HO_Y(Mloc,Nloc,Nloc1,Ibeg-3,Iend+3,Jbeg-3,Jend+3,MASK,U4,U4yL,U4yR)
 
   ENDIF
 
@@ -1416,8 +1416,8 @@ SUBROUTINE CONSTRUCTION_HO
 # if defined (ZALPHA)
   IF(DISPERSION)THEN
 
-    CALL CONSTRUCT_HO_Y(Mloc,Nloc,Nloc1,Ibeg,Iend,Jbeg,Jend,MASK,V4,V4yL,V4yR)
-    CALL CONSTRUCT_HO_Y(Mloc,Nloc,Nloc1,Ibeg,Iend,Jbeg,Jend,MASK,U4,U4yL,U4yR)
+    CALL CONSTRUCT_HO_Y(Mloc,Nloc,Nloc1,Ibeg-3,Iend+3,Jbeg-3,Jend+3,MASK,V4,V4yL,V4yR)
+    CALL CONSTRUCT_HO_Y(Mloc,Nloc,Nloc1,Ibeg-3,Iend+3,Jbeg-3,Jend+3,MASK,U4,U4yL,U4yR)
 
   ENDIF
 
