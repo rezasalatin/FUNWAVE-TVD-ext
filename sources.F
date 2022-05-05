@@ -218,7 +218,7 @@ SUBROUTINE SourceTerms
 
 107   format(500f12.6)
 
-
+  print *, "this is before the if and loop"
 # if defined (CARTESIAN)
 # if defined (MIXING)
   ! Sub-grid-scale Turbulence
@@ -229,7 +229,6 @@ SUBROUTINE SourceTerms
   ! depth gradient term
   DO J=Jbeg,Jend
     DO I=Ibeg,Iend
-      ! Smagorinsky
       tempX(I,J) = 1.0_SP/DX*( &
       0.5_SP*(nu_smg(I,J)+nu_smg(I+1,J)) &
       *1.0_SP/DX*(P(I+1,J)-P(I,J))  &
@@ -259,6 +258,7 @@ SUBROUTINE SourceTerms
       -nu_smg(I-1,J)*0.5_SP/DY*(P(I-1,J+1)-P(I-1,J-1)))
     ENDDO
   ENDDO
+  print *, "this is after the loop"
   ! Salatin
   nu_smg_effectx = tempX
   nu_smg_effecty = tempY
