@@ -1282,7 +1282,7 @@ SUBROUTINE CONSTRUCTION_HO
   MASK9u(Mloc1,1:Nloc)=MASK9(Mloc,1:Nloc)
   MASK9v(1:Mloc,Nloc1)=MASK9(1:Mloc,Nloc)
 
-  IJadd = 0 ! Salatin 05/05/2022 make this equal to 3
+  IJadd = 3 ! Salatin 05/05/2022 make this equal to 3
 
   ! construct in x-direction
   CALL CONSTRUCT_HO_X(Mloc,Nloc,Mloc1,Ibeg-IJadd,Iend+IJadd,Jbeg-IJadd,Jend+IJadd,MASK,U,UxL,UxR)
