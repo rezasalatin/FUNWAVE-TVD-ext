@@ -75,7 +75,6 @@ SUBROUTINE SourceTerms
     ! eddy viscosity, Salatin
     REAL(SP),DIMENSION(Mloc,Mloc) :: temp_smg
     REAL(SP),DIMENSION(Mloc,Mloc) :: tempX,tempY
-    INTEGER :: VTYPE
 
 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
@@ -223,12 +222,6 @@ SUBROUTINE SourceTerms
     temp_smg = SQRT(2.0*uMAx**2+2.0*vMAy**2+(uMAy+vMAx)*(uMAy+vMAx))
     nu_smg = C_smg**2*DX*DY*temp_smg
 
-    DO J=Jbeg,Jend
-    DO I=Ibeg,Iend
-        P(I,J) = 0.1
-    ENDDO
-    ENDDO
-
     ! depth gradient term
     DO J=Jbeg,Jend
     DO I=Ibeg,Iend
@@ -262,11 +255,6 @@ SUBROUTINE SourceTerms
     ENDDO
     ENDDO
 
-    VTYPE = 1
-    CALL PHI_COLL(Mloc,Nloc,Ibeg,Iend,Jbeg,Jend,Nghost,&
-        tempX,VTYPE,PERIODIC)
-    CALL PHI_COLL(Mloc,Nloc,Ibeg,Iend,Jbeg,Jend,Nghost,&
-        tempY,VTYPE,PERIODIC)
 
 # endif
 # endif
@@ -409,7 +397,7 @@ SUBROUTINE SourceTerms
 # if defined (MIXING)
 
         nu_smg_effectx(I,J) = tempX(I,J)
-        nu_smg_effecty(I,J) = SourceX(I,J)
+        nu_smg_effecty(I,J) = tempy(I,J)
 
         SourceX(I,J) = SourceX(I,J) ! + tempX
         SourceY(I,J) = SourceY(I,J) ! + tempY
