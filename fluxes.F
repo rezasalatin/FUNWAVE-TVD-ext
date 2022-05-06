@@ -1274,6 +1274,8 @@ SUBROUTINE CONSTRUCTION_HO
      USE GLOBAL
      IMPLICIT NONE
 
+     INTEGER :: IJadd
+
      REAL(SP),ALLOCATABLE :: MASK9u(:,:), MASK9v(:,:)
      ALLOCATE( MASK9u(1:Mloc1,1:Nloc), MASK9v(1:Mloc,1:Nloc1) )
 
@@ -1283,12 +1285,14 @@ SUBROUTINE CONSTRUCTION_HO
      MASK9u(Mloc1,1:Nloc)=MASK9(Mloc,1:Nloc)
      MASK9v(1:Mloc,Nloc1)=MASK9(1:Mloc,Nloc)
 
+     IJadd = 3
+
 ! construct in x-direction
-     CALL CONSTRUCT_HO_X(Mloc,Nloc,Mloc1,Ibeg,Iend,Jbeg,Jend,MASK,U,UxL,UxR)
-     CALL CONSTRUCT_HO_X(Mloc,Nloc,Mloc1,Ibeg,Iend,Jbeg,Jend,MASK,V,VxL,VxR)
-     CALL CONSTRUCT_HO_X(Mloc,Nloc,Mloc1,Ibeg,Iend,Jbeg,Jend,MASK,HU,HUxL,HUxR)
-     CALL CONSTRUCT_HO_X(Mloc,Nloc,Mloc1,Ibeg,Iend,Jbeg,Jend,MASK,HV,HVxL,HVxR)
-     CALL CONSTRUCT_HO_X(Mloc,Nloc,Mloc1,Ibeg,Iend,Jbeg,Jend,MASK,Eta,EtaRxL,EtaRxR)
+     CALL CONSTRUCT_HO_X(Mloc,Nloc,Mloc1,Ibeg-IJadd,Iend+IJadd,Jbeg-IJadd,Jend+IJadd,MASK,U,UxL,UxR)
+     CALL CONSTRUCT_HO_X(Mloc,Nloc,Mloc1,Ibeg-IJadd,Iend+IJadd,Jbeg-IJadd,Jend+IJadd,MASK,V,VxL,VxR)
+     CALL CONSTRUCT_HO_X(Mloc,Nloc,Mloc1,Ibeg-IJadd,Iend+IJadd,Jbeg-IJadd,Jend+IJadd,MASK,HU,HUxL,HUxR)
+     CALL CONSTRUCT_HO_X(Mloc,Nloc,Mloc1,Ibeg-IJadd,Iend+IJadd,Jbeg-IJadd,Jend+IJadd,MASK,HV,HVxL,HVxR)
+     CALL CONSTRUCT_HO_X(Mloc,Nloc,Mloc1,Ibeg-IJadd,Iend+IJadd,Jbeg-IJadd,Jend+IJadd,MASK,Eta,EtaRxL,EtaRxR)
 
      HxL=EtaRxL+Depthx
      HxR=EtaRxR+Depthx
@@ -1296,8 +1300,8 @@ SUBROUTINE CONSTRUCTION_HO
 # if defined (CARTESIAN)
      IF(DISPERSION)THEN
 
-      CALL CONSTRUCT_HO_X(Mloc,Nloc,Mloc1,Ibeg,Iend,Jbeg,Jend,MASK,U4,U4xL,U4xR)
-	CALL CONSTRUCT_HO_X(Mloc,Nloc,Mloc1,Ibeg,Iend,Jbeg,Jend,MASK,V4,V4xL,V4xR)
+      CALL CONSTRUCT_HO_X(Mloc,Nloc,Mloc1,Ibeg-IJadd,Iend+IJadd,Jbeg-IJadd,Jend+IJadd,MASK,U4,U4xL,U4xR)
+	    CALL CONSTRUCT_HO_X(Mloc,Nloc,Mloc1,Ibeg-IJadd,Iend+IJadd,Jbeg-IJadd,Jend+IJadd,MASK,V4,V4xL,V4xR)
 
      ENDIF
 
@@ -1321,8 +1325,8 @@ SUBROUTINE CONSTRUCTION_HO
 # if defined(ZALPHA)
      IF(DISPERSION)THEN
 
-      CALL CONSTRUCT_HO_X(Mloc,Nloc,Mloc1,Ibeg,Iend,Jbeg,Jend,MASK,U4,U4xL,U4xR)
-	CALL CONSTRUCT_HO_X(Mloc,Nloc,Mloc1,Ibeg,Iend,Jbeg,Jend,MASK,V4,V4xL,V4xR)
+      CALL CONSTRUCT_HO_X(Mloc,Nloc,Mloc1,Ibeg-IJadd,Iend+IJadd,Jbeg-IJadd,Jend+IJadd,MASK,U4,U4xL,U4xR)
+	    CALL CONSTRUCT_HO_X(Mloc,Nloc,Mloc1,Ibeg-IJadd,Iend+IJadd,Jbeg-IJadd,Jend+IJadd,MASK,V4,V4xL,V4xR)
 
      ENDIF
 
@@ -1372,11 +1376,11 @@ SUBROUTINE CONSTRUCTION_HO
 # endif
 
 ! construct in y-direction
-     CALL CONSTRUCT_HO_Y(Mloc,Nloc,Nloc1,Ibeg,Iend,Jbeg,Jend,MASK,U,UyL,UyR)
-     CALL CONSTRUCT_HO_Y(Mloc,Nloc,Nloc1,Ibeg,Iend,Jbeg,Jend,MASK,V,VyL,VyR)
-     CALL CONSTRUCT_HO_Y(Mloc,Nloc,Nloc1,Ibeg,Iend,Jbeg,Jend,MASK,HV,HVyL,HVyR)
-     CALL CONSTRUCT_HO_Y(Mloc,Nloc,Nloc1,Ibeg,Iend,Jbeg,Jend,MASK,HU,HUyL,HUyR)
-     CALL CONSTRUCT_HO_Y(Mloc,Nloc,Nloc1,Ibeg,Iend,Jbeg,Jend,MASK,Eta,EtaRyL,EtaRyR)
+     CALL CONSTRUCT_HO_Y(Mloc,Nloc,Nloc1,Ibeg-IJadd,Iend+IJadd,Jbeg-IJadd,Jend+IJadd,MASK,U,UyL,UyR)
+     CALL CONSTRUCT_HO_Y(Mloc,Nloc,Nloc1,Ibeg-IJadd,Iend+IJadd,Jbeg-IJadd,Jend+IJadd,MASK,V,VyL,VyR)
+     CALL CONSTRUCT_HO_Y(Mloc,Nloc,Nloc1,Ibeg-IJadd,Iend+IJadd,Jbeg-IJadd,Jend+IJadd,MASK,HV,HVyL,HVyR)
+     CALL CONSTRUCT_HO_Y(Mloc,Nloc,Nloc1,Ibeg-IJadd,Iend+IJadd,Jbeg-IJadd,Jend+IJadd,MASK,HU,HUyL,HUyR)
+     CALL CONSTRUCT_HO_Y(Mloc,Nloc,Nloc1,Ibeg-IJadd,Iend+IJadd,Jbeg-IJadd,Jend+IJadd,MASK,Eta,EtaRyL,EtaRyR)
 
      HyL=EtaRyL+Depthy
      HyR=EtaRyR+Depthy
@@ -1384,8 +1388,8 @@ SUBROUTINE CONSTRUCTION_HO
 # if defined (CARTESIAN)
      IF(DISPERSION)THEN
 
-       CALL CONSTRUCT_HO_Y(Mloc,Nloc,Nloc1,Ibeg,Iend,Jbeg,Jend,MASK,V4,V4yL,V4yR)
-	 CALL CONSTRUCT_HO_Y(Mloc,Nloc,Nloc1,Ibeg,Iend,Jbeg,Jend,MASK,U4,U4yL,U4yR)
+       CALL CONSTRUCT_HO_Y(Mloc,Nloc,Nloc1,Ibeg-IJadd,Iend+IJadd,Jbeg-IJadd,Jend+IJadd,MASK,V4,V4yL,V4yR)
+	     CALL CONSTRUCT_HO_Y(Mloc,Nloc,Nloc1,Ibeg-IJadd,Iend+IJadd,Jbeg-IJadd,Jend+IJadd,MASK,U4,U4yL,U4yR)
 
      ENDIF
 
@@ -1410,8 +1414,8 @@ SUBROUTINE CONSTRUCTION_HO
 # if defined (ZALPHA)
      IF(DISPERSION)THEN
 
-       CALL CONSTRUCT_HO_Y(Mloc,Nloc,Nloc1,Ibeg,Iend,Jbeg,Jend,MASK,V4,V4yL,V4yR)
-	 CALL CONSTRUCT_HO_Y(Mloc,Nloc,Nloc1,Ibeg,Iend,Jbeg,Jend,MASK,U4,U4yL,U4yR)
+       CALL CONSTRUCT_HO_Y(Mloc,Nloc,Nloc1,Ibeg-IJadd,Iend+IJadd,Jbeg-IJadd,Jend+IJadd,MASK,V4,V4yL,V4yR)
+	 CALL CONSTRUCT_HO_Y(Mloc,Nloc,Nloc1,Ibeg-IJadd,Iend+IJadd,Jbeg-IJadd,Jend+IJadd,MASK,U4,U4yL,U4yR)
 
      ENDIF
 
