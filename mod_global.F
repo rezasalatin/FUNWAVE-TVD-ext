@@ -127,7 +127,7 @@ REAL(SP)::Kappa   ! parameter for order of muscl
 ! some global variables
 ! Mloc1=Mloc+1, Nloc1=Nloc+1
 INTEGER :: Mglob,Nglob,Mloc,Nloc,Mloc1,Nloc1
-INTEGER, PARAMETER :: Nghost = 3 ! Salatin 05/05/2022
+INTEGER, PARAMETER :: Nghost = 3 ! Salatin 05/05/2022 put equal to 6
 INTEGER :: Ibeg,Iend,Jbeg,Jend,Iend1,Jend1
 # if defined (CARTESIAN)
 REAL(SP):: DX,DY
