@@ -256,9 +256,9 @@ SUBROUTINE SourceTerms
       -nu_smg(I-1,J)*0.5_SP/DY*(P(I-1,J+1)-P(I-1,J-1)))
     ENDDO
   ENDDO
-  ! Salatin
-  nu_smg_effectx = tempX
-  nu_smg_effecty = tempY
+  ! Save the value to print it
+  vis_smg_x = tempX
+  vis_smg_y = tempY
   ! end if Mixing
 # endif
 
