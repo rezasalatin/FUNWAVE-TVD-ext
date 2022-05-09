@@ -78,7 +78,7 @@ SUBROUTINE SourceTerms
   REAL(SP),DIMENSION(Mloc,Nloc) :: temp_smg
   ! temp files for sourceX and sourceY
   REAL(SP),DIMENSION(Mloc,Nloc) :: tempX,tempY,tempX_vis,tempY_vis
-  
+
   !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
   !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
   !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
@@ -458,8 +458,8 @@ SUBROUTINE SourceTerms
 # endif
 
 # if defined (MIXING)
-      SourceX(I,J) = SourceX(I,J) ! + tempX(I,J)
-      SourceY(I,J) = SourceY(I,J) ! + tempY(I,J)
+      SourceX(I,J) = SourceX(I,J) + tempX(I,J)
+      SourceY(I,J) = SourceY(I,J) + tempY(I,J)
 # endif
 
       ! eddy viscosity breaking
