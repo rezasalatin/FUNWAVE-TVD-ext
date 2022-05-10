@@ -369,8 +369,6 @@ SUBROUTINE CALCULATE_MovingAverage(DT,M,N,U,V,ETA,MASK,DX,DY,Depth,&
     vis_smg_xMA = vis_smg_xMA_SUM/MA_Window
     vis_smg_yMA = vis_smg_yMA_SUM/MA_Window
 # endif
-# endif
-
     ! go to next time step
     T_MA_Sum=T_MA_Sum-T_MA_STEP
 
