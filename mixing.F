@@ -74,8 +74,7 @@ SUBROUTINE MIXING_STUFF
   MA_Window,T_MA_Sum,T_MA_STEP,&
   Syx_temp,Syx_x,U_Window,V_Window,uMA,vMA,eta_MA_temp,eta_MA,Vor_MA,&
   ! Smagorinsky subgrid scale turbulence calculated here
-  PERIODIC,Nghost,nu_ver_x,nu_ver_y,Cd,&
-  uMAx,uMAy,vMAx,vMAy,vis_smg_xMA_temp,vis_smg_yMA_temp,&
+  PERIODIC,Nghost,uMAx,uMAy,vMAx,vMAy,vis_smg_xMA_temp,vis_smg_yMA_temp,&
   vis_smg_xMA,vis_smg_yMA)
 
 END SUBROUTINE MIXING_STUFF
@@ -267,8 +266,7 @@ SUBROUTINE CALCULATE_MovingAverage(DT,M,N,U,V,ETA,MASK,DX,DY,Depth,&
   OUT_uvMA,OUT_VorMA,OUT_RadStr,OUT_etaMA,&
   MA_Window,T_MA_Sum,T_MA_STEP,&
   Syx_temp,Syx_x,U_Window,V_Window,uMA,vMA,eta_MA_temp,eta_MA,Vor_MA,&
-  PERIODIC,Nghost,nu_ver_x,nu_ver_y,Cd,&
-  uMAx,uMAy,vMAx,vMAy,vis_smg_xMA_temp,vis_smg_yMA_temp,&
+  PERIODIC,Nghost,uMAx,uMAy,vMAx,vMAy,vis_smg_xMA_temp,vis_smg_yMA_temp,&
   vis_smg_xMA,vis_smg_yMA)
 
   USE PARAM
@@ -299,11 +297,11 @@ SUBROUTINE CALCULATE_MovingAverage(DT,M,N,U,V,ETA,MASK,DX,DY,Depth,&
   ! moving average of vorticity
   REAL(SP),DIMENSION(M,N),INTENT(OUT) :: Vor_MA
   ! eddy viscosity
-  REAL(SP),DIMENSION(M,N),INTENT(OUT) :: nu_ver_x,nu_ver_y
-  REAL(SP),DIMENSION(M,N),INTENT(IN)  :: Cd
-  REAL(SP),DIMENSION(M,N,MA_Window),INTENT(INOUT) :: vis_smg_xMA_temp, vis_smg_yMA_temp
+  !REAL(SP),DIMENSION(M,N),INTENT(OUT) :: nu_ver_x,nu_ver_y
+  !REAL(SP),DIMENSION(M,N),INTENT(IN)  :: Cd
+  REAL(SP),DIMENSION(M,N,MA_Window),INTENT(INOUT) :: vis_smg_xMA_temp,vis_smg_yMA_temp
   REAL(SP),DIMENSION(M,N),INTENT(OUT) :: vis_smg_xMA,vis_smg_yMA
-  REAL(SP),DIMENSION(M,N) :: vis_smg_xMA_SUM
+  REAL(SP),DIMENSION(M,N) :: vis_smg_xMA_SUM,vis_smg_yMA_SUM
 
   INTEGER :: VTYPE,Nghost
   LOGICAL :: PERIODIC
