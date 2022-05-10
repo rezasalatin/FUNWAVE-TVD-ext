@@ -75,7 +75,7 @@ SUBROUTINE MIXING_STUFF
   Syx_temp,Syx_x,U_Window,V_Window,uMA,vMA,eta_MA_temp,eta_MA,Vor_MA,&
   ! Smagorinsky subgrid scale turbulence calculated here
   PERIODIC,Nghost,uMAx,uMAy,vMAx,vMAy,vis_smg_xMA_temp,vis_smg_yMA_temp,&
-  vis_smg_xMA,vis_smg_yMA)
+  vis_smg_xMA,vis_smg_yMA,vis_smg_x,vis_smg_y)
 
 END SUBROUTINE MIXING_STUFF
 
@@ -267,7 +267,7 @@ SUBROUTINE CALCULATE_MovingAverage(DT,M,N,U,V,ETA,MASK,DX,DY,Depth,&
   MA_Window,T_MA_Sum,T_MA_STEP,&
   Syx_temp,Syx_x,U_Window,V_Window,uMA,vMA,eta_MA_temp,eta_MA,Vor_MA,&
   PERIODIC,Nghost,uMAx,uMAy,vMAx,vMAy,vis_smg_xMA_temp,vis_smg_yMA_temp,&
-  vis_smg_xMA,vis_smg_yMA)
+  vis_smg_xMA,vis_smg_yMA,vis_smg_x,vis_smg_y)
 
   USE PARAM
   IMPLICIT NONE
@@ -300,6 +300,7 @@ SUBROUTINE CALCULATE_MovingAverage(DT,M,N,U,V,ETA,MASK,DX,DY,Depth,&
   !REAL(SP),DIMENSION(M,N),INTENT(OUT) :: nu_ver_x,nu_ver_y
   !REAL(SP),DIMENSION(M,N),INTENT(IN)  :: Cd
   REAL(SP),DIMENSION(M,N,MA_Window),INTENT(INOUT) :: vis_smg_xMA_temp,vis_smg_yMA_temp
+  REAL(SP),DIMENSION(M,N),INTENT(IN) :: vis_smg_x,vis_smg_y
   REAL(SP),DIMENSION(M,N),INTENT(OUT) :: vis_smg_xMA,vis_smg_yMA
   REAL(SP),DIMENSION(M,N) :: vis_smg_xMA_SUM,vis_smg_yMA_SUM
 
