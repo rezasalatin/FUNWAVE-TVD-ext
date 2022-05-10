@@ -258,6 +258,10 @@ SUBROUTINE ALLOCATE_VARIABLES
   ALLOCATE(vis_smg_xMA(Mloc,Nloc),vis_smg_yMA(Mloc,Nloc))
   vis_smg_xMA=ZERO
   vis_smg_yMA=ZERO
+  ALLOCATE(nu_smg_MA_temp(Mloc,Nloc,MA_Window))
+  nu_smg_MA_temp=ZERO
+  ALLOCATE(nu_smg_MA(Mloc,Nloc))
+  nu_smg_MA=ZERO
 
 END SUBROUTINE ALLOCATE_VARIABLES
 
