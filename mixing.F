@@ -74,7 +74,7 @@ SUBROUTINE MIXING_STUFF
   MA_Window,T_MA_Sum,T_MA_STEP,&
   Syx_temp,Syx_x,U_Window,V_Window,uMA,vMA,eta_MA_temp,eta_MA,Vor_MA,&
   ! Smagorinsky subgrid scale turbulence calculated here
-  PERIODIC,Nghost,nu_vis_v_x,nu_vis_v_y,nu_vis_v_r,Cd,&
+  PERIODIC,Nghost,nu_ver_x,nu_ver_y,Cd,&
   uMAx, uMAy, vMAx, vMAy)
 
 END SUBROUTINE MIXING_STUFF
@@ -266,8 +266,8 @@ SUBROUTINE CALCULATE_MovingAverage(DT,M,N,U,V,ETA,MASK,DX,DY,Depth,&
   OUT_uvMA,OUT_VorMA,OUT_RadStr,OUT_etaMA,&
   MA_Window,T_MA_Sum,T_MA_STEP,&
   Syx_temp,Syx_x,U_Window,V_Window,uMA,vMA,eta_MA_temp,eta_MA,Vor_MA,&
-  PERIODIC,Nghost,nu_vis_v_x,nu_vis_v_y,nu_vis_v_r,Cd,&
-  uMAx, uMAy, vMAx, vMAy)
+  PERIODIC,Nghost,nu_ver_x,nu_ver_y,Cd,&
+  uMAx,uMAy,vMAx,vMAy)
 
   USE PARAM
   IMPLICIT NONE
@@ -297,8 +297,12 @@ SUBROUTINE CALCULATE_MovingAverage(DT,M,N,U,V,ETA,MASK,DX,DY,Depth,&
   ! moving average of vorticity
   REAL(SP),DIMENSION(M,N),INTENT(OUT) :: Vor_MA
   ! eddy viscosity
-  REAL(SP),DIMENSION(M,N),INTENT(OUT) :: nu_vis_v_x,nu_vis_v_y,nu_vis_v_r
+  REAL(SP),DIMENSION(M,N),INTENT(OUT) :: nu_ver_x,nu_ver_y
   REAL(SP),DIMENSION(M,N),INTENT(IN)  :: Cd
+  REAL(SP),DIMENSION(M,N,MA_Window),INTENT(INOUT) :: vis_smg_xMA_temp, vis_smg_yMA_temp
+  REAL(SP),DIMENSION(M,N),INTENT(OUT) :: vis_smg_xMA,vis_smg_yMA
+  REAL(SP),DIMENSION(M,N) :: vis_smg_xMA_SUM
+
   INTEGER :: VTYPE,Nghost
   LOGICAL :: PERIODIC
 
@@ -322,22 +326,13 @@ SUBROUTINE CALCULATE_MovingAverage(DT,M,N,U,V,ETA,MASK,DX,DY,Depth,&
       CALL DERIVATIVE_Y(M,N,Ibeg,Iend,Jbeg,Jend,MASK,DY,vMA,vMAy)
       CALL DERIVATIVE_X(M,N,Ibeg,Iend,Jbeg,Jend,MASK,DX,uMA,uMAx)
       CALL DERIVATIVE_Y(M,N,Ibeg,Iend,Jbeg,Jend,MASK,DY,uMA,uMAy)
-      VTYPE=1  !in both directions
+      VTYPE=1
       CALL PHI_COLL(M,N,Ibeg,Iend,Jbeg,Jend,Nghost,uMAx,VTYPE,PERIODIC)
       CALL PHI_COLL(M,N,Ibeg,Iend,Jbeg,Jend,Nghost,vMAy,VTYPE,PERIODIC)
-      VTYPE=3  !like v
+      VTYPE=3
       CALL PHI_COLL(M,N,Ibeg,Iend,Jbeg,Jend,Nghost,uMAy,VTYPE,PERIODIC)
-      Vtype=2  !like u
+      Vtype=2
       CALL PHI_COLL(M,N,Ibeg,Iend,Jbeg,Jend,Nghost,vMAx,VTYPE,PERIODIC)
-
-      ! Vertical Eddy Viscosity
-      ! if you want to use orbital velocity (wave+current)
-      nu_vis_v_x = 0.4/6.0*(Depth+Eta)*SQRT(Cd*abs(U)*SQRT(U*U+V*V))
-      nu_vis_v_y = 0.4/6.0*(Depth+Eta)*SQRT(Cd*abs(V)*SQRT(U*U+V*V))
-      ! if you want to use current speed
-      !nu_vis_v_x = 0.4/6.0*Depth*SQRT(Cd*abs(uMA)*SQRT(uMA*uMA+vMA*vMA))
-      !nu_vis_v_y = 0.4/6.0*Depth*SQRT(Cd*abs(vMA)*SQRT(uMA*uMA+vMA*vMA))
-      !nu_vis_v_r = SQRT(nu_vis_v_x**2+nu_vis_v_y**2)
 
       ! subtracting average velocity from the instant velocity
       U_temp1 = U - uMA
@@ -362,6 +357,20 @@ SUBROUTINE CALCULATE_MovingAverage(DT,M,N,U,V,ETA,MASK,DX,DY,Depth,&
       eta_MA_Sum = SUM(eta_MA_temp,3)
       eta_MA = eta_MA_Sum/MA_Window
     ENDIF
+
+# if defined (MIXING)
+    ! moving average of the horizontal viscosity
+    vis_smg_xMA_temp = CSHIFT(vis_smg_xMA_temp,-1,3)
+    vis_smg_yMA_temp = CSHIFT(vis_smg_yMA_temp,-1,3)
+    vis_smg_xMA_temp(:,:,1) = vis_smg_x
+    vis_smg_yMA_temp(:,:,1) = vis_smg_y
+    vis_smg_xMA_SUM = SUM(vis_smg_xMA_temp,3)
+    vis_smg_yMA_SUM = SUM(vis_smg_yMA_temp,3)
+    vis_smg_xMA = vis_smg_xMA_SUM/MA_Window
+    vis_smg_yMA = vis_smg_yMA_SUM/MA_Window
+# endif
+# endif
+
     ! go to next time step
     T_MA_Sum=T_MA_Sum-T_MA_STEP
 

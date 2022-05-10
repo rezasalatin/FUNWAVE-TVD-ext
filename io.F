@@ -4321,19 +4321,22 @@ SUBROUTINE PREVIEW
   IF(OUT_uvMA)THEN
     TMP_NAME = TRIM(FDIR)//'nu_smg_'//TRIM(FILE_NAME)
     call PutFile(TMP_NAME,nu_smg)
-
-    TMP_NAME = TRIM(FDIR)//'vis_smg_x_'//TRIM(FILE_NAME)
-    call PutFile(TMP_NAME,vis_smg_x)
-    TMP_NAME = TRIM(FDIR)//'vis_smg_y_'//TRIM(FILE_NAME)
-    call PutFile(TMP_NAME,vis_smg_y)
-
-    TMP_NAME = TRIM(FDIR)//'nu_verx_'//TRIM(FILE_NAME)
-    call PutFile(TMP_NAME,nu_vis_v_x)
-    TMP_NAME = TRIM(FDIR)//'nu_very_'//TRIM(FILE_NAME)
-    call PutFile(TMP_NAME,nu_vis_v_y)
-    TMP_NAME = TRIM(FDIR)//'nu_verr_'//TRIM(FILE_NAME)
-    call PutFile(TMP_NAME,nu_vis_v_r)
   ENDIF
+
+# if defined(MIXING)
+  TMP_NAME = TRIM(FDIR)//'vis_smg_x_'//TRIM(FILE_NAME)
+  call PutFile(TMP_NAME,vis_smg_x)
+  TMP_NAME = TRIM(FDIR)//'vis_smg_y_'//TRIM(FILE_NAME)
+  call PutFile(TMP_NAME,vis_smg_y)
+  TMP_NAME = TRIM(FDIR)//'vis_smg_xMA_'//TRIM(FILE_NAME)
+  call PutFile(TMP_NAME,vis_smg_xMA)
+  TMP_NAME = TRIM(FDIR)//'vis_smg_yMA_'//TRIM(FILE_NAME)
+  call PutFile(TMP_NAME,vis_smg_yMA)
+# endif
+  TMP_NAME = TRIM(FDIR)//'nu_verx_'//TRIM(FILE_NAME)
+  call PutFile(TMP_NAME,nu_ver_x)
+  TMP_NAME = TRIM(FDIR)//'nu_very_'//TRIM(FILE_NAME)
+  call PutFile(TMP_NAME,nu_ver_y)
 
 101   continue
 

@@ -220,10 +220,20 @@ SUBROUTINE SourceTerms
 # if defined (CARTESIAN)
 # if defined (MIXING)
   ! Sub-grid-scale Turbulence
+
   ! Horizontal Eddy viscosity
   ! temp_smg = SQRT(2.0*uMAx**2+2.0*vMAy**2+(uMAy+vMAx)*(uMAy+vMAx))
   temp_smg = SQRT(2.0*Ux**2+2.0*Vy**2+(Uy+Vx)*(Uy+Vx))
   nu_smg = C_smg**2*DX*DY*temp_smg
+
+  ! Vertical Eddy Viscosity
+  ! if you want to use orbital velocity (wave+current)
+  nu_ver_x = 0.4/6.0*(Depth+Eta)*SQRT(Cd*abs(U)*SQRT(U*U+V*V))
+  nu_ver_y = 0.4/6.0*(Depth+Eta)*SQRT(Cd*abs(V)*SQRT(U*U+V*V))
+  ! if you want to use current speed
+  !nu_ver_x = 0.4/6.0*Depth*SQRT(Cd*abs(uMA)*SQRT(uMA*uMA+vMA*vMA))
+  !nu_ver_y = 0.4/6.0*Depth*SQRT(Cd*abs(vMA)*SQRT(uMA*uMA+vMA*vMA))
+
   ! depth gradient term
   DO J=Jbeg,Jend
     DO I=Ibeg,Iend
@@ -269,6 +279,7 @@ SUBROUTINE SourceTerms
       IF(PQ_scheme)THEN
         ! it turns out P and Q are not exchanged at processor
         ! interface. it affects edges, make PQ_scheme=false
+        ! Reza Salatin corrected this issue on May 5, 2022
         tempX_vis(I,J) = 0.5_SP/DX*( &
         nu_vis(I+1,J)* &
         1.0_SP/DX*(P(I+2,J)-P(I+1,J)) &

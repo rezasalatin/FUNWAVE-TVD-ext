@@ -105,9 +105,8 @@ SUBROUTINE ALLOCATE_VARIABLES
   nu_smg(Mloc,Nloc), &
   vis_smg_x(Mloc,Nloc), &
   vis_smg_y(Mloc,Nloc), &
-  nu_vis_v_x(Mloc,Nloc), &
-  nu_vis_v_y(Mloc,Nloc), &
-  nu_vis_v_r(Mloc,Nloc), &
+  nu_ver_x(Mloc,Nloc), &
+  nu_ver_y(Mloc,Nloc), &
   Num_Zero_Up(Mloc,Nloc), &
   WaveHeightRMS(Mloc,Nloc),  &
   WaveHeightAve(Mloc,Nloc),  &
@@ -251,6 +250,19 @@ SUBROUTINE ALLOCATE_VARIABLES
   ALLOCATE(Vor_MA(Mloc,Nloc))
   Vor_MA=ZERO
 
+  ! Reza Salatin, May 2022, Moving average of horizontal eddy viscosity
+# if defined (CARTESIAN)
+# if defined (MIXING)
+  ALLOCATE(vis_smg_xMA_temp(Mloc,Nloc,MA_Window))
+  vis_smg_xMA_temp=ZERO
+  ALLOCATE(vis_smg_yMA_temp(Mloc,Nloc,MA_Window))
+  vis_smg_yMA_temp=ZERO
+  ALLOCATE(vis_smg_xMA(Mloc,Nloc),vis_smg_yMA(Mloc,Nloc))
+  vis_smg_xMA=ZERO
+  vis_smg_yMA=ZERO
+# endif
+# endif
+
 END SUBROUTINE ALLOCATE_VARIABLES
 
 !-------------------------------------------------------------------------------------
@@ -383,9 +395,8 @@ SUBROUTINE INITIALIZATION
   nu_smg = ZERO
   vis_smg_x = ZERO
   vis_smg_y = ZERO
-  nu_vis_v_x = ZERO
-  nu_vis_v_y = ZERO
-  nu_vis_v_r = ZERO
+  nu_ver_x = ZERO
+  nu_ver_y = ZERO
   Num_Zero_Up = 0
   WaveHeightRMS = ZERO
   WaveHeightAve =ZERO
