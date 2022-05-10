@@ -75,7 +75,7 @@ SUBROUTINE MIXING_STUFF
   Syx_temp,Syx_x,U_Window,V_Window,uMA,vMA,eta_MA_temp,eta_MA,Vor_MA,&
   ! Smagorinsky subgrid scale turbulence calculated here
   PERIODIC,Nghost,uMAx,uMAy,vMAx,vMAy,vis_smg_xMA_temp,vis_smg_yMA_temp,&
-  vis_smg_xMA,vis_smg_yMA,vis_smg_x,vis_smg_y)
+  vis_smg_xMA,vis_smg_yMA,vis_smg_x,vis_smg_y,nu_smg,nu_smg_MA,nu_smg_MA_temp)
 
 END SUBROUTINE MIXING_STUFF
 
@@ -267,7 +267,7 @@ SUBROUTINE CALCULATE_MovingAverage(DT,M,N,U,V,ETA,MASK,DX,DY,Depth,&
   MA_Window,T_MA_Sum,T_MA_STEP,&
   Syx_temp,Syx_x,U_Window,V_Window,uMA,vMA,eta_MA_temp,eta_MA,Vor_MA,&
   PERIODIC,Nghost,uMAx,uMAy,vMAx,vMAy,vis_smg_xMA_temp,vis_smg_yMA_temp,&
-  vis_smg_xMA,vis_smg_yMA,vis_smg_x,vis_smg_y)
+  vis_smg_xMA,vis_smg_yMA,vis_smg_x,vis_smg_y,nu_smg,nu_smg_MA,nu_smg_MA_temp)
 
   USE PARAM
   IMPLICIT NONE
@@ -299,10 +299,10 @@ SUBROUTINE CALCULATE_MovingAverage(DT,M,N,U,V,ETA,MASK,DX,DY,Depth,&
   ! eddy viscosity
   !REAL(SP),DIMENSION(M,N),INTENT(OUT) :: nu_ver_x,nu_ver_y
   !REAL(SP),DIMENSION(M,N),INTENT(IN)  :: Cd
-  REAL(SP),DIMENSION(M,N,MA_Window),INTENT(INOUT) :: vis_smg_xMA_temp,vis_smg_yMA_temp
+  REAL(SP),DIMENSION(M,N,MA_Window),INTENT(INOUT) :: vis_smg_xMA_temp,vis_smg_yMA_temp,nu_smg_MA_temp
   REAL(SP),DIMENSION(M,N),INTENT(IN) :: vis_smg_x,vis_smg_y
-  REAL(SP),DIMENSION(M,N),INTENT(OUT) :: vis_smg_xMA,vis_smg_yMA
-  REAL(SP),DIMENSION(M,N) :: vis_smg_xMA_SUM,vis_smg_yMA_SUM
+  REAL(SP),DIMENSION(M,N),INTENT(OUT) :: vis_smg_xMA,vis_smg_yMA,nu_smg_MA
+  REAL(SP),DIMENSION(M,N) :: vis_smg_xMA_SUM,vis_smg_yMA_SUM,nu_smg_MA_SUM
 
   INTEGER :: VTYPE,Nghost
   LOGICAL :: PERIODIC
@@ -362,12 +362,16 @@ SUBROUTINE CALCULATE_MovingAverage(DT,M,N,U,V,ETA,MASK,DX,DY,Depth,&
     ! moving average of the horizontal viscosity
     vis_smg_xMA_temp = CSHIFT(vis_smg_xMA_temp,-1,3)
     vis_smg_yMA_temp = CSHIFT(vis_smg_yMA_temp,-1,3)
+    nu_smg_MA_temp = CSHIFT(nu_smg_MA_temp,-1,3)
     vis_smg_xMA_temp(:,:,1) = vis_smg_x
     vis_smg_yMA_temp(:,:,1) = vis_smg_y
+    nu_smg_MA_temp(:,:,1) = nu_smg
     vis_smg_xMA_SUM = SUM(vis_smg_xMA_temp,3)
     vis_smg_yMA_SUM = SUM(vis_smg_yMA_temp,3)
+    nu_smg_MA_SUM = SUM(nu_smg_MA_temp,3)
     vis_smg_xMA = vis_smg_xMA_SUM/MA_Window
     vis_smg_yMA = vis_smg_yMA_SUM/MA_Window
+    nu_smg_MA = nu_smg_MA_SUM/MA_Window
     ! go to next time step
     T_MA_Sum=T_MA_Sum-T_MA_STEP
 

@@ -4332,6 +4332,8 @@ SUBROUTINE PREVIEW
   call PutFile(TMP_NAME,vis_smg_xMA)
   TMP_NAME = TRIM(FDIR)//'vis_smg_yMA_'//TRIM(FILE_NAME)
   call PutFile(TMP_NAME,vis_smg_yMA)
+  TMP_NAME = TRIM(FDIR)//'nu_smg_MA_'//TRIM(FILE_NAME)
+  call PutFile(TMP_NAME,nu_smg_MA)
 # endif
   TMP_NAME = TRIM(FDIR)//'nu_verx_'//TRIM(FILE_NAME)
   call PutFile(TMP_NAME,nu_ver_x)
