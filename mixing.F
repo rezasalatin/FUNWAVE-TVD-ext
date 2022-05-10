@@ -358,7 +358,6 @@ SUBROUTINE CALCULATE_MovingAverage(DT,M,N,U,V,ETA,MASK,DX,DY,Depth,&
       eta_MA = eta_MA_Sum/MA_Window
     ENDIF
 
-# if defined (MIXING)
     ! moving average of the horizontal viscosity
     vis_smg_xMA_temp = CSHIFT(vis_smg_xMA_temp,-1,3)
     vis_smg_yMA_temp = CSHIFT(vis_smg_yMA_temp,-1,3)
@@ -368,7 +367,6 @@ SUBROUTINE CALCULATE_MovingAverage(DT,M,N,U,V,ETA,MASK,DX,DY,Depth,&
     vis_smg_yMA_SUM = SUM(vis_smg_yMA_temp,3)
     vis_smg_xMA = vis_smg_xMA_SUM/MA_Window
     vis_smg_yMA = vis_smg_yMA_SUM/MA_Window
-# endif
     ! go to next time step
     T_MA_Sum=T_MA_Sum-T_MA_STEP
 
