@@ -251,8 +251,6 @@ SUBROUTINE ALLOCATE_VARIABLES
   Vor_MA=ZERO
 
   ! Reza Salatin, May 2022, Moving average of horizontal eddy viscosity
-# if defined (CARTESIAN)
-# if defined (MIXING)
   ALLOCATE(vis_smg_xMA_temp(Mloc,Nloc,MA_Window))
   vis_smg_xMA_temp=ZERO
   ALLOCATE(vis_smg_yMA_temp(Mloc,Nloc,MA_Window))
@@ -260,8 +258,6 @@ SUBROUTINE ALLOCATE_VARIABLES
   ALLOCATE(vis_smg_xMA(Mloc,Nloc),vis_smg_yMA(Mloc,Nloc))
   vis_smg_xMA=ZERO
   vis_smg_yMA=ZERO
-# endif
-# endif
 
 END SUBROUTINE ALLOCATE_VARIABLES
 
