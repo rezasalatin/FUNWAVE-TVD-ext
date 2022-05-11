@@ -263,6 +263,11 @@ SUBROUTINE ALLOCATE_VARIABLES
   ALLOCATE(nu_smg_MA(Mloc,Nloc))
   nu_smg_MA=ZERO
 
+  ! two variables to print some variables
+  ALLOCATE(temp_output1(Mloc,Nloc),temp_output2(Mloc,Nloc))
+  temp_output1=ZERO
+  temp_output2=ZERO
+
 END SUBROUTINE ALLOCATE_VARIABLES
 
 !-------------------------------------------------------------------------------------

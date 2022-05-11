@@ -469,6 +469,8 @@ SUBROUTINE SourceTerms
 # endif
 
 # if defined (MIXING)
+      temp_output1(I,J) = tempX(I,J)/SourceX(I,J)
+      temp_output2(I,J) = tempY(I,J)/SourceY(I,J)
       SourceX(I,J) = SourceX(I,J) + tempX(I,J)
       SourceY(I,J) = SourceY(I,J) + tempY(I,J)
 # endif
