@@ -279,7 +279,7 @@ SUBROUTINE SourceTerms
       IF(PQ_scheme)THEN
         ! it turns out P and Q are not exchanged at processor
         ! interface. it affects edges, make PQ_scheme=false
-        ! Reza Salatin corrected this issue on May 5, 2022
+        ! Reza Salatin corrected this bug on May 5, 2022
         tempX_vis(I,J) = 0.5_SP/DX*( &
         nu_vis(I+1,J)* &
         1.0_SP/DX*(P(I+2,J)-P(I+1,J)) &
@@ -336,6 +336,12 @@ SUBROUTINE SourceTerms
     DO I=Ibeg,Iend
 # if defined (CARTESIAN)
       ! second order, move the second term to left-hand side
+
+
+      !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+      !!! Source term in X direction
+
+
       SourceX(I,J)=GRAV*(Eta(I,J))/DX*(Depthx(I+1,J)-Depthx(I,J)) &
       *MASK(I,J) &
       ! friction
@@ -362,37 +368,10 @@ SUBROUTINE SourceTerms
       ! wavemaker
       +WaveMaker_Mass(I,J)*U(I,J)
 
-      IF(FRICTION_SPONGE) THEN
-        ! note that, compared to wei et al, we used flux.
-        ! So need multiply D
-        SourceX(I,J) = SourceX(I,J) &
-        -CD_4_SPONGE(I,J)*U(I,J) &
-        *SQRT(U(I,J)*U(I,J)+V(I,J)*V(I,J))*Depth(I,J)
-      ENDIF
 
-      IF(WaveMakerCurrentBalance)THEN
-# if defined (PARALLEL)
-        xmk=(I-Ibeg)*DXg + (iista-1)*DXg
-        ymk=(J-Jbeg)*DYg + (jjsta-1)*DYg
-# else
-        xmk=(I-Ibeg)*DXg
-        ymk=(J-Jbeg)*DYg
-# endif
-        IF(ABS(xmk-Xc_WK)<Width_WK.AND. &
-        ABS(ymk-Yc_WK)<Ywidth_WK/2.0_SP)THEN
-          SourceX(I,J) = SourceX(I,J) &
-          -WaveMakerCd*U(I,J) &
-          *SQRT(U(I,J)*U(I,J)+V(I,J)*V(I,J))
-        ENDIF
-      ENDIF ! current balance
+      !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+      !!! Source term in Y direction
 
-      IF(BREAKWATER) THEN
-        ! note that, compared to wei et al, we used flux.
-        ! So need multiply D
-        SourceX(I,J) = SourceX(I,J) &
-        - CD_breakwater(I,J)*U(I,J) &
-        *SQRT(U(I,J)*U(I,J)+V(I,J)*V(I,J))*Depth(I,J)
-      ENDIF
 
       SourceY(I,J)=GRAV*(Eta(I,J))/DY*(Depthy(I,J+1)-Depthy(I,J)) &
       *MASK(I,J) &
@@ -421,13 +400,10 @@ SUBROUTINE SourceTerms
       ! wavemaker
       +WaveMaker_Mass(I,J)*V(I,J)
 
-      IF(FRICTION_SPONGE) THEN
-        ! note that, compared to wei et al, we used flux.
-        ! So need multiply D
-        SourceY(I,J) = SourceY(I,J) &
-        -CD_4_SPONGE(I,J)*V(I,J) &
-        *SQRT(U(I,J)*U(I,J)+V(I,J)*V(I,J))*Depth(I,J)
-      ENDIF
+
+      !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+      !!! CURRENT BALANCE
+
 
       IF(WaveMakerCurrentBalance)THEN
 # if defined (PARALLEL)
@@ -438,20 +414,55 @@ SUBROUTINE SourceTerms
         ymk=(J-Jbeg)*DYg
 # endif
         IF(ABS(xmk-Xc_WK)<Width_WK.AND. &
-          ABS(ymk-Yc_WK)<Ywidth_WK/2.0_SP)THEN
+        ABS(ymk-Yc_WK)<Ywidth_WK/2.0_SP)THEN
+          SourceX(I,J) = SourceX(I,J) &
+          -WaveMakerCd*U(I,J) &
+          *SQRT(U(I,J)*U(I,J)+V(I,J)*V(I,J))
+
           SourceY(I,J) = SourceY(I,J) &
           -WaveMakerCd*V(I,J) &
           *SQRT(U(I,J)*U(I,J)+V(I,J)*V(I,J))
         ENDIF
       ENDIF ! current balance
 
+
+      !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+      !!! FRICTION SPONGE
+
+
+      IF(FRICTION_SPONGE) THEN
+        ! note that, compared to wei et al, we used flux.
+        ! So need multiply D
+        SourceX(I,J) = SourceX(I,J) &
+        -CD_4_SPONGE(I,J)*U(I,J) &
+        *SQRT(U(I,J)*U(I,J)+V(I,J)*V(I,J))*Depth(I,J)
+
+        SourceY(I,J) = SourceY(I,J) &
+        -CD_4_SPONGE(I,J)*V(I,J) &
+        *SQRT(U(I,J)*U(I,J)+V(I,J)*V(I,J))*Depth(I,J)
+      ENDIF
+
+
+      !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+      !!! BREAKWATER
+
+
       IF(BREAKWATER) THEN
         ! note that, compared to wei et al, we used flux.
         ! So need multiply D
+        SourceX(I,J) = SourceX(I,J) &
+        - CD_breakwater(I,J)*U(I,J) &
+        *SQRT(U(I,J)*U(I,J)+V(I,J)*V(I,J))*Depth(I,J)
+
         SourceY(I,J) = SourceY(I,J) &
         -CD_BREAKWATER(I,J)*V(I,J) &
         *SQRT(U(I,J)*U(I,J)+V(I,J)*V(I,J))*Depth(I,J)
       ENDIF
+
+
+      !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+      !!! METEO MODULE
+
 
 # if defined (METEO)
       IF(WindForce)THEN
@@ -468,12 +479,22 @@ SUBROUTINE SourceTerms
       ! end METEO
 # endif
 
+
+      !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+      !!! MIXING MODULE
+
+
 # if defined (MIXING)
       temp_output1(I,J) = tempX(I,J)/SourceX(I,J)
       temp_output2(I,J) = tempY(I,J)/SourceY(I,J)
       SourceX(I,J) = SourceX(I,J) + tempX(I,J)
       SourceY(I,J) = SourceY(I,J) + tempY(I,J)
 # endif
+
+
+      !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+      !!! BREAKING
+
 
       ! eddy viscosity breaking
       ! ykchoi(08.18.2015)
@@ -483,6 +504,8 @@ SUBROUTINE SourceTerms
         SourceX(I,J) = SourceX(I,J) + tempX_vis(I,J)
         SourceY(I,J) = SourceY(I,J) + tempY_vis(I,J)
       ENDIF  ! end eddy viscosity breaking
+
+
       ! else Cartesian
 # else
 

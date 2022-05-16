@@ -92,123 +92,119 @@ SUBROUTINE ESTIMATE_HUV(ISTEP)
       .OR.WAVEMAKER(1:9)=='WK_DATA2D'.OR.WAVEMAKER(1:13)=='WK_NEW_DATA2D'&
       .OR.WAVEMAKER(1:7)=='WK_TIME')THEN
 # if defined (PARALLEL)
-      ![---ykchoi Jan/23/2018
-      !            xmk=(I-Ibeg)*DXg+npx*(Mloc-2*Nghost)*DXg
-      !            ymk=(J-Jbeg)*DYg+npy*(Nloc-2*Nghost)*DYg
-      xmk=(I-Ibeg)*DXg + (iista-1)*DXg
-      ymk=(J-Jbeg)*DYg + (jjsta-1)*DYg
-      !---ykchoi Jan/23/2018]
+        ![---ykchoi Jan/23/2018
+        !            xmk=(I-Ibeg)*DXg+npx*(Mloc-2*Nghost)*DXg
+        !            ymk=(J-Jbeg)*DYg+npy*(Nloc-2*Nghost)*DYg
+        xmk=(I-Ibeg)*DXg + (iista-1)*DXg
+        ymk=(J-Jbeg)*DYg + (jjsta-1)*DYg
+        !---ykchoi Jan/23/2018]
 # else
-      xmk=(I-Ibeg)*DXg
-      ymk=(J-Jbeg)*DYg
+        xmk=(I-Ibeg)*DXg
+        ymk=(J-Jbeg)*DYg
 # endif
-      IF(ABS(xmk-Xc_WK)<Width_WK.AND. &
-      ABS(ymk-Yc_WK)<Ywidth_WK/2.0_SP)THEN
-
-      R1(I,J)=-1.0_SP/DXg*(F_right*n_right+F_left*n_left) &
-      -1.0_SP/DYg*(F_top*n_top+F_bottom*n_bottom) &
-      ! wavemaker
-      +WaveMaker_Mass(I,J)
-      !                +WK_Source
-    ELSE
-      R1(I,J)=-1.0_SP/DXg*(F_right*n_right+F_left*n_left) &
-      -1.0_SP/DYg*(F_top*n_top+F_bottom*n_bottom)
-    ENDIF
-
-  ELSE ! no wk_wavemaker, theres bug in version 1.1 Dxg,Dyg should be
-    ! replaced by Dxg() and Dy()
+        IF(ABS(xmk-Xc_WK)<Width_WK.AND. &
+        ABS(ymk-Yc_WK)<Ywidth_WK/2.0_SP)THEN
+          R1(I,J)=-1.0_SP/DXg*(F_right*n_right+F_left*n_left) &
+          -1.0_SP/DYg*(F_top*n_top+F_bottom*n_bottom) &
+          ! wavemaker
+          +WaveMaker_Mass(I,J)
+          !                +WK_Source
+        ELSE
+          R1(I,J)=-1.0_SP/DXg*(F_right*n_right+F_left*n_left) &
+          -1.0_SP/DYg*(F_top*n_top+F_bottom*n_bottom)
+        ENDIF
+      ELSE ! no wk_wavemaker, theres bug in version 1.1 Dxg,Dyg should be
+        ! replaced by Dxg() and Dy()
 # if defined (CARTESIAN)
-    R1(I,J)=-1.0_SP/DXg*(F_right*n_right+F_left*n_left) &
-    -1.0_SP/DYg*(F_top*n_top+F_bottom*n_bottom)
+        R1(I,J)=-1.0_SP/DXg*(F_right*n_right+F_left*n_left) &
+        -1.0_SP/DYg*(F_top*n_top+F_bottom*n_bottom)
 # if defined (VESSEL)
-    R1(I,J)=R1(I,J) +VesselFluxGradient(I,J)
+        R1(I,J)=R1(I,J) +VesselFluxGradient(I,J)
 # endif
     ! end vessel
-
 # else
-    R1(I,J)=-1.0_SP/DX(I,J)*(F_right*n_right+F_left*n_left) &
-    -1.0_SP/DY(I,J)*(F_top*n_top+F_bottom*n_bottom)
+        R1(I,J)=-1.0_SP/DX(I,J)*(F_right*n_right+F_left*n_left) &
+        -1.0_SP/DY(I,J)*(F_top*n_top+F_bottom*n_bottom)
 # endif
-  ENDIF
+      ENDIF
 # if defined (CARTESIAN)
   ! do nothing
 # else
 
 # if defined (ZALPHA)
-  ! extra terms for z_alpha: 1/R tan theta (HV+hV4)
-  R1(I,J)=R1(I,J)+1.0_SP/R_earth*TAN(Lat_theta(I,J))*(HV(I,J)+ &
-  Depth(I,J)*V4(I,J)*Gamma1)
+      ! extra terms for z_alpha: 1/R tan theta (HV+hV4)
+      R1(I,J)=R1(I,J)+1.0_SP/R_earth*TAN(Lat_theta(I,J))*(HV(I,J)+ &
+      Depth(I,J)*V4(I,J)*Gamma1)
 # else
-  ! extra terms for depth-averaged u: 1/R tan theta HV
-  R1(I,J)=R1(I,J)+1.0_SP/R_earth*TAN(Lat_theta(I,J))*HV(I,J)
+      ! extra terms for depth-averaged u: 1/R tan theta HV
+      R1(I,J)=R1(I,J)+1.0_SP/R_earth*TAN(Lat_theta(I,J))*HV(I,J)
 # endif
 
 # endif
 
 # if defined (ITERATION)
-  Eta(I,J)=ALPHA(ISTEP)*Eta0(I,J)+BETA(ISTEP)*(EtaOld(I,J)+DT*R1(I,J))
+      Eta(I,J)=ALPHA(ISTEP)*Eta0(I,J)+BETA(ISTEP)*(EtaOld(I,J)+DT*R1(I,J))
 # else
-  Eta(I,J)=ALPHA(ISTEP)*Eta0(I,J)+BETA(ISTEP)*(Eta(I,J)+DT*R1(I,J))
+      Eta(I,J)=ALPHA(ISTEP)*Eta0(I,J)+BETA(ISTEP)*(Eta(I,J)+DT*R1(I,J))
 
   ! eta_limiter is used for the case as wave touches the seabed within wavemaker
-  IF(ETA_LIMITER)THEN
-    IF(Eta(I,J)<TroughLimit)Eta(I,J)=TroughLimit
-    IF(Eta(I,J)>CrestLimit)Eta(I,J)=CrestLimit
-  ENDIF ! end eta_limiter
-
+      IF(ETA_LIMITER)THEN
+        IF(Eta(I,J)<TroughLimit)Eta(I,J)=TroughLimit
+        IF(Eta(I,J)>CrestLimit)Eta(I,J)=CrestLimit
+      ENDIF ! end eta_limiter
 # endif
-ENDDO
-ENDDO
+    ENDDO
+  ENDDO
 
-! solve ubar
-DO J=Jbeg,Jend
-  DO I=Ibeg,Iend
-    F_left=Fx(I,J)
-    F_right=Fx(I+1,J)
-    F_bottom=Fy(I,J)
-    F_top=Fy(I,J+1)
+  ! solve ubar
+  DO J=Jbeg,Jend
+    DO I=Ibeg,Iend
+      F_left=Fx(I,J)
+      F_right=Fx(I+1,J)
+      F_bottom=Fy(I,J)
+      F_top=Fy(I,J+1)
 # if defined (CARTESIAN)
-    R2(I,J)=-1.0_SP/DX*(F_right*n_right+F_left*n_left) &
-    -1.0_SP/DY*(F_top*n_top+F_bottom*n_bottom) &
-    +SourceX(I,J)
+      R2(I,J)=-1.0_SP/DX*(F_right*n_right+F_left*n_left) &
+      -1.0_SP/DY*(F_top*n_top+F_bottom*n_bottom) &
+      +SourceX(I,J)
 # else
-    R2(I,J)=-1.0_SP/DX(I,J)*(F_right*n_right+F_left*n_left) &
-    -1.0_SP/DY(I,J)*(F_top*n_top+F_bottom*n_bottom) &
-    +SourceX(I,J)
+      R2(I,J)=-1.0_SP/DX(I,J)*(F_right*n_right+F_left*n_left) &
+      -1.0_SP/DY(I,J)*(F_top*n_top+F_bottom*n_bottom) &
+      +SourceX(I,J)
 # endif
 # if defined (ITERATION)
-    Ubar(I,J)=ALPHA(ISTEP)*Ubar0(I,J)+BETA(ISTEP)*(UbarOld(I,J)+DT*R2(I,J))
+      Ubar(I,J)=ALPHA(ISTEP)*Ubar0(I,J)+BETA(ISTEP)*(UbarOld(I,J)+DT*R2(I,J))
 # else
-    Ubar(I,J)=ALPHA(ISTEP)*Ubar0(I,J)+BETA(ISTEP)*(Ubar(I,J)+DT*R2(I,J))
+      Ubar(I,J)=ALPHA(ISTEP)*Ubar0(I,J)+BETA(ISTEP)*(Ubar(I,J)+DT*R2(I,J))
 # endif
+    ENDDO
   ENDDO
-ENDDO
 
-! solve vbar
-DO J=Jbeg,Jend
-  DO I=Ibeg,Iend
-    F_left=Gx(I,J)
-    F_right=Gx(I+1,J)
-    F_bottom=Gy(I,J)
-    F_top=Gy(I,J+1)
+  ! solve vbar
+  DO J=Jbeg,Jend
+    DO I=Ibeg,Iend
+      F_left=Gx(I,J)
+      F_right=Gx(I+1,J)
+      F_bottom=Gy(I,J)
+      F_top=Gy(I,J+1)
 # if defined (CARTESIAN)
-    R3(I,J)=-1.0_SP/DX*(F_right*n_right+F_left*n_left) &
-    -1.0_SP/DY*(F_top*n_top+F_bottom*n_bottom) &
-    +SourceY(I,J)
+      R3(I,J)=-1.0_SP/DX*(F_right*n_right+F_left*n_left) &
+      -1.0_SP/DY*(F_top*n_top+F_bottom*n_bottom) &
+      +SourceY(I,J)
 # else
-    R3(I,J)=-1.0_SP/DX(I,J)*(F_right*n_right+F_left*n_left) &
-    -1.0_SP/DY(I,J)*(F_top*n_top+F_bottom*n_bottom) &
-    +SourceY(I,J)
+      R3(I,J)=-1.0_SP/DX(I,J)*(F_right*n_right+F_left*n_left) &
+      -1.0_SP/DY(I,J)*(F_top*n_top+F_bottom*n_bottom) &
+      +SourceY(I,J)
 # endif
 # if defined (ITERATION)
-    Vbar(I,J)=ALPHA(ISTEP)*Vbar0(I,J)+BETA(ISTEP)*(VbarOld(I,J)+DT*R3(I,J))
+      Vbar(I,J)=ALPHA(ISTEP)*Vbar0(I,J)+BETA(ISTEP)*(VbarOld(I,J)+DT*R3(I,J))
 # else
-    Vbar(I,J)=ALPHA(ISTEP)*Vbar0(I,J)+BETA(ISTEP)*(Vbar(I,J)+DT*R3(I,J))
+      Vbar(I,J)=ALPHA(ISTEP)*Vbar0(I,J)+BETA(ISTEP)*(Vbar(I,J)+DT*R3(I,J))
 # endif
+    ENDDO
   ENDDO
-ENDDO
 
-CALL GET_Eta_U_V_HU_HV
+  CALL GET_Eta_U_V_HU_HV
 
 END SUBROUTINE ESTIMATE_HUV
 
@@ -247,7 +243,6 @@ SUBROUTINE GET_Eta_U_V_HU_HV
   ! calculate etar, u and vetar, HU, HV
   H=Eta*Gamma3+Depth
 
-
   !   tridiagonal coefficient
   ! x direction
 
@@ -257,13 +252,11 @@ SUBROUTINE GET_Eta_U_V_HU_HV
   ! ykchoi : U0, V0 are moved to the above part of "Do istage=1,3"
 
   IF(DISPERSION)THEN
-
     DO J=Jbeg,Jend
       DO I=Ibeg,Iend
         dep=Max(Depth(I,J),MinDepthFrc)
         depl=Max(Depth(I-1,J),MinDepthFrc)
         depr=Max(Depth(I+1,J),MinDepthFrc)
-
 # if defined (CARTESIAN)
         tmp1=Gamma1*MASK9(I,J)*(b1/2.0_SP/DX/DX*dep*dep + b2/DX/DX*depl*dep)
         tmp2=1.0_SP+Gamma1*MASK9(I,J)*(-b1/DX/DX*dep*dep-2.0_SP*b2/DX/DX*dep*dep)
@@ -308,7 +301,6 @@ SUBROUTINE GET_Eta_U_V_HU_HV
 # if defined (PARALLEL)
         endif
 # endif
-
 
         IF(tmp2.NE.0.0_SP.OR.MASK(I,J).GT.0)THEN
           myA(I,J)=tmp1/tmp2
@@ -423,7 +415,6 @@ SUBROUTINE GET_Eta_U_V_HU_HV
         V(I,J)=Vbar(I,J)/Max(H(I,J),MinDepthFrc)
       ENDDO
     ENDDO
-
   ENDIF  ! end dispersion
 
   DO J=Jbeg,Jend
@@ -456,10 +447,8 @@ SUBROUTINE GET_Eta_U_V_HU_HV
   !------------ykchoi 07/26/2016
 
   IF( .NOT. DISPERSION) THEN
-
     Ubar = HU
     Vbar = HV
-
   ENDIF
 
 END SUBROUTINE GET_Eta_U_V_HU_HV
