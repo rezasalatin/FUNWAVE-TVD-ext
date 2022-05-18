@@ -4324,12 +4324,14 @@ SUBROUTINE PREVIEW
   ENDIF
 
   ! variables to get output
-  TMP_NAME = TRIM(FDIR)//'dummy1_'//TRIM(FILE_NAME)
+  TMP_NAME = TRIM(FDIR)//'SmgX_'//TRIM(FILE_NAME)
   call PutFile(TMP_NAME,temp_output1)
-  TMP_NAME = TRIM(FDIR)//'dummy2_'//TRIM(FILE_NAME)
+  TMP_NAME = TRIM(FDIR)//'VertX_'//TRIM(FILE_NAME)
   call PutFile(TMP_NAME,temp_output2)
-  TMP_NAME = TRIM(FDIR)//'dummy3_'//TRIM(FILE_NAME)
+  TMP_NAME = TRIM(FDIR)//'VisBrkX_'//TRIM(FILE_NAME)
   call PutFile(TMP_NAME,temp_output3)
+  TMP_NAME = TRIM(FDIR)//'SourceX_'//TRIM(FILE_NAME)
+  call PutFile(TMP_NAME,temp_output4)
 
 # if defined(MIXING)
   TMP_NAME = TRIM(FDIR)//'vis_smg_x_'//TRIM(FILE_NAME)
