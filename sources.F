@@ -317,7 +317,7 @@ SUBROUTINE SourceTerms
         0.5_SP*(nu_vis(I+1,J)+nu_vis(I,J))* &
         0.5_SP/DX*(Q(I+1,J)+Q(I+1,J+1)-Q(I,J)-Q(I,J+1)) &
         -0.5_SP*(nu_vis(I-1,J)+nu_vis(I,J))* &
-        0.5_SP/DX*(Q(I,J)+Q(I,J+1)-Q(I-1,J)-Q(I-1,J+1)) )\
+        0.5_SP/DX*(Q(I,J)+Q(I,J+1)-Q(I-1,J)-Q(I-1,J+1)) )
       ENDDO
     ENDDO
 
