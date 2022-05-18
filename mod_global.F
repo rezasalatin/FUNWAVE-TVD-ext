@@ -462,6 +462,6 @@ INTEGER :: jlo,jhi,ilo,ihi
 REAL(SP), DIMENSION(:),ALLOCATABLE :: xmk_wk, ymk_wk !Chen, Salatin (July 19, 2021)
 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 ! two additional variables to save some output
-REAL(SP), DIMENSION(:,:),ALLOCATABLE :: temp_output1,temp_output2
+REAL(SP), DIMENSION(:,:),ALLOCATABLE :: temp_output1,temp_output2,temp_output3
 
 END MODULE GLOBAL

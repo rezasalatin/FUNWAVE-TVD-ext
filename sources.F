@@ -476,10 +476,12 @@ SUBROUTINE SourceTerms
   !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
   !!! MIXING MODULE
 
+  temp_output1 = SmgX/SourceX
+  temp_output2 = VertX/SourceY
+  temp_output3 = Vis_BrkX/SourceY
+
 # if defined (MIXING)
   ! SmgX and SmgY values are calculated above
-  temp_output1 = SmgX/SourceX
-  temp_output2 = SmgY/SourceY
   SourceX = SourceX + SmgX
   SourceY = SourceY + SmgY
 

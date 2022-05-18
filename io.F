@@ -4328,6 +4328,8 @@ SUBROUTINE PREVIEW
   call PutFile(TMP_NAME,temp_output1)
   TMP_NAME = TRIM(FDIR)//'dummy2_'//TRIM(FILE_NAME)
   call PutFile(TMP_NAME,temp_output2)
+  TMP_NAME = TRIM(FDIR)//'dummy3_'//TRIM(FILE_NAME)
+  call PutFile(TMP_NAME,temp_output3)
 
 # if defined(MIXING)
   TMP_NAME = TRIM(FDIR)//'vis_smg_x_'//TRIM(FILE_NAME)
