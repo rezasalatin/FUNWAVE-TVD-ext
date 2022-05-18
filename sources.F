@@ -216,16 +216,14 @@ SUBROUTINE SourceTerms
 107   format(500f12.6)
 
 # if defined (CARTESIAN)
+
+  ! Horizontal eddy viscosity
   IF(H_MIXING)THEN
-    ! Sub-grid-scale Turbulence
-    ! Horizontal Eddy viscosity
     nu_smg = &
     C_smg**2*DX*DY*SQRT(2.0*uMAx**2+2.0*vMAy**2+(uMAy+vMAx)*(uMAy+vMAx))
 
-    ! depth gradient term
     DO J=Jbeg,Jend
       DO I=Ibeg,Iend
-        ! Horizontal eddy viscosity
         SmgX(I,J) = 1.0_SP/DX*( &
         0.5_SP*(nu_smg(I,J)+nu_smg(I+1,J)) &
         *1.0_SP/DX*(P(I+1,J)-P(I,J))  &
@@ -258,19 +256,17 @@ SUBROUTINE SourceTerms
     ! Save the value to print it
     vis_smg_x = SmgX
     vis_smg_y = SmgY
-    ! end if Horizontal Mixing
   ENDIF
 
+  ! Vertical Eddy Viscosity
   IF(V_MIXING)THEN
-    ! depth gradient term
+
+    nu_ver_x = 0.4/6.0*Depth*SQRT(Cd*abs(uMA)*SQRT(uMA*uMA+vMA*vMA))
+    nu_ver_y = 0.4/6.0*Depth*SQRT(Cd*abs(vMA)*SQRT(uMA*uMA+vMA*vMA))
+    nu_ver = 0.4/6.0*Depth*SQRT(Cd*(uMA*uMA+vMA*vMA))
+
     DO J=Jbeg,Jend
       DO I=Ibeg,Iend
-        ! Vertical Eddy Viscosity
-        nu_ver_x = 0.4/6.0*Depth*SQRT(Cd*abs(uMA)*SQRT(uMA*uMA+vMA*vMA))
-        nu_ver_y = 0.4/6.0*Depth*SQRT(Cd*abs(vMA)*SQRT(uMA*uMA+vMA*vMA))
-        nu_ver = 0.4/6.0*Depth*SQRT(Cd*(uMA*uMA+vMA*vMA))
-
-        ! Vertical eddy viscosity
         VertX(I,J) = -2.0_SP/DX* &
         (0.5_SP*(nu_ver(I,J)+nu_ver(I+1,J))*1.0_SP/DX*(P(I+1,J)-P(I,J))  &
         -0.5_SP*(nu_ver(I,J)+nu_ver(I-1,J))*1.0_SP/DX*(P(I,J)-P(I-1,J))) &
@@ -286,7 +282,6 @@ SUBROUTINE SourceTerms
         -nu_ver(I,J-1)*0.5_SP/DX*(P(I+1,J-1)-P(I-1,J-1)))
       ENDDO
     ENDDO
-    ! end if Vertical Mixing
   ENDIF
 
   ! Viscosity Breaking
