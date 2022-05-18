@@ -485,8 +485,8 @@ SUBROUTINE SourceTerms
   SourceX = SourceX + SmgX
   SourceY = SourceY + SmgY
 
-  SourceX = SourceX + VertX
-  SourceY = SourceY + VertY
+  !SourceX = SourceX + VertX
+  !SourceY = SourceY + VertY
 # endif
 
   !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
