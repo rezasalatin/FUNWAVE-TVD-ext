@@ -308,12 +308,12 @@ REAL(SP),DIMENSION(:,:),ALLOCATABLE :: nu_smg,vis_smg_x,vis_smg_y
 REAL(SP),DIMENSION(:,:),ALLOCATABLE :: vis_smg_xMA,vis_smg_yMA,nu_smg_MA
 REAL(SP),DIMENSION(:,:,:),ALLOCATABLE :: vis_smg_xMA_temp, vis_smg_yMA_temp,nu_smg_MA_temp
 ! vertical eddy viscosity
-REAL(SP),DIMENSION(:,:),ALLOCATABLE :: nu_ver_x,nu_ver_y,nu_ver_r
+REAL(SP),DIMENSION(:,:),ALLOCATABLE :: nu_ver_x,nu_ver_y,nu_ver
 
 ! smagorinsky and wave height
 REAL(SP),DIMENSION(:,:),ALLOCATABLE :: Umean,Vmean,&
 ETAmean,Usum,Vsum,ETAsum
-REAL(SP)::T_INTV_mean = 20.0,T_sum=0.0,C_smg=0.25
+REAL(SP)::T_INTV_mean = 20.0,T_sum=0.0,C_smg=0.0
 ! Chen, Salatin, Current and Vorticity field
 REAL(SP)::T_INTV_UVmean = 20.0,T_sumUVmean=0.0
 ! Chen, Salatin, Oct 2021, Moving Average
@@ -329,7 +329,7 @@ REAL(SP),DIMENSION(:,:),ALLOCATABLE :: ETA2,ETA2sum,SigWaveHeight,ETAvariance
 ! depth H=Eta+Depth,
 REAL(SP),DIMENSION(:,:),ALLOCATABLE :: Depth,H,&
 DepthNode,Depthx,Depthy
-REAL(SP)::Depth_Flat, SLP,Xslp
+REAL(SP)::Depth_Flat,SLP,Xslp
 
 ! updating variables
 REAL(SP),DIMENSION(:,:),ALLOCATABLE::Ubar0,Vbar0,Eta0,&

@@ -3689,8 +3689,8 @@ if (myid.eq.0)   then
   WRITE(3,'(A15,L2)')'OUT_etaMA',OUT_etaMA ! Chen, Salatin
   WRITE(3,'(A15,L2)')'OUT_VorMA',OUT_VorMA ! Chen, Salatin
 
-  WRITE(3,'(A15,L2)')'HORIZONTAL MIXING',H_MIXING ! Chen, Salatin
-  WRITE(3,'(A15,L2)')'VERTICAL MIXING',V_MIXING ! Chen, Salatin
+  WRITE(3,'(A15,L2)')'HRZ MIXING',H_MIXING ! Chen, Salatin
+  WRITE(3,'(A15,L2)')'VRT MIXING',V_MIXING ! Chen, Salatin
 
 # if defined (PARALLEL)
 endif
@@ -4357,7 +4357,7 @@ SUBROUTINE PREVIEW
     TMP_NAME = TRIM(FDIR)//'nu_very_'//TRIM(FILE_NAME)
     call PutFile(TMP_NAME,nu_ver_y)
     TMP_NAME = TRIM(FDIR)//'nu_verr_'//TRIM(FILE_NAME)
-    call PutFile(TMP_NAME,nu_ver_r)
+    call PutFile(TMP_NAME,nu_ver)
   ENDIF
 
 101   continue

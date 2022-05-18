@@ -268,32 +268,32 @@ SUBROUTINE SourceTerms
         ! Vertical Eddy Viscosity
         nu_ver_x = 0.4/6.0*Depth*SQRT(Cd*abs(uMA)*SQRT(uMA*uMA+vMA*vMA))
         nu_ver_y = 0.4/6.0*Depth*SQRT(Cd*abs(vMA)*SQRT(uMA*uMA+vMA*vMA))
-        nu_ver_r = 0.4/6.0*Depth*SQRT(Cd*(uMA*uMA+vMA*vMA))
+        nu_ver = 0.4/6.0*Depth*SQRT(Cd*(uMA*uMA+vMA*vMA))
 
         ! Vertical eddy viscosity
         VertX(I,J) = -2.0_SP/DX* &
-        (0.5_SP*(nu_ver_r(I,J)+nu_ver_r(I+1,J))*1.0_SP/DX*(P(I+1,J)-P(I,J))  &
-        -0.5_SP*(nu_ver_r(I,J)+nu_ver_r(I-1,J))*1.0_SP/DX*(P(I,J)-P(I-1,J))) &
+        (0.5_SP*(nu_ver(I,J)+nu_ver(I+1,J))*1.0_SP/DX*(P(I+1,J)-P(I,J))  &
+        -0.5_SP*(nu_ver(I,J)+nu_ver(I-1,J))*1.0_SP/DX*(P(I,J)-P(I-1,J))) &
         -2.0_SP*0.5_SP/DX* &
-        (nu_ver_r(I+1,J)*0.5_SP/DY*(Q(I+1,J+1)-Q(I+1,J-1)) &
-        -nu_ver_r(I-1,J)*0.5_SP/DY*(Q(I-1,J+1)-Q(I-1,J-1)))
+        (nu_ver(I+1,J)*0.5_SP/DY*(Q(I+1,J+1)-Q(I+1,J-1)) &
+        -nu_ver(I-1,J)*0.5_SP/DY*(Q(I-1,J+1)-Q(I-1,J-1)))
 
         VertY(I,J) = -2.0_SP/DY* &
-        (0.5_SP*(nu_ver_r(I,J)+nu_ver_r(I,J+1))*1.0_SP/DY*(Q(I,J+1)-Q(I,J))  &
-        -0.5_SP*(nu_ver_r(I,J)+nu_ver_r(I,J-1))*1.0_SP/DY*(Q(I,J)-Q(I,J-1))) &
+        (0.5_SP*(nu_ver(I,J)+nu_ver(I,J+1))*1.0_SP/DY*(Q(I,J+1)-Q(I,J))  &
+        -0.5_SP*(nu_ver(I,J)+nu_ver(I,J-1))*1.0_SP/DY*(Q(I,J)-Q(I,J-1))) &
         -2.0_SP*0.5_SP/DY* &
-        (nu_ver_r(I,J+1)*0.5_SP/DX*(P(I+1,J+1)-P(I-1,J+1)) &
-        -nu_ver_r(I,J-1)*0.5_SP/DX*(P(I+1,J-1)-P(I-1,J-1)))
+        (nu_ver(I,J+1)*0.5_SP/DX*(P(I+1,J+1)-P(I-1,J+1)) &
+        -nu_ver(I,J-1)*0.5_SP/DX*(P(I+1,J-1)-P(I-1,J-1)))
       ENDDO
     ENDDO
     ! end if Vertical Mixing
   ENDIF
 
-  ! depth gradient term
-  DO J=Jbeg,Jend
-    DO I=Ibeg,Iend
-      ! Viscosity Breaking
-      IF(PQ_scheme)THEN
+  ! Viscosity Breaking
+  IF(PQ_scheme)THEN
+    ! depth gradient term
+    DO J=Jbeg,Jend
+      DO I=Ibeg,Iend
         ! it turns out P and Q are not exchanged at processor
         ! interface. it affects edges, make PQ_scheme=false
         ! Reza Salatin corrected this bug on May 5, 2022
@@ -317,10 +317,14 @@ SUBROUTINE SourceTerms
         0.5_SP*(nu_vis(I+1,J)+nu_vis(I,J))* &
         0.5_SP/DX*(Q(I+1,J)+Q(I+1,J+1)-Q(I,J)-Q(I,J+1)) &
         -0.5_SP*(nu_vis(I-1,J)+nu_vis(I,J))* &
-        0.5_SP/DX*(Q(I,J)+Q(I,J+1)-Q(I-1,J)-Q(I-1,J+1)) )
+        0.5_SP/DX*(Q(I,J)+Q(I,J+1)-Q(I-1,J)-Q(I-1,J+1)) )\
+      ENDDO
+    ENDDO
 
-      ELSE
+  ELSE
 
+    DO J=Jbeg,Jend
+      DO I=Ibeg,Iend
         Vis_BrkX(I,J) = 0.5_SP/DX*( &
         (nu_vis(I+1,J)+nu_vis(I,J)) &
         *1.0_SP/DX*(HU(I+1,J)-HU(I,J)) &
@@ -342,23 +346,20 @@ SUBROUTINE SourceTerms
         *1.0_SP/DY*(HV(I,J+1)-HV(I,J)) &
         -(nu_vis(I,J-1)+nu_vis(I,J)) &
         *1.0_SP/DY*(HV(I,J)-HV(I,J-1)) )
-      ENDIF
+      ENDDO
     ENDDO
-  ENDDO
+
+  ENDIF
   ! end if Cartesian
 # endif
 
 # if defined (CARTESIAN)
-
   DO J=Jbeg,Jend
     DO I=Ibeg,Iend
-
       ! depth gradient term
-
       ! second order, move the second term to left-hand side
       !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
       !!! Source term in X direction
-
       SourceX(I,J)=GRAV*Eta(I,J)*(Depthx(I+1,J)-Depthx(I,J))/DX &
       *MASK(I,J) &
       ! friction
