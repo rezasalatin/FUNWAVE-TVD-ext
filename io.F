@@ -3626,7 +3626,9 @@ CALL READ_LOGICAL(OUT_RadStr,FILE_NAME,'RadStr',ierr) ! Chen, Salatin
 CALL READ_LOGICAL(OUT_uvMA,FILE_NAME,'uvMA',ierr) ! Chen, Salatin
 CALL READ_LOGICAL(OUT_etaMA,FILE_NAME,'etaMA',ierr) ! Chen, Salatin
 CALL READ_LOGICAL(OUT_VorMA,FILE_NAME,'VorMA',ierr) ! Chen, Salatin
-
+! Salatin, MIXING is better to be determined in the input file
+CALL READ_LOGICAL(H_MIXING,FILE_NAME,'H_MIXING',ierr) ! Chen, Salatin
+CALL READ_LOGICAL(V_MIXING,FILE_NAME,'V_MIXING',ierr) ! Chen, Salatin
 
 !ykchoi
 !	CALL READ_FLOAT(EtaBlowVal,FILE_NAME,'EtaBlowVal',ierr)
@@ -3686,6 +3688,9 @@ if (myid.eq.0)   then
   WRITE(3,'(A15,L2)')'OUT_uvMA',OUT_uvMA ! Chen, Salatin
   WRITE(3,'(A15,L2)')'OUT_etaMA',OUT_etaMA ! Chen, Salatin
   WRITE(3,'(A15,L2)')'OUT_VorMA',OUT_VorMA ! Chen, Salatin
+
+  WRITE(3,'(A15,L2)')'HORIZONTAL MIXING',H_MIXING ! Chen, Salatin
+  WRITE(3,'(A15,L2)')'VERTICAL MIXING',V_MIXING ! Chen, Salatin
 
 # if defined (PARALLEL)
 endif
@@ -4333,24 +4338,27 @@ SUBROUTINE PREVIEW
   TMP_NAME = TRIM(FDIR)//'SourceX_'//TRIM(FILE_NAME)
   call PutFile(TMP_NAME,temp_output4)
 
-# if defined(MIXING)
-  TMP_NAME = TRIM(FDIR)//'vis_smg_x_'//TRIM(FILE_NAME)
-  call PutFile(TMP_NAME,vis_smg_x)
-  TMP_NAME = TRIM(FDIR)//'vis_smg_y_'//TRIM(FILE_NAME)
-  call PutFile(TMP_NAME,vis_smg_y)
-  TMP_NAME = TRIM(FDIR)//'vis_smg_xMA_'//TRIM(FILE_NAME)
-  call PutFile(TMP_NAME,vis_smg_xMA)
-  TMP_NAME = TRIM(FDIR)//'vis_smg_yMA_'//TRIM(FILE_NAME)
-  call PutFile(TMP_NAME,vis_smg_yMA)
-  TMP_NAME = TRIM(FDIR)//'nu_smg_MA_'//TRIM(FILE_NAME)
-  call PutFile(TMP_NAME,nu_smg_MA)
-# endif
-  TMP_NAME = TRIM(FDIR)//'nu_verx_'//TRIM(FILE_NAME)
-  call PutFile(TMP_NAME,nu_ver_x)
-  TMP_NAME = TRIM(FDIR)//'nu_very_'//TRIM(FILE_NAME)
-  call PutFile(TMP_NAME,nu_ver_y)
-  TMP_NAME = TRIM(FDIR)//'nu_verr_'//TRIM(FILE_NAME)
-  call PutFile(TMP_NAME,nu_ver_r)
+  IF(H_MIXING)THEN
+    TMP_NAME = TRIM(FDIR)//'vis_smg_x_'//TRIM(FILE_NAME)
+    call PutFile(TMP_NAME,vis_smg_x)
+    TMP_NAME = TRIM(FDIR)//'vis_smg_y_'//TRIM(FILE_NAME)
+    call PutFile(TMP_NAME,vis_smg_y)
+    TMP_NAME = TRIM(FDIR)//'vis_smg_xMA_'//TRIM(FILE_NAME)
+    call PutFile(TMP_NAME,vis_smg_xMA)
+    TMP_NAME = TRIM(FDIR)//'vis_smg_yMA_'//TRIM(FILE_NAME)
+    call PutFile(TMP_NAME,vis_smg_yMA)
+    TMP_NAME = TRIM(FDIR)//'nu_smg_MA_'//TRIM(FILE_NAME)
+    call PutFile(TMP_NAME,nu_smg_MA)
+  ENDIF
+
+  IF(V_MIXING)THEN
+    TMP_NAME = TRIM(FDIR)//'nu_verx_'//TRIM(FILE_NAME)
+    call PutFile(TMP_NAME,nu_ver_x)
+    TMP_NAME = TRIM(FDIR)//'nu_very_'//TRIM(FILE_NAME)
+    call PutFile(TMP_NAME,nu_ver_y)
+    TMP_NAME = TRIM(FDIR)//'nu_verr_'//TRIM(FILE_NAME)
+    call PutFile(TMP_NAME,nu_ver_r)
+  ENDIF
 
 101   continue
 

@@ -455,6 +455,9 @@ REAL(SP) :: STEADY_TIME
 REAL(SP) :: visbrk, WAVEMAKER_visbrk
 LOGICAL :: WAVEMAKER_VIS=.FALSE.
 !	 REAL(SP) :: PLOT_SMALLINTV
+! Chen, Salatin, Mixing is better to be determined in the input file
+LOGICAL :: H_MIXING=.FALSE.
+LOGICAL :: V_MIXING=.FALSE.
 
 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 ! Chen, Salatin

@@ -216,72 +216,78 @@ SUBROUTINE SourceTerms
 107   format(500f12.6)
 
 # if defined (CARTESIAN)
-# if defined (MIXING)
-  ! Sub-grid-scale Turbulence
+  IF(H_MIXING)THEN
+    ! Sub-grid-scale Turbulence
+    ! Horizontal Eddy viscosity
+    nu_smg = &
+    C_smg**2*DX*DY*SQRT(2.0*uMAx**2+2.0*vMAy**2+(uMAy+vMAx)*(uMAy+vMAx))
 
-  ! Horizontal Eddy viscosity
-  nu_smg = &
-  C_smg**2*DX*DY*SQRT(2.0*uMAx**2+2.0*vMAy**2+(uMAy+vMAx)*(uMAy+vMAx))
+    ! depth gradient term
+    DO J=Jbeg,Jend
+      DO I=Ibeg,Iend
+        ! Horizontal eddy viscosity
+        SmgX(I,J) = 1.0_SP/DX*( &
+        0.5_SP*(nu_smg(I,J)+nu_smg(I+1,J)) &
+        *1.0_SP/DX*(P(I+1,J)-P(I,J))  &
+        - 0.5_SP*(nu_smg(I,J)+nu_smg(I-1,J)) &
+        *1.0_SP/DX*(P(I,J)-P(I-1,J))) &
+        + 0.5_SP/DY*( &
+        0.5_SP*(nu_smg(I,J+1)+nu_smg(I,J)) &
+        *1.0_SP/DY*(P(I,J+1)-P(I,J)) &
+        -0.5_SP*(nu_smg(I,J-1)+nu_smg(I,J)) &
+        *1.0_SP/DY*(P(I,J)-P(I,J-1))) &
+        + 1.0_SP/DY*( &
+        nu_smg(I,J+1)*0.5_SP/DX*(Q(I+1,J+1)-Q(I-1,J+1)) &
+        -nu_smg(I,J-1)*0.5_SP/DX*(Q(I+1,J-1)-Q(I-1,J-1)))
 
-  ! Vertical Eddy Viscosity
-  nu_ver_x = 0.4/6.0*Depth*SQRT(Cd*abs(uMA)*SQRT(uMA*uMA+vMA*vMA))
-  nu_ver_y = 0.4/6.0*Depth*SQRT(Cd*abs(vMA)*SQRT(uMA*uMA+vMA*vMA))
-  nu_ver_r = 0.4/6.0*Depth*SQRT(Cd*(uMA*uMA+vMA*vMA))
-
-  ! depth gradient term
-  DO J=Jbeg,Jend
-    DO I=Ibeg,Iend
-      ! Horizontal eddy viscosity
-      SmgX(I,J) = 1.0_SP/DX*( &
-      0.5_SP*(nu_smg(I,J)+nu_smg(I+1,J)) &
-      *1.0_SP/DX*(P(I+1,J)-P(I,J))  &
-      - 0.5_SP*(nu_smg(I,J)+nu_smg(I-1,J)) &
-      *1.0_SP/DX*(P(I,J)-P(I-1,J))) &
-      + 0.5_SP/DY*( &
-      0.5_SP*(nu_smg(I,J+1)+nu_smg(I,J)) &
-      *1.0_SP/DY*(P(I,J+1)-P(I,J)) &
-      -0.5_SP*(nu_smg(I,J-1)+nu_smg(I,J)) &
-      *1.0_SP/DY*(P(I,J)-P(I,J-1))) &
-      + 1.0_SP/DY*( &
-      nu_smg(I,J+1)*0.5_SP/DX*(Q(I+1,J+1)-Q(I-1,J+1)) &
-      -nu_smg(I,J-1)*0.5_SP/DX*(Q(I+1,J-1)-Q(I-1,J-1)))
-
-      SmgY(I,J) = 1.0_SP/DY*( &
-      0.5_SP*(nu_smg(I,J)+nu_smg(I,J+1)) &
-      *1.0_SP/DY*(Q(I,J+1)-Q(I,J))  &
-      - 0.5_SP*(nu_smg(I,J)+nu_smg(I,J-1)) &
-      *1.0_SP/DY*(Q(I,J)-Q(I,J-1))) &
-      + 0.5_SP/DX*( &
-      0.5_SP*(nu_smg(I+1,J)+nu_smg(I,J)) &
-      *1.0_SP/DX*(Q(I+1,J)-Q(I,J)) &
-      -0.5_SP*(nu_smg(I-1,J)+nu_smg(I,J)) &
-      *1.0_SP/DX*(Q(I,J)-Q(I-1,J))) &
-      + 1.0_SP/DX*( &
-      nu_smg(I+1,J)*0.5_SP/DY*(P(I+1,J+1)-P(I+1,J-1)) &
-      -nu_smg(I-1,J)*0.5_SP/DY*(P(I-1,J+1)-P(I-1,J-1)))
-
-      ! Vertical eddy viscosity
-      VertX(I,J) = -2.0_SP/DX* &
-      (0.5_SP*(nu_ver_r(I,J)+nu_ver_r(I+1,J))*1.0_SP/DX*(P(I+1,J)-P(I,J))  &
-      -0.5_SP*(nu_ver_r(I,J)+nu_ver_r(I-1,J))*1.0_SP/DX*(P(I,J)-P(I-1,J))) &
-      -2.0_SP*0.5_SP/DX* &
-      (nu_ver_r(I+1,J)*0.5_SP/DY*(Q(I+1,J+1)-Q(I+1,J-1)) &
-      -nu_ver_r(I-1,J)*0.5_SP/DY*(Q(I-1,J+1)-Q(I-1,J-1)))
-
-      VertY(I,J) = -2.0_SP/DY* &
-      (0.5_SP*(nu_ver_r(I,J)+nu_ver_r(I,J+1))*1.0_SP/DY*(Q(I,J+1)-Q(I,J))  &
-      -0.5_SP*(nu_ver_r(I,J)+nu_ver_r(I,J-1))*1.0_SP/DY*(Q(I,J)-Q(I,J-1))) &
-      -2.0_SP*0.5_SP/DY* &
-      (nu_ver_r(I,J+1)*0.5_SP/DX*(P(I+1,J+1)-P(I-1,J+1)) &
-      -nu_ver_r(I,J-1)*0.5_SP/DX*(P(I+1,J-1)-P(I-1,J-1)))
-
+        SmgY(I,J) = 1.0_SP/DY*( &
+        0.5_SP*(nu_smg(I,J)+nu_smg(I,J+1)) &
+        *1.0_SP/DY*(Q(I,J+1)-Q(I,J))  &
+        - 0.5_SP*(nu_smg(I,J)+nu_smg(I,J-1)) &
+        *1.0_SP/DY*(Q(I,J)-Q(I,J-1))) &
+        + 0.5_SP/DX*( &
+        0.5_SP*(nu_smg(I+1,J)+nu_smg(I,J)) &
+        *1.0_SP/DX*(Q(I+1,J)-Q(I,J)) &
+        -0.5_SP*(nu_smg(I-1,J)+nu_smg(I,J)) &
+        *1.0_SP/DX*(Q(I,J)-Q(I-1,J))) &
+        + 1.0_SP/DX*( &
+        nu_smg(I+1,J)*0.5_SP/DY*(P(I+1,J+1)-P(I+1,J-1)) &
+        -nu_smg(I-1,J)*0.5_SP/DY*(P(I-1,J+1)-P(I-1,J-1)))
+      ENDDO
     ENDDO
-  ENDDO
-  ! Save the value to print it
-  vis_smg_x = SmgX
-  vis_smg_y = SmgY
-  ! end if Mixing
-# endif
+    ! Save the value to print it
+    vis_smg_x = SmgX
+    vis_smg_y = SmgY
+    ! end if Horizontal Mixing
+  ENDIF
+
+  IF(V_MIXING)THEN
+    ! depth gradient term
+    DO J=Jbeg,Jend
+      DO I=Ibeg,Iend
+        ! Vertical Eddy Viscosity
+        nu_ver_x = 0.4/6.0*Depth*SQRT(Cd*abs(uMA)*SQRT(uMA*uMA+vMA*vMA))
+        nu_ver_y = 0.4/6.0*Depth*SQRT(Cd*abs(vMA)*SQRT(uMA*uMA+vMA*vMA))
+        nu_ver_r = 0.4/6.0*Depth*SQRT(Cd*(uMA*uMA+vMA*vMA))
+
+        ! Vertical eddy viscosity
+        VertX(I,J) = -2.0_SP/DX* &
+        (0.5_SP*(nu_ver_r(I,J)+nu_ver_r(I+1,J))*1.0_SP/DX*(P(I+1,J)-P(I,J))  &
+        -0.5_SP*(nu_ver_r(I,J)+nu_ver_r(I-1,J))*1.0_SP/DX*(P(I,J)-P(I-1,J))) &
+        -2.0_SP*0.5_SP/DX* &
+        (nu_ver_r(I+1,J)*0.5_SP/DY*(Q(I+1,J+1)-Q(I+1,J-1)) &
+        -nu_ver_r(I-1,J)*0.5_SP/DY*(Q(I-1,J+1)-Q(I-1,J-1)))
+
+        VertY(I,J) = -2.0_SP/DY* &
+        (0.5_SP*(nu_ver_r(I,J)+nu_ver_r(I,J+1))*1.0_SP/DY*(Q(I,J+1)-Q(I,J))  &
+        -0.5_SP*(nu_ver_r(I,J)+nu_ver_r(I,J-1))*1.0_SP/DY*(Q(I,J)-Q(I,J-1))) &
+        -2.0_SP*0.5_SP/DY* &
+        (nu_ver_r(I,J+1)*0.5_SP/DX*(P(I+1,J+1)-P(I-1,J+1)) &
+        -nu_ver_r(I,J-1)*0.5_SP/DX*(P(I+1,J-1)-P(I-1,J-1)))
+      ENDDO
+    ENDDO
+    ! end if Vertical Mixing
+  ENDIF
 
   ! depth gradient term
   DO J=Jbeg,Jend
@@ -481,15 +487,16 @@ SUBROUTINE SourceTerms
   temp_output3 = Vis_BrkX
   temp_output4 = SourceX
 
-# if defined (MIXING)
-  ! SmgX and SmgY values are calculated above
-  ! Horizontal Mixing
-  SourceX = SourceX + SmgX
-  SourceY = SourceY + SmgY
-  ! Vertical Mixing
-  SourceX = SourceX + VertX
-  SourceY = SourceY + VertY
-# endif
+  IF(H_MIXING)THEN
+    ! Horizontal Mixing
+    SourceX = SourceX + SmgX
+    SourceY = SourceY + SmgY
+  ENDIF
+  IF(V_MIXING)THEN
+    ! Vertical Mixing
+    SourceX = SourceX + VertX
+    SourceY = SourceY + VertY
+  ENDIF
 
   !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
   !!! EDDY VISCOSITY BREAKING
