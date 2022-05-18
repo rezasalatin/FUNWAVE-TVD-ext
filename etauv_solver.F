@@ -108,7 +108,7 @@ SUBROUTINE ESTIMATE_HUV(ISTEP)
           -1.0_SP/DYg*(F_top*n_top+F_bottom*n_bottom) &
           ! wavemaker
           +WaveMaker_Mass(I,J)
-          !                +WK_Source
+          ! +WK_Source
         ELSE
           R1(I,J)=-1.0_SP/DXg*(F_right*n_right+F_left*n_left) &
           -1.0_SP/DYg*(F_top*n_top+F_bottom*n_bottom)

@@ -4345,6 +4345,8 @@ SUBROUTINE PREVIEW
   call PutFile(TMP_NAME,nu_ver_x)
   TMP_NAME = TRIM(FDIR)//'nu_very_'//TRIM(FILE_NAME)
   call PutFile(TMP_NAME,nu_ver_y)
+  TMP_NAME = TRIM(FDIR)//'nu_verr_'//TRIM(FILE_NAME)
+  call PutFile(TMP_NAME,nu_ver_r)
 
 101   continue
 

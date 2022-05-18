@@ -297,8 +297,6 @@ SUBROUTINE CALCULATE_MovingAverage(DT,M,N,U,V,ETA,MASK,DX,DY,Depth,&
   ! moving average of vorticity
   REAL(SP),DIMENSION(M,N),INTENT(OUT) :: Vor_MA
   ! eddy viscosity
-  !REAL(SP),DIMENSION(M,N),INTENT(OUT) :: nu_ver_x,nu_ver_y
-  !REAL(SP),DIMENSION(M,N),INTENT(IN)  :: Cd
   REAL(SP),DIMENSION(M,N,MA_Window),INTENT(INOUT) :: vis_smg_xMA_temp,vis_smg_yMA_temp,nu_smg_MA_temp
   REAL(SP),DIMENSION(M,N),INTENT(IN) :: vis_smg_x,vis_smg_y,nu_smg
   REAL(SP),DIMENSION(M,N),INTENT(OUT) :: vis_smg_xMA,vis_smg_yMA,nu_smg_MA

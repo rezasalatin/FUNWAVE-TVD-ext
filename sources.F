@@ -74,10 +74,8 @@ SUBROUTINE SourceTerms
   REAL(SP), DIMENSION(NumWaveComp,1) :: BB1 ! for WK_TIME (optimized)
   REAL(SP), DIMENSION(NumFreq) :: BB2,CC2 ! for WK_DATA (optimized)
   INTEGER :: kf_index ! Chen, Salatin
-  ! eddy viscosity, Salatin
-  REAL(SP),DIMENSION(Mloc,Nloc) :: temp_smg
-  ! temp files for sourceX and sourceY
-  REAL(SP),DIMENSION(Mloc,Nloc) :: tempX,tempY,tempX_vis,tempY_vis
+  ! variables eddy viscosity terms (horizontal, vertical, breaking)
+  REAL(SP),DIMENSION(Mloc,Nloc) :: SmgX,SmgY,Vis_BrkX,Vis_BrkY,VertX,VertY
 
   !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
   !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
@@ -222,22 +220,19 @@ SUBROUTINE SourceTerms
   ! Sub-grid-scale Turbulence
 
   ! Horizontal Eddy viscosity
-  temp_smg = SQRT(2.0*uMAx**2+2.0*vMAy**2+(uMAy+vMAx)*(uMAy+vMAx))
-  !temp_smg = SQRT(2.0*Ux**2+2.0*Vy**2+(Uy+Vx)*(Uy+Vx))
-  nu_smg = C_smg**2*DX*DY*temp_smg
+  nu_smg = &
+  C_smg**2*DX*DY*SQRT(2.0*uMAx**2+2.0*vMAy**2+(uMAy+vMAx)*(uMAy+vMAx))
 
   ! Vertical Eddy Viscosity
-  ! if you want to use orbital velocity (wave+current)
-  !nu_ver_x = 0.4/6.0*(Depth+Eta)*SQRT(Cd*abs(U)*SQRT(U*U+V*V))
-  !nu_ver_y = 0.4/6.0*(Depth+Eta)*SQRT(Cd*abs(V)*SQRT(U*U+V*V))
-  ! if you want to use current speed
   nu_ver_x = 0.4/6.0*Depth*SQRT(Cd*abs(uMA)*SQRT(uMA*uMA+vMA*vMA))
   nu_ver_y = 0.4/6.0*Depth*SQRT(Cd*abs(vMA)*SQRT(uMA*uMA+vMA*vMA))
+  nu_ver_r = 0.4/6.0*Depth*SQRT(Cd*(uMA*uMA+vMA*vMA))
 
   ! depth gradient term
   DO J=Jbeg,Jend
     DO I=Ibeg,Iend
-      tempX(I,J) = 1.0_SP/DX*( &
+      ! Horizontal eddy viscosity
+      SmgX(I,J) = 1.0_SP/DX*( &
       0.5_SP*(nu_smg(I,J)+nu_smg(I+1,J)) &
       *1.0_SP/DX*(P(I+1,J)-P(I,J))  &
       - 0.5_SP*(nu_smg(I,J)+nu_smg(I-1,J)) &
@@ -251,7 +246,7 @@ SUBROUTINE SourceTerms
       nu_smg(I,J+1)*0.5_SP/DX*(Q(I+1,J+1)-Q(I-1,J+1)) &
       -nu_smg(I,J-1)*0.5_SP/DX*(Q(I+1,J-1)-Q(I-1,J-1)))
 
-      tempY(I,J) = 1.0_SP/DY*( &
+      SmgY(I,J) = 1.0_SP/DY*( &
       0.5_SP*(nu_smg(I,J)+nu_smg(I,J+1)) &
       *1.0_SP/DY*(Q(I,J+1)-Q(I,J))  &
       - 0.5_SP*(nu_smg(I,J)+nu_smg(I,J-1)) &
@@ -264,11 +259,27 @@ SUBROUTINE SourceTerms
       + 1.0_SP/DX*( &
       nu_smg(I+1,J)*0.5_SP/DY*(P(I+1,J+1)-P(I+1,J-1)) &
       -nu_smg(I-1,J)*0.5_SP/DY*(P(I-1,J+1)-P(I-1,J-1)))
+
+      ! Vertical eddy viscosity
+      VertX(I,J) = -2.0_SP/DX* &
+      (0.5_SP*(nu_ver_r(I,J)+nu_ver_r(I+1,J))*1.0_SP/DX*(P(I+1,J)-P(I,J))  &
+      -0.5_SP*(nu_ver_r(I,J)+nu_ver_r(I-1,J))*1.0_SP/DX*(P(I,J)-P(I-1,J))) &
+      -2.0_SP*0.5_SP/DX* &
+      (nu_ver_r(I+1,J)*0.5_SP/DY*(Q(I+1,J+1)-Q(I+1,J-1)) &
+      -nu_ver_r(I-1,J)*0.5_SP/DY*(Q(I-1,J+1)-Q(I-1,J-1)))
+
+      VertY(I,J) = -2.0_SP/DY* &
+      (0.5_SP*(nu_ver_r(I,J)+nu_ver_r(I,J+1))*1.0_SP/DY*(Q(I,J+1)-Q(I,J))  &
+      -0.5_SP*(nu_ver_r(I,J)+nu_ver_r(I,J-1))*1.0_SP/DY*(Q(I,J)-Q(I,J-1))) &
+      -2.0_SP*0.5_SP/DY* &
+      (nu_ver_r(I,J+1)*0.5_SP/DX*(P(I+1,J+1)-P(I-1,J+1)) &
+      -nu_ver_r(I,J-1)*0.5_SP/DX*(P(I+1,J-1)-P(I-1,J-1)))
+
     ENDDO
   ENDDO
   ! Save the value to print it
-  vis_smg_x = tempX
-  vis_smg_y = tempY
+  vis_smg_x = SmgX
+  vis_smg_y = SmgY
   ! end if Mixing
 # endif
 
@@ -280,7 +291,7 @@ SUBROUTINE SourceTerms
         ! it turns out P and Q are not exchanged at processor
         ! interface. it affects edges, make PQ_scheme=false
         ! Reza Salatin corrected this bug on May 5, 2022
-        tempX_vis(I,J) = 0.5_SP/DX*( &
+        Vis_BrkX(I,J) = 0.5_SP/DX*( &
         nu_vis(I+1,J)* &
         1.0_SP/DX*(P(I+2,J)-P(I+1,J)) &
         -nu_vis(I-1,J)* &
@@ -291,7 +302,7 @@ SUBROUTINE SourceTerms
         -0.5_SP*(nu_vis(I,J-1)+nu_vis(I,J))* &
         0.5_SP/DY*(P(I,J)+P(I+1,J)-P(I,J-1)-P(I+1,J-1)) )
 
-        tempY_vis(I,J) = 0.5_SP/DY*( &
+        Vis_BrkY(I,J) = 0.5_SP/DY*( &
         nu_vis(I,J+1)* &
         1.0_SP/DY*(Q(I,J+2)-Q(I,J+1)) &
         -nu_vis(I,J-1)* &
@@ -304,7 +315,7 @@ SUBROUTINE SourceTerms
 
       ELSE
 
-        tempX_vis(I,J) = 0.5_SP/DX*( &
+        Vis_BrkX(I,J) = 0.5_SP/DX*( &
         (nu_vis(I+1,J)+nu_vis(I,J)) &
         *1.0_SP/DX*(HU(I+1,J)-HU(I,J)) &
         -(nu_vis(I-1,J)+nu_vis(I,J)) &
@@ -315,7 +326,7 @@ SUBROUTINE SourceTerms
         -(nu_vis(I,J-1)+nu_vis(I,J)) &
         *1.0_SP/DY*(HU(I,J)-HU(I,J-1)) )
 
-        tempY_vis(I,J) = 0.5_SP/DX*( &
+        Vis_BrkY(I,J) = 0.5_SP/DX*( &
         (nu_vis(I+1,J)+nu_vis(I,J)) &
         *1.0_SP/DX*(HV(I+1,J)-HV(I,J)) &
         -(nu_vis(I-1,J)+nu_vis(I,J)) &
@@ -325,24 +336,24 @@ SUBROUTINE SourceTerms
         *1.0_SP/DY*(HV(I,J+1)-HV(I,J)) &
         -(nu_vis(I,J-1)+nu_vis(I,J)) &
         *1.0_SP/DY*(HV(I,J)-HV(I,J-1)) )
-      ENDIF ! end pq_scheme
+      ENDIF
     ENDDO
   ENDDO
   ! end if Cartesian
 # endif
 
-  ! depth gradient term
+# if defined (CARTESIAN)
+
   DO J=Jbeg,Jend
     DO I=Ibeg,Iend
-# if defined (CARTESIAN)
+
+      ! depth gradient term
+
       ! second order, move the second term to left-hand side
-
-
       !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
       !!! Source term in X direction
 
-
-      SourceX(I,J)=GRAV*(Eta(I,J))/DX*(Depthx(I+1,J)-Depthx(I,J)) &
+      SourceX(I,J)=GRAV*Eta(I,J)*(Depthx(I+1,J)-Depthx(I,J))/DX &
       *MASK(I,J) &
       ! friction
 # if defined (MANNING)
@@ -368,12 +379,10 @@ SUBROUTINE SourceTerms
       ! wavemaker
       +WaveMaker_Mass(I,J)*U(I,J)
 
-
       !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
       !!! Source term in Y direction
 
-
-      SourceY(I,J)=GRAV*(Eta(I,J))/DY*(Depthy(I,J+1)-Depthy(I,J)) &
+      SourceY(I,J)=GRAV*Eta(I,J)*(Depthy(I,J+1)-Depthy(I,J))/DY &
       *MASK(I,J) &
       ! friction
 # if defined (MANNING)
@@ -400,10 +409,8 @@ SUBROUTINE SourceTerms
       ! wavemaker
       +WaveMaker_Mass(I,J)*V(I,J)
 
-
       !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
       !!! CURRENT BALANCE
-
 
       IF(WaveMakerCurrentBalance)THEN
 # if defined (PARALLEL)
@@ -424,94 +431,80 @@ SUBROUTINE SourceTerms
           *SQRT(U(I,J)*U(I,J)+V(I,J)*V(I,J))
         ENDIF
       ENDIF ! current balance
+    ENDDO
+  ENDDO
 
+  !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+  !!! FRICTION SPONGE
 
-      !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-      !!! FRICTION SPONGE
+  IF(FRICTION_SPONGE) THEN
+    ! note that, compared to wei et al, we used flux.
+    ! So need multiply D
+    SourceX = SourceX &
+    -CD_4_SPONGE*U*SQRT(U*U+V*V)*Depth
+    SourceY = SourceY &
+    -CD_4_SPONGE*V*SQRT(U*U+V*V)*Depth
+  ENDIF
 
+  !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+  !!! BREAKWATER
 
-      IF(FRICTION_SPONGE) THEN
-        ! note that, compared to wei et al, we used flux.
-        ! So need multiply D
-        SourceX(I,J) = SourceX(I,J) &
-        -CD_4_SPONGE(I,J)*U(I,J) &
-        *SQRT(U(I,J)*U(I,J)+V(I,J)*V(I,J))*Depth(I,J)
+  IF(BREAKWATER) THEN
+    ! note that, compared to wei et al, we used flux.
+    ! So need multiply D
+    SourceX = SourceX &
+    -CD_breakwater*U*SQRT(U*U+V*V)*Depth
+    SourceY = SourceY &
+    -CD_BREAKWATER*V*SQRT(U*U+V*V)*Depth
+  ENDIF
 
-        SourceY(I,J) = SourceY(I,J) &
-        -CD_4_SPONGE(I,J)*V(I,J) &
-        *SQRT(U(I,J)*U(I,J)+V(I,J)*V(I,J))*Depth(I,J)
-      ENDIF
-
-
-      !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-      !!! BREAKWATER
-
-
-      IF(BREAKWATER) THEN
-        ! note that, compared to wei et al, we used flux.
-        ! So need multiply D
-        SourceX(I,J) = SourceX(I,J) &
-        - CD_breakwater(I,J)*U(I,J) &
-        *SQRT(U(I,J)*U(I,J)+V(I,J)*V(I,J))*Depth(I,J)
-
-        SourceY(I,J) = SourceY(I,J) &
-        -CD_BREAKWATER(I,J)*V(I,J) &
-        *SQRT(U(I,J)*U(I,J)+V(I,J)*V(I,J))*Depth(I,J)
-      ENDIF
-
-
-      !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-      !!! METEO MODULE
-
+  !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+  !!! METEO MODULE
 
 # if defined (METEO)
-      IF(WindForce)THEN
-        SourceX(I,J)=SourceX(I,J) &
-        +MASK_WIND(I,J)*RHO_AW*Cdw*WindU2D(I,J) &
-        *SQRT(WindU2D(I,J)*WindU2D(I,J) &
-        + WindV2D(I,J)*WindV2D(I,J))
+  IF(WindForce)THEN
+    SourceX=SourceX &
+    +MASK_WIND*RHO_AW &
+    *Cdw*WindU2D*SQRT(WindU2D*WindU2D + WindV2D*WindV2D)
 
-        SourceY(I,J)=SourceY(I,J) &
-        +MASK_WIND(I,J)*RHO_AW*Cdw*WindV2D(I,J) &
-        *SQRT(WindU2D(I,J)*WindU2D(I,J) &
-        + WindV2D(I,J)*WindV2D(I,J))
-      ENDIF   ! end wind
-      ! end METEO
+    SourceY=SourceY &
+    +MASK_WIND*RHO_AW &
+    *Cdw*WindV2D*SQRT(WindU2D*WindU2D + WindV2D*WindV2D)
+  ENDIF
 # endif
 
-
-      !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-      !!! MIXING MODULE
-
+  !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+  !!! MIXING MODULE
 
 # if defined (MIXING)
-      temp_output1(I,J) = tempX(I,J)/SourceX(I,J)
-      temp_output2(I,J) = tempY(I,J)/SourceY(I,J)
-      SourceX(I,J) = SourceX(I,J) + tempX(I,J)
-      SourceY(I,J) = SourceY(I,J) + tempY(I,J)
+  ! SmgX and SmgY values are calculated above
+  temp_output1 = SmgX/SourceX
+  temp_output2 = SmgY/SourceY
+  SourceX = SourceX + SmgX
+  SourceY = SourceY + SmgY
+
+  SourceX = SourceX + VertX
+  SourceY = SourceY + VertY
 # endif
 
+  !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+  !!! EDDY VISCOSITY BREAKING
 
-      !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-      !!! BREAKING
+  IF(VISCOSITY_BREAKING.OR.DIFFUSION_SPONGE.OR.WAVEMAKER_VIS)THEN
+    ! Vis_BrkX and Vis_BrkY values are calculated above
+    SourceX = SourceX + Vis_BrkX
+    SourceY = SourceY + Vis_BrkY
+  ENDIF
 
-
-      ! eddy viscosity breaking
-      ! ykchoi(08.18.2015)
-      ! new variable :: WAVEMAKER_VIS
-      !IF(VISCOSITY_BREAKING.OR.DIFFUSION_SPONGE)THEN
-      IF(VISCOSITY_BREAKING.OR.DIFFUSION_SPONGE.OR.WAVEMAKER_VIS)THEN
-        SourceX(I,J) = SourceX(I,J) + tempX_vis(I,J)
-        SourceY(I,J) = SourceY(I,J) + tempY_vis(I,J)
-      ENDIF  ! end eddy viscosity breaking
-
-
-      ! else Cartesian
+! else Cartesian
 # else
+
+  DO J=Jbeg,Jend
+    DO I=Ibeg,Iend
 
       ! second order, move the second term to left-hand side
 # if defined (ZALPHA)
-      SourceX(I,J)=GRAV*(Eta(I,J))*SlopeX(I,J)*MASK(I,J) &
+      SourceX(I,J)=GRAV*Eta(I,J)*SlopeX(I,J)*MASK(I,J) &
       ! friction
 # if defined (MANNING)
       -(GRAV*Cd(I,J)**2/  &
@@ -528,7 +521,7 @@ SUBROUTINE SourceTerms
       ! Coriolis
       +Coriolis(I,J)*0.5_SP*(Q(I,J)+Q(I,J+1))
 
-      SourceY(I,J)=GRAV*(Eta(I,J))*SlopeY(I,J)*MASK(I,J) &
+      SourceY(I,J)=GRAV*Eta(I,J)*SlopeY(I,J)*MASK(I,J) &
       ! friction
 # if defined (MANNING)
       -(GRAV*Cd(I,J)**2/  &
@@ -581,11 +574,11 @@ SUBROUTINE SourceTerms
       -Coriolis(I,J)*0.5_SP*(P(I,J)+P(I+1,J))
       ! end if ZALPHA
 # endif
-      ! end if Cartesian
-# endif
-
     ENDDO
   ENDDO
+  ! end if Cartesian
+# endif
+
 
 # if defined (VESSEL)
   SourceX = SourceX + VesselPressureX
