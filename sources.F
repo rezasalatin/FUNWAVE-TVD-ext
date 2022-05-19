@@ -215,138 +215,6 @@ SUBROUTINE SourceTerms
 
 107   format(500f12.6)
 
-# if defined (CARTESIAN)
-
-  ! Horizontal eddy viscosity
-  IF(H_MIXING)THEN
-    nu_smg = &
-    C_smg**2*DX*DY*SQRT(2.0*uMAx**2+2.0*vMAy**2+(uMAy+vMAx)*(uMAy+vMAx))
-
-    DO J=Jbeg,Jend
-      DO I=Ibeg,Iend
-        SmgX(I,J) = 1.0_SP/DX*( &
-        0.5_SP*(nu_smg(I,J)+nu_smg(I+1,J)) &
-        *1.0_SP/DX*(P(I+1,J)-P(I,J))  &
-        - 0.5_SP*(nu_smg(I,J)+nu_smg(I-1,J)) &
-        *1.0_SP/DX*(P(I,J)-P(I-1,J))) &
-        + 0.5_SP/DY*( &
-        0.5_SP*(nu_smg(I,J+1)+nu_smg(I,J)) &
-        *1.0_SP/DY*(P(I,J+1)-P(I,J)) &
-        -0.5_SP*(nu_smg(I,J-1)+nu_smg(I,J)) &
-        *1.0_SP/DY*(P(I,J)-P(I,J-1))) &
-        + 1.0_SP/DY*( &
-        nu_smg(I,J+1)*0.5_SP/DX*(Q(I+1,J+1)-Q(I-1,J+1)) &
-        -nu_smg(I,J-1)*0.5_SP/DX*(Q(I+1,J-1)-Q(I-1,J-1)))
-
-        SmgY(I,J) = 1.0_SP/DY*( &
-        0.5_SP*(nu_smg(I,J)+nu_smg(I,J+1)) &
-        *1.0_SP/DY*(Q(I,J+1)-Q(I,J))  &
-        - 0.5_SP*(nu_smg(I,J)+nu_smg(I,J-1)) &
-        *1.0_SP/DY*(Q(I,J)-Q(I,J-1))) &
-        + 0.5_SP/DX*( &
-        0.5_SP*(nu_smg(I+1,J)+nu_smg(I,J)) &
-        *1.0_SP/DX*(Q(I+1,J)-Q(I,J)) &
-        -0.5_SP*(nu_smg(I-1,J)+nu_smg(I,J)) &
-        *1.0_SP/DX*(Q(I,J)-Q(I-1,J))) &
-        + 1.0_SP/DX*( &
-        nu_smg(I+1,J)*0.5_SP/DY*(P(I+1,J+1)-P(I+1,J-1)) &
-        -nu_smg(I-1,J)*0.5_SP/DY*(P(I-1,J+1)-P(I-1,J-1)))
-      ENDDO
-    ENDDO
-    ! Save the value to print it
-    vis_smg_x = SmgX
-    vis_smg_y = SmgY
-  ENDIF
-
-  ! Vertical Eddy Viscosity
-  IF(V_MIXING)THEN
-
-    nu_ver_x = 0.4/6.0*Depth*SQRT(Cd*abs(uMA)*SQRT(uMA*uMA+vMA*vMA))
-    nu_ver_y = 0.4/6.0*Depth*SQRT(Cd*abs(vMA)*SQRT(uMA*uMA+vMA*vMA))
-    nu_ver = 0.4/6.0*Depth*SQRT(Cd*(uMA*uMA+vMA*vMA))
-
-    DO J=Jbeg,Jend
-      DO I=Ibeg,Iend
-        VertX(I,J) = -2.0_SP/DX* &
-        (0.5_SP*(nu_ver(I,J)+nu_ver(I+1,J))*1.0_SP/DX*(P(I+1,J)-P(I,J))  &
-        -0.5_SP*(nu_ver(I,J)+nu_ver(I-1,J))*1.0_SP/DX*(P(I,J)-P(I-1,J))) &
-        -2.0_SP*0.5_SP/DX* &
-        (nu_ver(I+1,J)*0.5_SP/DY*(Q(I+1,J+1)-Q(I+1,J-1)) &
-        -nu_ver(I-1,J)*0.5_SP/DY*(Q(I-1,J+1)-Q(I-1,J-1)))
-
-        VertY(I,J) = -2.0_SP/DY* &
-        (0.5_SP*(nu_ver(I,J)+nu_ver(I,J+1))*1.0_SP/DY*(Q(I,J+1)-Q(I,J))  &
-        -0.5_SP*(nu_ver(I,J)+nu_ver(I,J-1))*1.0_SP/DY*(Q(I,J)-Q(I,J-1))) &
-        -2.0_SP*0.5_SP/DY* &
-        (nu_ver(I,J+1)*0.5_SP/DX*(P(I+1,J+1)-P(I-1,J+1)) &
-        -nu_ver(I,J-1)*0.5_SP/DX*(P(I+1,J-1)-P(I-1,J-1)))
-      ENDDO
-    ENDDO
-  ENDIF
-
-  ! Viscosity Breaking
-  IF(PQ_scheme)THEN
-    ! depth gradient term
-    DO J=Jbeg,Jend
-      DO I=Ibeg,Iend
-        ! it turns out P and Q are not exchanged at processor
-        ! interface. it affects edges, make PQ_scheme=false
-        ! Reza Salatin corrected this bug on May 5, 2022
-        Vis_BrkX(I,J) = 0.5_SP/DX*( &
-        nu_vis(I+1,J)* &
-        1.0_SP/DX*(P(I+2,J)-P(I+1,J)) &
-        -nu_vis(I-1,J)* &
-        1.0_SP/DX*(P(I,J)-P(I-1,J)) ) &
-        + 1.0_SP/DY*( &
-        0.5_SP*(nu_vis(I,J+1)+nu_vis(I,J))* &
-        0.5_SP/DY*(P(I,J+1)+P(I+1,J+1)-P(I,J)-P(I+1,J)) &
-        -0.5_SP*(nu_vis(I,J-1)+nu_vis(I,J))* &
-        0.5_SP/DY*(P(I,J)+P(I+1,J)-P(I,J-1)-P(I+1,J-1)) )
-
-        Vis_BrkY(I,J) = 0.5_SP/DY*( &
-        nu_vis(I,J+1)* &
-        1.0_SP/DY*(Q(I,J+2)-Q(I,J+1)) &
-        -nu_vis(I,J-1)* &
-        1.0_SP/DY*(Q(I,J)-Q(I,J-1)) ) &
-        + 1.0_SP/DX*( &
-        0.5_SP*(nu_vis(I+1,J)+nu_vis(I,J))* &
-        0.5_SP/DX*(Q(I+1,J)+Q(I+1,J+1)-Q(I,J)-Q(I,J+1)) &
-        -0.5_SP*(nu_vis(I-1,J)+nu_vis(I,J))* &
-        0.5_SP/DX*(Q(I,J)+Q(I,J+1)-Q(I-1,J)-Q(I-1,J+1)) )
-      ENDDO
-    ENDDO
-
-  ELSE
-
-    DO J=Jbeg,Jend
-      DO I=Ibeg,Iend
-        Vis_BrkX(I,J) = 0.5_SP/DX*( &
-        (nu_vis(I+1,J)+nu_vis(I,J)) &
-        *1.0_SP/DX*(HU(I+1,J)-HU(I,J)) &
-        -(nu_vis(I-1,J)+nu_vis(I,J)) &
-        *1.0_SP/DX*(HU(I,J)-HU(I-1,J)) ) &
-        + 0.5_SP/DY*( &
-        (nu_vis(I,J+1)+nu_vis(I,J)) &
-        *1.0_SP/DY*(HU(I,J+1)-HU(I,J)) &
-        -(nu_vis(I,J-1)+nu_vis(I,J)) &
-        *1.0_SP/DY*(HU(I,J)-HU(I,J-1)) )
-
-        Vis_BrkY(I,J) = 0.5_SP/DX*( &
-        (nu_vis(I+1,J)+nu_vis(I,J)) &
-        *1.0_SP/DX*(HV(I+1,J)-HV(I,J)) &
-        -(nu_vis(I-1,J)+nu_vis(I,J)) &
-        *1.0_SP/DX*(HV(I,J)-HV(I-1,J)) ) &
-        + 0.5_SP/DY*( &
-        (nu_vis(I,J+1)+nu_vis(I,J)) &
-        *1.0_SP/DY*(HV(I,J+1)-HV(I,J)) &
-        -(nu_vis(I,J-1)+nu_vis(I,J)) &
-        *1.0_SP/DY*(HV(I,J)-HV(I,J-1)) )
-      ENDDO
-    ENDDO
-
-  ENDIF
-  ! end if Cartesian
-# endif
 
 # if defined (CARTESIAN)
   DO J=Jbeg,Jend
@@ -477,19 +345,78 @@ SUBROUTINE SourceTerms
 
   !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
   !!! MIXING MODULE
-
-  temp_output1 = SmgX
-  temp_output2 = VertX
-  temp_output3 = Vis_BrkX
   temp_output4 = SourceX
 
+  ! Horizontal Mixing
   IF(H_MIXING)THEN
-    ! Horizontal Mixing
+    nu_smg = &
+    C_smg**2*DX*DY*SQRT(2.0*uMAx**2+2.0*vMAy**2+(uMAy+vMAx)*(uMAy+vMAx))
+
+    DO J=Jbeg,Jend
+      DO I=Ibeg,Iend
+        SmgX(I,J) = 1.0_SP/DX*( &
+        0.5_SP*(nu_smg(I,J)+nu_smg(I+1,J)) &
+        *1.0_SP/DX*(P(I+1,J)-P(I,J))  &
+        - 0.5_SP*(nu_smg(I,J)+nu_smg(I-1,J)) &
+        *1.0_SP/DX*(P(I,J)-P(I-1,J))) &
+        + 0.5_SP/DY*( &
+        0.5_SP*(nu_smg(I,J+1)+nu_smg(I,J)) &
+        *1.0_SP/DY*(P(I,J+1)-P(I,J)) &
+        -0.5_SP*(nu_smg(I,J-1)+nu_smg(I,J)) &
+        *1.0_SP/DY*(P(I,J)-P(I,J-1))) &
+        + 1.0_SP/DY*( &
+        nu_smg(I,J+1)*0.5_SP/DX*(Q(I+1,J+1)-Q(I-1,J+1)) &
+        -nu_smg(I,J-1)*0.5_SP/DX*(Q(I+1,J-1)-Q(I-1,J-1)))
+
+        SmgY(I,J) = 1.0_SP/DY*( &
+        0.5_SP*(nu_smg(I,J)+nu_smg(I,J+1)) &
+        *1.0_SP/DY*(Q(I,J+1)-Q(I,J))  &
+        - 0.5_SP*(nu_smg(I,J)+nu_smg(I,J-1)) &
+        *1.0_SP/DY*(Q(I,J)-Q(I,J-1))) &
+        + 0.5_SP/DX*( &
+        0.5_SP*(nu_smg(I+1,J)+nu_smg(I,J)) &
+        *1.0_SP/DX*(Q(I+1,J)-Q(I,J)) &
+        -0.5_SP*(nu_smg(I-1,J)+nu_smg(I,J)) &
+        *1.0_SP/DX*(Q(I,J)-Q(I-1,J))) &
+        + 1.0_SP/DX*( &
+        nu_smg(I+1,J)*0.5_SP/DY*(P(I+1,J+1)-P(I+1,J-1)) &
+        -nu_smg(I-1,J)*0.5_SP/DY*(P(I-1,J+1)-P(I-1,J-1)))
+      ENDDO
+    ENDDO
+    ! Save the value to print it
+    vis_smg_x = SmgX
+    vis_smg_y = SmgY
+    ! add to the source term
     SourceX = SourceX + SmgX
     SourceY = SourceY + SmgY
   ENDIF
+
+  !!!!!!!!!!!!!!!!!!!!!!!!!!!!
   IF(V_MIXING)THEN
-    ! Vertical Mixing
+
+    nu_ver_x = 0.4/6.0*Depth*SQRT(Cd*abs(uMA)*SQRT(uMA*uMA+vMA*vMA))
+    nu_ver_y = 0.4/6.0*Depth*SQRT(Cd*abs(vMA)*SQRT(uMA*uMA+vMA*vMA))
+    nu_ver = 0.4/6.0*Depth*SQRT(Cd*(uMA*uMA+vMA*vMA))
+
+    DO J=Jbeg,Jend
+      DO I=Ibeg,Iend
+        VertX(I,J) = 2.0_SP/DX* &
+        (0.5_SP*(nu_ver(I,J)+nu_ver(I+1,J))*1.0_SP/DX*(P(I+1,J)-P(I,J))  &
+        -0.5_SP*(nu_ver(I,J)+nu_ver(I-1,J))*1.0_SP/DX*(P(I,J)-P(I-1,J))) &
+        2.0_SP*0.5_SP/DX* &
+        (nu_ver(I+1,J)*0.5_SP/DY*(Q(I+1,J+1)-Q(I+1,J-1)) &
+        -nu_ver(I-1,J)*0.5_SP/DY*(Q(I-1,J+1)-Q(I-1,J-1)))
+
+        VertY(I,J) = 2.0_SP/DY* &
+        (0.5_SP*(nu_ver(I,J)+nu_ver(I,J+1))*1.0_SP/DY*(Q(I,J+1)-Q(I,J))  &
+        -0.5_SP*(nu_ver(I,J)+nu_ver(I,J-1))*1.0_SP/DY*(Q(I,J)-Q(I,J-1))) &
+        2.0_SP*0.5_SP/DY* &
+        (nu_ver(I,J+1)*0.5_SP/DX*(P(I+1,J+1)-P(I-1,J+1)) &
+        -nu_ver(I,J-1)*0.5_SP/DX*(P(I+1,J-1)-P(I-1,J-1)))
+      ENDDO
+    ENDDO
+
+    ! add Vertical Mixing to the source term
     SourceX = SourceX + VertX
     SourceY = SourceY + VertY
   ENDIF
@@ -498,10 +425,76 @@ SUBROUTINE SourceTerms
   !!! EDDY VISCOSITY BREAKING
 
   IF(VISCOSITY_BREAKING.OR.DIFFUSION_SPONGE.OR.WAVEMAKER_VIS)THEN
-    ! Vis_BrkX and Vis_BrkY values are calculated above
+    ! Viscosity Breaking
+    IF(PQ_scheme)THEN
+      ! depth gradient term
+      DO J=Jbeg,Jend
+        DO I=Ibeg,Iend
+          ! it turns out P and Q are not exchanged at processor
+          ! interface. it affects edges, make PQ_scheme=false
+          ! Reza Salatin corrected this bug on May 5, 2022
+          Vis_BrkX(I,J) = 0.5_SP/DX*( &
+          nu_vis(I+1,J)* &
+          1.0_SP/DX*(P(I+2,J)-P(I+1,J)) &
+          -nu_vis(I-1,J)* &
+          1.0_SP/DX*(P(I,J)-P(I-1,J)) ) &
+          + 1.0_SP/DY*( &
+          0.5_SP*(nu_vis(I,J+1)+nu_vis(I,J))* &
+          0.5_SP/DY*(P(I,J+1)+P(I+1,J+1)-P(I,J)-P(I+1,J)) &
+          -0.5_SP*(nu_vis(I,J-1)+nu_vis(I,J))* &
+          0.5_SP/DY*(P(I,J)+P(I+1,J)-P(I,J-1)-P(I+1,J-1)) )
+
+          Vis_BrkY(I,J) = 0.5_SP/DY*( &
+          nu_vis(I,J+1)* &
+          1.0_SP/DY*(Q(I,J+2)-Q(I,J+1)) &
+          -nu_vis(I,J-1)* &
+          1.0_SP/DY*(Q(I,J)-Q(I,J-1)) ) &
+          + 1.0_SP/DX*( &
+          0.5_SP*(nu_vis(I+1,J)+nu_vis(I,J))* &
+          0.5_SP/DX*(Q(I+1,J)+Q(I+1,J+1)-Q(I,J)-Q(I,J+1)) &
+          -0.5_SP*(nu_vis(I-1,J)+nu_vis(I,J))* &
+          0.5_SP/DX*(Q(I,J)+Q(I,J+1)-Q(I-1,J)-Q(I-1,J+1)) )
+        ENDDO
+      ENDDO
+    ELSE
+      DO J=Jbeg,Jend
+        DO I=Ibeg,Iend
+          Vis_BrkX(I,J) = 0.5_SP/DX*( &
+          (nu_vis(I+1,J)+nu_vis(I,J)) &
+          *1.0_SP/DX*(HU(I+1,J)-HU(I,J)) &
+          -(nu_vis(I-1,J)+nu_vis(I,J)) &
+          *1.0_SP/DX*(HU(I,J)-HU(I-1,J)) ) &
+          + 0.5_SP/DY*( &
+          (nu_vis(I,J+1)+nu_vis(I,J)) &
+          *1.0_SP/DY*(HU(I,J+1)-HU(I,J)) &
+          -(nu_vis(I,J-1)+nu_vis(I,J)) &
+          *1.0_SP/DY*(HU(I,J)-HU(I,J-1)) )
+
+          Vis_BrkY(I,J) = 0.5_SP/DX*( &
+          (nu_vis(I+1,J)+nu_vis(I,J)) &
+          *1.0_SP/DX*(HV(I+1,J)-HV(I,J)) &
+          -(nu_vis(I-1,J)+nu_vis(I,J)) &
+          *1.0_SP/DX*(HV(I,J)-HV(I-1,J)) ) &
+          + 0.5_SP/DY*( &
+          (nu_vis(I,J+1)+nu_vis(I,J)) &
+          *1.0_SP/DY*(HV(I,J+1)-HV(I,J)) &
+          -(nu_vis(I,J-1)+nu_vis(I,J)) &
+          *1.0_SP/DY*(HV(I,J)-HV(I,J-1)) )
+        ENDDO
+      ENDDO
+    ENDIF
+    ! add to the source term
     SourceX = SourceX + Vis_BrkX
     SourceY = SourceY + Vis_BrkY
   ENDIF
+
+    !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
+    temp_output1 = SmgX
+    temp_output2 = VertX
+    temp_output3 = Vis_BrkX
+
+    !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
 ! else Cartesian
 # else
