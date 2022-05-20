@@ -4368,8 +4368,10 @@ SUBROUTINE PREVIEW
   ENDIF
 
   IF(V_MIXING)THEN
-    TMP_NAME = TRIM(FDIR)//'nu_ver_'//TRIM(FILE_NAME)
-    call PutFile(TMP_NAME,nu_ver)
+    TMP_NAME = TRIM(FDIR)//'nu_verx_'//TRIM(FILE_NAME)
+    call PutFile(TMP_NAME,nu_ver_x)
+    TMP_NAME = TRIM(FDIR)//'nu_very_'//TRIM(FILE_NAME)
+    call PutFile(TMP_NAME,nu_ver_y)
   ENDIF
 
 101   continue
