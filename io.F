@@ -3439,6 +3439,20 @@ IF(ierr==1)THEN
 # endif
 ENDIF
 
+CALL READ_FLOAT(C_VMixing,FILE_NAME,'C_VMixing',ierr)
+IF(ierr==1)THEN
+  C_VMixing = 1.0_SP
+# if defined (PARALLEL)
+  if (myid.eq.0) THEN
+    WRITE(*,'(A40)')'Vertical Mixing Coefficient Default:  1.0'
+    WRITE(3,'(A40)')'Vertical Mixing Coefficient Default:  1.0'
+  endif
+# else
+  WRITE(*,'(A40)')'Vertical Mixing Coefficient Default:  1.0'
+  WRITE(3,'(A40)')'Vertical Mixing Coefficient Default:  1.0'
+# endif
+ENDIF
+
 # if defined (PARALLEL)
 if (myid.eq.0) WRITE(3,'(A14,F12.6)')'T_INTV_mean =', T_INTV_mean
 ! Chen, Salatin
@@ -3448,6 +3462,7 @@ if (myid.eq.0) WRITE(3,'(A14,F12.6)')'MA_Window =', MA_Window
 !!
 if (myid.eq.0) WRITE(3,'(A14,F12.6)')'STEADY_TIME =', STEADY_TIME
 if (myid.eq.0) WRITE(3,'(A8,F12.6)')'C_smg =', C_smg
+if (myid.eq.0) WRITE(3,'(A8,F12.6)')'C_VMixing =', C_VMixing
 # else
 WRITE(3,'(A14,F12.6)')'T_INTV_mean =', T_INTV_mean
 ! Chen, Salatin
@@ -3457,6 +3472,7 @@ WRITE(3,'(A14,F12.6)')'MA_Window =', MA_Window
 !!
 WRITE(3,'(A14,F12.6)')'STEADY_TIME =', STEADY_TIME
 WRITE(3,'(A8,F12.6)')'C_smg =', C_smg
+WRITE(3,'(A8,F12.6)')'C_VMixing =', C_VMixing
 # endif
 
 CALL READ_FLOAT(nu_bkg,FILE_NAME,'nu_bkg',ierr)
