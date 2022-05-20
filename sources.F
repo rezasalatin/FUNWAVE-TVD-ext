@@ -417,8 +417,8 @@ SUBROUTINE SourceTerms
     ENDDO
 
     ! add Vertical Mixing to the source term
-    SourceX = SourceX - 200.0_SP*VertX
-    SourceY = SourceY - 200.0_SP*VertY
+    SourceX = SourceX + 200.0_SP*VertX
+    SourceY = SourceY + 200.0_SP*VertY
   ENDIF
 
   !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
