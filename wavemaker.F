@@ -992,12 +992,11 @@ SUBROUTINE CALCULATE_Cm_Sm(M,N,DX,DY,Xc,Ibeg,Jbeg,mfreq,mtheta,D_gen,phi1, &
     DO I=1,M
       do kf=1,mfreq
         do ktheta=1,mtheta
-
 # if defined (PARALLEL)
           Cm(i,j,kf)=Cm(i,j,kf) &
           !             +D_gen(kf,ktheta)*exp(-beta_gen(kf)*((I-Ibeg +npx*Mglob/px)*DX-Xc)**2) &
           !ykchoi Jan/23/2018
-          +D_gen(kf,ktheta)*exp(-beta_gen(kf)*((I-Ibeg + (iista-1) )*DX-Xc)**2) &
+          +D_gen(kf,ktheta)*exp(-beta_gen(kf)*((I-Ibeg+(iista-1))*DX-Xc)**2) &
           *cos(rlamda(kf,ktheta) &
           ![ykchoi Jan/23/2018 --- missing part
           !          *((J-Jbeg  +npy*Nglob/py)*DY-ZERO)+phi1(kf,ktheta))
@@ -1007,7 +1006,7 @@ SUBROUTINE CALCULATE_Cm_Sm(M,N,DX,DY,Xc,Ibeg,Jbeg,mfreq,mtheta,D_gen,phi1, &
           Sm(i,j,kf)=Sm(i,j,kf) &
           !             +D_gen(kf,ktheta)*exp(-beta_gen(kf)*((I-Ibeg+ npx*Mglob/px)*DX-Xc)**2) &
           !ykchoi Jan/23/2018
-          +D_gen(kf,ktheta)*exp(-beta_gen(kf)*((I-Ibeg+ (iista-1) )*DX-Xc)**2) &
+          +D_gen(kf,ktheta)*exp(-beta_gen(kf)*((I-Ibeg+(iista-1))*DX-Xc)**2) &
           *sin(rlamda(kf,ktheta) &
           !          *((J-Jbeg +npy*Nglob/py)*DY-ZERO)+phi1(kf,ktheta))
           !ykchoi Jan/23/2018
@@ -1026,9 +1025,8 @@ SUBROUTINE CALCULATE_Cm_Sm(M,N,DX,DY,Xc,Ibeg,Jbeg,mfreq,mtheta,D_gen,phi1, &
 
         enddo
       enddo
-
-    enddo
-  enddo
+    ENDDO
+  ENDDO
 
 END SUBROUTINE CALCULATE_Cm_Sm
 
