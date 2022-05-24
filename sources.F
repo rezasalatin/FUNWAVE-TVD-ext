@@ -104,6 +104,7 @@ SUBROUTINE SourceTerms
     AA = TANH(PI/(Time_ramp*Tperiod)*TIME)*D_gen
 
     DO J=1,Nloc
+      print *, ymk_wk(J)
       IF(ABS(ymk_wk(J)-7.5_SP)<15.0_SP/2.0_SP) THEN
         DO I=ilo,ihi
           WaveMaker_Mass(I,J)= &
@@ -113,17 +114,6 @@ SUBROUTINE SourceTerms
         ENDDO
       ENDIF
     ENDDO
-
-    IF(0==1)THEN
-    DO J=jhi/2+1,jhi
-      DO I=ilo,ihi
-        WaveMaker_Mass(I,J)=WaveMaker_Mass(I,J)+ &
-        ! make two wavemakers and also add a phase
-        AA*EXP(-Beta_gen*(xmk_wk(I)-Xc_WK)**2) &
-        *SIN(rlamda*(ymk_wk(J)-ZERO)-2.0_SP*PI/Tperiod*TIME+PI/2.0_SP)
-      ENDDO
-    ENDDO
-    ENDIF
 
   ENDIF
 
