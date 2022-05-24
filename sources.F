@@ -102,13 +102,16 @@ SUBROUTINE SourceTerms
   ! two regular waves out of phase
   IF(WAVEMAKER(1:6)=='WK_REG')THEN
     AA = TANH(PI/(Time_ramp*Tperiod)*TIME)*D_gen
-    DO J=jlo,jhi/2
-      DO I=ilo,ihi
-        WaveMaker_Mass(I,J)= &
-        ! make two wavemakers and also add a phase
-        AA*EXP(-Beta_gen*(xmk_wk(I)-Xc_WK)**2) &
-        *SIN(rlamda*(ymk_wk(J)-ZERO)-2.0_SP*PI/Tperiod*TIME+0.0_SP)
-      ENDDO
+
+    DO J=1,Nloc
+      IF(ABS(ymk_wk(J)-7.5_SP)<15.0_SP/2.0_SP) THEN
+        DO I=ilo,ihi
+          WaveMaker_Mass(I,J)= &
+          ! make two wavemakers and also add a phase 0 and 180 deg
+          AA*EXP(-Beta_gen*(xmk_wk(I)-Xc_WK)**2) &
+          *SIN(rlamda*(ymk_wk(J)-ZERO)-2.0_SP*PI/Tperiod*TIME+0.0_SP)
+        ENDDO
+      ENDIF
     ENDDO
 
     IF(0==1)THEN
