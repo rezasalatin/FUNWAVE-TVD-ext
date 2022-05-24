@@ -103,8 +103,12 @@ SUBROUTINE SourceTerms
     AA = TANH(PI/(Time_ramp*Tperiod)*TIME)*D_gen
     DO J=jlo,jhi
       DO I=ilo,ihi
-        WaveMaker_Mass(I,J)= AA*EXP(-Beta_gen*(xmk_wk(I)-Xc_WK)**2) &
-        *SIN(rlamda*(ymk_wk(J)-ZERO)-2.0_SP*PI/Tperiod*TIME)
+        WaveMaker_Mass(I,J)= &
+        ! make two wavemakers and also add a phase
+        AA*EXP(-Beta_gen*(xmk_wk(I)-Xc_WK)**2) &
+        *SIN(rlamda*(ymk_wk(J)-7.5_SP)-2.0_SP*PI/Tperiod*TIME+0.0_SP) + &
+        AA*EXP(-Beta_gen*(xmk_wk(I)-Xc_WK)**2) &
+        *SIN(rlamda*(ymk_wk(J)-22.5_SP)-2.0_SP*PI/Tperiod*TIME+PI/2.0_SP)
       ENDDO
     ENDDO
   ENDIF
