@@ -110,7 +110,8 @@ SUBROUTINE SourceTerms
         *SIN(rlamda*(ymk_wk(J)-ZERO)-2.0_SP*PI/Tperiod*TIME+0.0_SP)
       ENDDO
     ENDDO
-    ''''
+
+    IF(0==1)
     DO J=jhi/2+1,jhi
       DO I=ilo,ihi
         WaveMaker_Mass(I,J)=WaveMaker_Mass(I,J)+ &
@@ -119,7 +120,8 @@ SUBROUTINE SourceTerms
         *SIN(rlamda*(ymk_wk(J)-ZERO)-2.0_SP*PI/Tperiod*TIME+PI/2.0_SP)
       ENDDO
     ENDDO
-    '''
+    ENDIF
+    
   ENDIF
 
   !!!!!!!!!!!!!!!!!!!!!!!!!!
