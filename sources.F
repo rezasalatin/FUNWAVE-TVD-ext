@@ -112,19 +112,19 @@ SUBROUTINE SourceTerms
     ENDDO
     ENDIF
 
-    ! SPLIT WAVEMAKER INTO TWO for a range of 15 m (5 to 19.75 m) and
+    ! SPLIT WAVEMAKER INTO TWO and
     ! 0.5 m gap in between two wk's
     ! first part has phase of pi and second has zero deg phase
     DO J=Jbeg,Jend
-      IF(ymk_wk(J)<19.75_SP) THEN
+      IF(ymk_wk(J)<(Yc_WK-0.25_SP)) THEN
         DO I=ilo,ihi
           WaveMaker_Mass(I,J)=AA*EXP(-Beta_gen*(xmk_wk(I)-Xc_WK)**2) &
-          *SIN(rlamda*(ymk_wk(J))-2.0_SP*PI/Tperiod*TIME+PI)
+          *SIN(rlamda*(ymk_wk(J)-ZERO)-2.0_SP*PI/Tperiod*TIME+PI)
         ENDDO
-      ELSEIF(ymk_wk(J)>20.25_SP) THEN
+      ELSEIF(ymk_wk(J)>(Yc_WK+0.25_SP)) THEN
         DO I=ilo,ihi
+          *SIN(rlamda*(ymk_wk(J)-ZERO)-2.0_SP*PI/Tperiod*TIME+0.0_SP)
           WaveMaker_Mass(I,J)=AA*EXP(-Beta_gen*(xmk_wk(I)-Xc_WK)**2) &
-          *SIN(rlamda*(ymk_wk(J))-2.0_SP*PI/Tperiod*TIME+0.0_SP)
         ENDDO
       ENDIF
     ENDDO
