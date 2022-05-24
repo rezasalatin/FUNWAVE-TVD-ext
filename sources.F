@@ -103,14 +103,15 @@ SUBROUTINE SourceTerms
   IF(WAVEMAKER(1:6)=='WK_REG')THEN
     AA = TANH(PI/(Time_ramp*Tperiod)*TIME)*D_gen
 
+    IF(0==1)THEN
     DO J=jlo,jhi
       DO I=ilo,ihi
         WaveMaker_Mass(I,J)= AA*EXP(-Beta_gen*(xmk_wk(I)-Xc_WK)**2) &
         *SIN(rlamda*(ymk_wk(J)-ZERO)-2.0_SP*PI/Tperiod*TIME)
       ENDDO
     ENDDO
+    ENDIF
 
-    IF(0==1)THEN
     DO J=1,Nloc
       IF(ABS(ymk_wk(J)-7.5_SP)<15.0_SP/2.0_SP) THEN
         DO I=ilo,ihi
@@ -121,7 +122,7 @@ SUBROUTINE SourceTerms
         ENDDO
       ENDIF
     ENDDO
-    ENDIF
+
 
   ENDIF
 
