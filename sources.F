@@ -119,14 +119,14 @@ SUBROUTINE SourceTerms
           WaveMaker_Mass(I,J)= &
           ! make two wavemakers and also add a phase 0 and 180 deg
           AA*EXP(-Beta_gen*(xmk_wk(I)-Xc_WK)**2) &
-          *SIN(rlamda*(ymk_wk(J)-ZERO)-2.0_SP*PI/Tperiod*TIME)
+          *SIN(rlamda*(ymk_wk(J))-2.0_SP*PI/Tperiod*TIME+0.0_SP)
         ENDDO
       ELSEIF(ABS(ymk_wk(J)-22.5_SP)<15.0_SP/2.0_SP) THEN
         DO I=ilo,ihi
           WaveMaker_Mass(I,J)= &
           ! make two wavemakers and also add a phase 0 and 180 deg
           AA*EXP(-Beta_gen*(xmk_wk(I)-Xc_WK)**2) &
-          *SIN(rlamda*(ymk_wk(J)-ZERO)-2.0_SP*PI/Tperiod*TIME+PI/2.0_SP)
+          *SIN(rlamda*(ymk_wk(J))-2.0_SP*PI/Tperiod*TIME+PI)
         ENDDO
       ENDIF
     ENDDO
