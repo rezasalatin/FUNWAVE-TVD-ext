@@ -116,17 +116,14 @@ SUBROUTINE SourceTerms
     ! 0.5 m gap in between two wk's
     ! first part has phase of pi and second has zero deg phase
     DO J=Jbeg,Jend
-      IF(ABS(ymk_wk(J)-12.375_SP)<7.375_SP) THEN
+      IF(ymk_wk(J)<19.75_SP) THEN
         DO I=ilo,ihi
-          WaveMaker_Mass(I,J)= &
-          ! make two wavemakers and also add a phase 0 and 180 deg
-          AA*EXP(-Beta_gen*(xmk_wk(I)-Xc_WK)**2) &
+          WaveMaker_Mass(I,J)=AA*EXP(-Beta_gen*(xmk_wk(I)-Xc_WK)**2) &
           *SIN(rlamda*(ymk_wk(J))-2.0_SP*PI/Tperiod*TIME+PI)
         ENDDO
-      ELSEIF(ABS(ymk_wk(J)-27.625_SP)<7.375_SP) THEN
+      ELSEIF(ymk_wk(J)>20.25_SP) THEN
         DO I=ilo,ihi
-          WaveMaker_Mass(I,J)= &
-          AA*EXP(-Beta_gen*(xmk_wk(I)-Xc_WK)**2) &
+          WaveMaker_Mass(I,J)=AA*EXP(-Beta_gen*(xmk_wk(I)-Xc_WK)**2) &
           *SIN(rlamda*(ymk_wk(J))-2.0_SP*PI/Tperiod*TIME+0.0_SP)
         ENDDO
       ENDIF
