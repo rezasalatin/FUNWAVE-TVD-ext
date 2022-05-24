@@ -111,7 +111,7 @@ SUBROUTINE SourceTerms
       ENDDO
     ENDDO
 
-    IF(0==1)
+    IF(0==1)THEN
     DO J=jhi/2+1,jhi
       DO I=ilo,ihi
         WaveMaker_Mass(I,J)=WaveMaker_Mass(I,J)+ &
@@ -121,7 +121,7 @@ SUBROUTINE SourceTerms
       ENDDO
     ENDDO
     ENDIF
-    
+
   ENDIF
 
   !!!!!!!!!!!!!!!!!!!!!!!!!!
