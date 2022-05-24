@@ -115,7 +115,7 @@ SUBROUTINE SourceTerms
     ! SPLIT WAVEMAKER INTO TWO for a range of 15 m (5 to 19.75 m) and
     ! 0.5 m gap in between two wk's
     ! first part has phase of pi and second has zero deg phase
-    DO J=1,Nloc
+    DO J=Jbeg,Jend
       !IF(ABS(ymk_wk(J)-12.375_SP)<7.375_SP) THEN
       !  DO I=ilo,ihi
       !    WaveMaker_Mass(I,J)= &
