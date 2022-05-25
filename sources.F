@@ -112,8 +112,7 @@ SUBROUTINE SourceTerms
     ENDDO
     ENDIF
 
-    ! SPLIT WAVEMAKER INTO TWO and
-    ! 0.5 m gap in between two wk's
+    ! SPLIT WAVEMAKER INTO TWO
     ! first part has phase of pi and second has zero deg phase
     DO J=Jbeg,Jend
       IF(ymk_wk(J)<(Yc_WK)) THEN
