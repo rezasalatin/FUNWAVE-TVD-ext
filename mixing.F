@@ -361,15 +361,19 @@ SUBROUTINE CALCULATE_MovingAverage(DT,M,N,U,V,ETA,MASK,DX,DY,Depth,&
     vis_smg_xMA_temp = CSHIFT(vis_smg_xMA_temp,-1,3)
     vis_smg_yMA_temp = CSHIFT(vis_smg_yMA_temp,-1,3)
     nu_smg_MA_temp = CSHIFT(nu_smg_MA_temp,-1,3)
+
     vis_smg_xMA_temp(:,:,1) = vis_smg_x
     vis_smg_yMA_temp(:,:,1) = vis_smg_y
     nu_smg_MA_temp(:,:,1) = nu_smg
+
     vis_smg_xMA_SUM = SUM(vis_smg_xMA_temp,3)
     vis_smg_yMA_SUM = SUM(vis_smg_yMA_temp,3)
     nu_smg_MA_SUM = SUM(nu_smg_MA_temp,3)
+
     vis_smg_xMA = vis_smg_xMA_SUM/MA_Window
     vis_smg_yMA = vis_smg_yMA_SUM/MA_Window
     nu_smg_MA = nu_smg_MA_SUM/MA_Window
+    
     ! go to next time step
     T_MA_Sum=T_MA_Sum-T_MA_STEP
 

@@ -4351,7 +4351,7 @@ SUBROUTINE PREVIEW
   call PutFile(TMP_NAME,temp_output2)
   TMP_NAME = TRIM(FDIR)//'VisBrkX_'//TRIM(FILE_NAME)
   call PutFile(TMP_NAME,temp_output3)
-  TMP_NAME = TRIM(FDIR)//'SourceX_'//TRIM(FILE_NAME)
+  TMP_NAME = TRIM(FDIR)//'nuVis_MA_'//TRIM(FILE_NAME)
   call PutFile(TMP_NAME,temp_output4)
 
   IF(H_MIXING)THEN

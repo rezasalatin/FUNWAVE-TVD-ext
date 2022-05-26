@@ -263,9 +263,14 @@ SUBROUTINE ALLOCATE_VARIABLES
   ALLOCATE(nu_smg_MA(Mloc,Nloc))
   nu_smg_MA=ZERO
 
+  ALLOCATE(nu_visMA_temp(Mloc,Nloc,MA_Window))
+  nu_visMA_temp=ZERO
+  ALLOCATE(nu_visMA(Mloc,Nloc))
+  nu_visMA=ZERO
+
   ! two variables to print some variables
   ALLOCATE(temp_output1(Mloc,Nloc),temp_output2(Mloc,Nloc), &
-  temp_output3(Mloc,Nloc),temp_output4(Mloc,Nloc))
+      temp_output3(Mloc,Nloc),temp_output4(Mloc,Nloc))
   temp_output1=ZERO
   temp_output2=ZERO
   temp_output3=ZERO

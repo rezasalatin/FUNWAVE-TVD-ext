@@ -310,6 +310,9 @@ REAL(SP),DIMENSION(:,:,:),ALLOCATABLE :: vis_smg_xMA_temp, vis_smg_yMA_temp,nu_s
 ! vertical eddy viscosity
 REAL(SP),DIMENSION(:,:),ALLOCATABLE :: nu_ver_x,nu_ver_y
 REAL(SP) :: C_VMixing=1.0
+! viscosity BREAKING MA
+REAL(SP),DIMENSION(:,:),ALLOCATABLE :: nu_visMA
+REAL(SP),DIMENSION(:,:,:),ALLOCATABLE :: nu_visMA_temp
 
 ! smagorinsky and wave height
 REAL(SP),DIMENSION(:,:),ALLOCATABLE :: Umean,Vmean,&

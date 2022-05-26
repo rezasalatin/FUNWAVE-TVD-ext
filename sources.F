@@ -103,6 +103,7 @@ SUBROUTINE SourceTerms
   IF(WAVEMAKER(1:6)=='WK_REG')THEN
     AA = TANH(PI/(Time_ramp*Tperiod)*TIME)*D_gen
 
+    ! do not execute this part
     IF(0==1)THEN
     DO J=jlo,jhi
       DO I=ilo,ihi
@@ -112,15 +113,16 @@ SUBROUTINE SourceTerms
     ENDDO
     ENDIF
 
-    ! SPLIT WAVEMAKER INTO TWO
+    ! SPLIT WAVEMAKER INTO TWO with 0.5 m gap in between according to
+    ! Choi 2021 experimental design
     ! first part has phase of pi and second has zero deg phase
     DO J=Jbeg,Jend
-      IF(ymk_wk(J)<(Yc_WK)) THEN
+      IF(ymk_wk(J)<(Yc_WK-0.25_SP)) THEN
         DO I=ilo,ihi
           WaveMaker_Mass(I,J)=AA*EXP(-Beta_gen*(xmk_wk(I)-Xc_WK)**2) &
           *SIN(rlamda*(ymk_wk(J)-ZERO)-2.0_SP*PI/Tperiod*TIME+PI)
         ENDDO
-      ELSEIF(ymk_wk(J)>(Yc_WK)) THEN
+      ELSEIF(ymk_wk(J)>(Yc_WK+0.25_SP)) THEN
         DO I=ilo,ihi
           WaveMaker_Mass(I,J)=AA*EXP(-Beta_gen*(xmk_wk(I)-Xc_WK)**2) &
           *SIN(rlamda*(ymk_wk(J)-ZERO)-2.0_SP*PI/Tperiod*TIME+0.0_SP)
@@ -365,7 +367,6 @@ SUBROUTINE SourceTerms
 
   !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
   !!! MIXING MODULE
-  temp_output4 = SourceX
 
   ! Horizontal Mixing
   IF(H_MIXING)THEN
@@ -374,6 +375,7 @@ SUBROUTINE SourceTerms
 
     DO J=Jbeg,Jend
       DO I=Ibeg,Iend
+        IF(0==1)THEN
         SmgX(I,J) = 1.0_SP/DX*( &
         0.5_SP*(nu_smg(I,J)+nu_smg(I+1,J)) &
         *1.0_SP/DX*(P(I+1,J)-P(I,J))  &
@@ -401,6 +403,39 @@ SUBROUTINE SourceTerms
         + 1.0_SP/DX*( &
         nu_smg(I+1,J)*0.5_SP/DY*(P(I+1,J+1)-P(I+1,J-1)) &
         -nu_smg(I-1,J)*0.5_SP/DY*(P(I-1,J+1)-P(I-1,J-1)))
+        ELSE
+        SmgX(I,J) = 2.0_SP * (1.0_SP * (1.0_SP/DX*( &
+        0.5_SP*(nu_smg(I,J)+nu_smg(I+1,J)) &
+        *1.0_SP/DX*(P(I+1,J)-P(I,J))  &
+        -0.5_SP*(nu_smg(I-1,J)+nu_smg(I,J)) &
+        *1.0_SP/DX*(P(I,J)-P(I-1,J))) ) &
+        +0.5_SP * ( 1.0_SP/DY*( &
+        0.5_SP*(nu_smg(I,J)+nu_smg(I,J+1)) &
+        *1.0_SP/DY*(P(I,J+1)-P(I,J)) &
+        -0.5_SP*(nu_smg(I,J-1)+nu_smg(I,J)) &
+        *1.0_SP/DY*(P(I,J)-P(I,J-1))) &
+        + 0.5_SP/DY*( &
+        nu_smg(I,J+1) &
+        *0.5_SP/DX*(Q(I+1,J+1)-Q(I-1,J+1)) &
+        -nu_smg(I,J-1) &
+        *0.5_SP/DX*(Q(I+1,J-1)-Q(I-1,J-1))) ) )
+
+        SmgY(I,J) = 2.0_SP * (1.0_SP * (1.0_SP/DY*( &
+        0.5_SP*(nu_smg(I,J)+nu_smg(I,J+1)) &
+        *1.0_SP/DY*(Q(I,J+1)-Q(I,J))  &
+        - 0.5_SP*(nu_smg(I,J-1)+nu_smg(I,J)) &
+        *1.0_SP/DY*(Q(I,J)-Q(I,J-1))) ) &
+        + 0.5_SP * ( 1.0_SP/DX*( &
+        0.5_SP*(nu_smg(I,J)+nu_smg(I+1,J)) &
+        *1.0_SP/DX*(Q(I+1,J)-Q(I,J)) &
+        -0.5_SP*(nu_smg(I-1,J)+nu_smg(I,J)) &
+        *1.0_SP/DX*(Q(I,J)-Q(I-1,J))) &
+        + 0.5_SP/DX*( &
+        nu_smg(I+1,J) &
+        *0.5_SP/DY*(P(I+1,J+1)-P(I+1,J-1)) &
+        -nu_smg(I-1,J)* &
+        0.5_SP/DY*(P(I-1,J+1)-P(I-1,J-1))) ) )
+        ENDIF
       ENDDO
     ENDDO
     ! Save the value to print it
@@ -419,19 +454,23 @@ SUBROUTINE SourceTerms
 
     DO J=Jbeg,Jend
       DO I=Ibeg,Iend
-        VertX(I,J) = 2.0_SP/DX* &
-        (0.5_SP*(nu_ver_x(I,J)+nu_ver_x(I+1,J))*1.0_SP/DX*(P(I+1,J)-P(I,J))  &
-        -0.5_SP*(nu_ver_x(I,J)+nu_ver_x(I-1,J))*1.0_SP/DX*(P(I,J)-P(I-1,J))) &
-        +2.0_SP*0.5_SP/DX* &
+        VertX(I,J) = 2.0_SP * (1.0_SP/DX* &
+        (0.5_SP*(nu_ver_x(I,J)+nu_ver_x(I+1,J)) &
+        *1.0_SP/DX*(P(I+1,J)-P(I,J))  &
+        -0.5_SP*(nu_ver_x(I,J)+nu_ver_x(I-1,J)) &
+        *1.0_SP/DX*(P(I,J)-P(I-1,J))) &
+        + 0.5_SP/DX* &
         (nu_ver_x(I+1,J)*0.5_SP/DY*(Q(I+1,J+1)-Q(I+1,J-1)) &
-        -nu_ver_x(I-1,J)*0.5_SP/DY*(Q(I-1,J+1)-Q(I-1,J-1)))
+        -nu_ver_x(I-1,J)*0.5_SP/DY*(Q(I-1,J+1)-Q(I-1,J-1))) )
 
-        VertY(I,J) = 2.0_SP/DY* &
-        (0.5_SP*(nu_ver_y(I,J)+nu_ver_y(I,J+1))*1.0_SP/DY*(Q(I,J+1)-Q(I,J))  &
-        -0.5_SP*(nu_ver_y(I,J)+nu_ver_y(I,J-1))*1.0_SP/DY*(Q(I,J)-Q(I,J-1))) &
-        +2.0_SP*0.5_SP/DY* &
+        VertY(I,J) = 2.0_SP * (1.0_SP/DY* &
+        (0.5_SP*(nu_ver_y(I,J)+nu_ver_y(I,J+1)) &
+        *1.0_SP/DY*(Q(I,J+1)-Q(I,J))  &
+        -0.5_SP*(nu_ver_y(I,J)+nu_ver_y(I,J-1)) &
+        *1.0_SP/DY*(Q(I,J)-Q(I,J-1))) &
+        +0.5_SP/DY* &
         (nu_ver_y(I,J+1)*0.5_SP/DX*(P(I+1,J+1)-P(I-1,J+1)) &
-        -nu_ver_y(I,J-1)*0.5_SP/DX*(P(I+1,J-1)-P(I-1,J-1)))
+        -nu_ver_y(I,J-1)*0.5_SP/DX*(P(I+1,J-1)-P(I-1,J-1))) )
       ENDDO
     ENDDO
 
@@ -449,6 +488,7 @@ SUBROUTINE SourceTerms
       ! depth gradient term
       DO J=Jbeg,Jend
         DO I=Ibeg,Iend
+          IF(0==1)THEN
           ! it turns out P and Q are not exchanged at processor
           ! interface. it affects edges, make PQ_scheme=false
           ! Reza Salatin corrected this bug on May 5, 2022
@@ -473,31 +513,64 @@ SUBROUTINE SourceTerms
           0.5_SP/DX*(Q(I+1,J)+Q(I+1,J+1)-Q(I,J)-Q(I,J+1)) &
           -0.5_SP*(nu_vis(I-1,J)+nu_vis(I,J))* &
           0.5_SP/DX*(Q(I,J)+Q(I,J+1)-Q(I-1,J)-Q(I-1,J+1)) )
+          ELSE
+          Vis_BrkX(I,J) = 1.0_SP * (1.0_SP/DX*( &
+          0.5_SP*(nu_vis(I,J)+nu_vis(I+1,J)) &
+          *1.0_SP/DX*(P(I+1,J)-P(I,J))  &
+          -0.5_SP*(nu_vis(I-1,J)+nu_vis(I,J)) &
+          *1.0_SP/DX*(P(I,J)-P(I-1,J))) ) &
+          +0.5_SP * ( 1.0_SP/DY*( &
+          0.5_SP*(nu_vis(I,J)+nu_vis(I,J+1)) &
+          *1.0_SP/DY*(P(I,J+1)-P(I,J)) &
+          -0.5_SP*(nu_vis(I,J-1)+nu_vis(I,J)) &
+          *1.0_SP/DY*(P(I,J)-P(I,J-1))) &
+          + 0.5_SP/DY*( &
+          nu_vis(I,J+1) &
+          *0.5_SP/DX*(Q(I+1,J+1)-Q(I-1,J+1)) &
+          -nu_vis(I,J-1) &
+          *0.5_SP/DX*(Q(I+1,J-1)-Q(I-1,J-1))) )
+
+          Vis_BrkY(I,J) = 1.0_SP * (1.0_SP/DY*( &
+          0.5_SP*(nu_vis(I,J)+nu_vis(I,J+1)) &
+          *1.0_SP/DY*(Q(I,J+1)-Q(I,J))  &
+          - 0.5_SP*(nu_vis(I,J-1)+nu_vis(I,J)) &
+          *1.0_SP/DY*(Q(I,J)-Q(I,J-1))) ) &
+          + 0.5_SP * ( 1.0_SP/DX*( &
+          0.5_SP*(nu_vis(I,J)+nu_vis(I+1,J)) &
+          *1.0_SP/DX*(Q(I+1,J)-Q(I,J)) &
+          -0.5_SP*(nu_vis(I-1,J)+nu_vis(I,J)) &
+          *1.0_SP/DX*(Q(I,J)-Q(I-1,J))) &
+          + 0.5_SP/DX*( &
+          nu_vis(I+1,J) &
+          *0.5_SP/DY*(P(I+1,J+1)-P(I+1,J-1)) &
+          -nu_vis(I-1,J)* &
+          0.5_SP/DY*(P(I-1,J+1)-P(I-1,J-1))) )
+          ENDIF
         ENDDO
       ENDDO
     ELSE
       DO J=Jbeg,Jend
         DO I=Ibeg,Iend
-          Vis_BrkX(I,J) = 0.5_SP/DX*( &
-          (nu_vis(I+1,J)+nu_vis(I,J)) &
+          Vis_BrkX(I,J) = 1.0_SP/DX*( &
+          0.5_SP*(nu_vis(I+1,J)+nu_vis(I,J)) &
           *1.0_SP/DX*(HU(I+1,J)-HU(I,J)) &
-          -(nu_vis(I-1,J)+nu_vis(I,J)) &
+          -0.5_SP*(nu_vis(I-1,J)+nu_vis(I,J)) &
           *1.0_SP/DX*(HU(I,J)-HU(I-1,J)) ) &
-          + 0.5_SP/DY*( &
-          (nu_vis(I,J+1)+nu_vis(I,J)) &
+          + 1.0_SP/DY*( &
+          0.5_SP*(nu_vis(I,J+1)+nu_vis(I,J)) &
           *1.0_SP/DY*(HU(I,J+1)-HU(I,J)) &
-          -(nu_vis(I,J-1)+nu_vis(I,J)) &
+          -0.5_SP*(nu_vis(I,J-1)+nu_vis(I,J)) &
           *1.0_SP/DY*(HU(I,J)-HU(I,J-1)) )
 
-          Vis_BrkY(I,J) = 0.5_SP/DX*( &
-          (nu_vis(I+1,J)+nu_vis(I,J)) &
+          Vis_BrkY(I,J) = 1.0_SP/DX*( &
+          0.5_SP*(nu_vis(I+1,J)+nu_vis(I,J)) &
           *1.0_SP/DX*(HV(I+1,J)-HV(I,J)) &
-          -(nu_vis(I-1,J)+nu_vis(I,J)) &
+          -0.5_SP*(nu_vis(I-1,J)+nu_vis(I,J)) &
           *1.0_SP/DX*(HV(I,J)-HV(I-1,J)) ) &
-          + 0.5_SP/DY*( &
-          (nu_vis(I,J+1)+nu_vis(I,J)) &
+          + 1.0_SP/DY*( &
+          0.5_SP*(nu_vis(I,J+1)+nu_vis(I,J)) &
           *1.0_SP/DY*(HV(I,J+1)-HV(I,J)) &
-          -(nu_vis(I,J-1)+nu_vis(I,J)) &
+          -0.5_SP*(nu_vis(I,J-1)+nu_vis(I,J)) &
           *1.0_SP/DY*(HV(I,J)-HV(I,J-1)) )
         ENDDO
       ENDDO
@@ -512,6 +585,13 @@ SUBROUTINE SourceTerms
     temp_output1 = SmgX
     temp_output2 = VertX
     temp_output3 = Vis_BrkX
+
+    ! moving average of the breaking terms
+    nu_visMA_temp = CSHIFT(nu_visMA_temp,-1,3)
+    nu_visMA_temp(:,:,1) = nu_vis
+    nu_visMA_SUM = SUM(nu_visMA_temp,3)
+    nu_visMA = nu_visMA_SUM/MA_Window
+    temp_output4 = nu_visMA    
 
     !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
