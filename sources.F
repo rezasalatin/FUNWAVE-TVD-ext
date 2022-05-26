@@ -75,7 +75,7 @@ SUBROUTINE SourceTerms
   REAL(SP), DIMENSION(NumFreq) :: BB2,CC2 ! for WK_DATA (optimized)
   INTEGER :: kf_index ! Chen, Salatin
   ! variables eddy viscosity terms (horizontal, vertical, breaking)
-  REAL(SP),DIMENSION(Mloc,Nloc) :: SmgX,SmgY,Vis_BrkX,Vis_BrkY,VertX,VertY
+  REAL(SP),DIMENSION(Mloc,Nloc) :: SmgX,SmgY,Vis_BrkX,Vis_BrkY,VertX,VertY,nu_visMA_SUM
 
   !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
   !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
@@ -591,7 +591,7 @@ SUBROUTINE SourceTerms
     nu_visMA_temp(:,:,1) = nu_vis
     nu_visMA_SUM = SUM(nu_visMA_temp,3)
     nu_visMA = nu_visMA_SUM/MA_Window
-    temp_output4 = nu_visMA    
+    temp_output4 = nu_visMA
 
     !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
