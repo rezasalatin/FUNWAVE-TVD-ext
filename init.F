@@ -250,7 +250,8 @@ SUBROUTINE ALLOCATE_VARIABLES
   ALLOCATE(Vor_MA(Mloc,Nloc))
   Vor_MA=ZERO
 
-  ! Reza Salatin, May 2022, Moving average of horizontal eddy viscosity
+  ! Reza Salatin, May 2022, horizontal eddy viscosity (with moving ave)
+  ALLOCATE(Csmg(Mloc,Nloc))
   ALLOCATE(vis_smg_xMA_temp(Mloc,Nloc,MA_Window))
   vis_smg_xMA_temp=ZERO
   ALLOCATE(vis_smg_yMA_temp(Mloc,Nloc,MA_Window))
