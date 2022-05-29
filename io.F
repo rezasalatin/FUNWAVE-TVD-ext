@@ -3425,19 +3425,66 @@ IF(ierr==1)THEN
 # endif
 ENDIF
 
-CALL READ_FLOAT(C_smg,FILE_NAME,'C_smg',ierr)
+!!!!!!!!!!!!!!!!!!!!!! Csmg input
+CALL READ_LOGICAL(IN_Csmg,FILE_NAME,'Csmg_matrix',ierr)
 IF(ierr==1)THEN
-  C_smg = 0.0_SP
+  IN_Csmg = .FALSE.
 # if defined (PARALLEL)
   if (myid.eq.0) THEN
-    WRITE(*,'(A40)')'C_smg Default:  0.0'
-    WRITE(3,'(A40)')'C_smg Default:  0.0'
+    WRITE(*,'(A50)')'Csmg Default:  constant Csmg'
+    WRITE(3,'(A50)')'Csmg Default:  constant Csmg'
   endif
 # else
-  WRITE(*,'(A40)')'C_smg Default:  0.0'
-  WRITE(3,'(A40)')'C_smg Default:  0.0'
+  WRITE(*,'(A50)')'Csmg Default:  constant Csmg'
+  WRITE(3,'(A50)')'Csmg Default:  constant Csmg'
 # endif
 ENDIF
+
+CALL READ_FLOAT(Csmg_fixed,FILE_NAME,'Csmg',ierr)
+IF(ierr==1)THEN
+  Csmg_fixed = 0.0_SP
+# if defined (PARALLEL)
+  if (myid.eq.0) THEN
+    WRITE(*,'(A40)')'Csmg Default:  0.0'
+    WRITE(3,'(A40)')'Csmg Default:  0.0'
+  endif
+# else
+  WRITE(*,'(A40)')'Csmg Default:  0.0'
+  WRITE(3,'(A40)')'Csmg Default:  0.0'
+# endif
+ENDIF
+
+# if defined (PARALLEL)
+if (myid.eq.0) WRITE(3,'(A13,F12.2)')'Csmg = ', Csmg_fixed
+# else
+WRITE(3,'(A13,F12.2)')'Csmg = ', Csmg_fixed
+# endif
+
+IF(IN_Csmg)THEN
+  CALL READ_STRING(Csmg_file,FILE_NAME,'Csmg_file',ierr)
+  IF(ierr==1)THEN
+# if defined (PARALLEL)
+    if (myid.eq.0) THEN
+      WRITE(*,'(A80)')'Csmg_file NOT FOUND, Please specify Csmg_file in input.txt'
+      WRITE(3,'(A80)')'Csmg_file NOT FOUND, Please specify Csmg_file in input.txt'
+    endif
+    call MPI_FINALIZE ( ier )
+# else
+    WRITE(*,'(A80)')'Csmg_file NOT FOUND, Please specify Csmg_file in input.txt'
+    WRITE(3,'(A80)')'Csmg_file NOT FOUND, Please specify Csmg_file in input.txt'
+# endif
+    STOP
+  ELSE
+# if defined (PARALLEL)
+    if (myid.eq.0) WRITE(3,'(A15,A50)')'Csmg_file:', Csmg_file
+# else
+    WRITE(3,'(A15,A50)')'Csmg_file:', Csmg_file
+# endif
+  ENDIF
+
+ENDIF ! endif IN_Csmg
+
+!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
 CALL READ_FLOAT(C_VMixing,FILE_NAME,'C_VMixing',ierr)
 IF(ierr==1)THEN
@@ -3461,7 +3508,6 @@ if (myid.eq.0) WRITE(3,'(A14,F12.6)')'T_MA_STEP =', T_MA_STEP
 if (myid.eq.0) WRITE(3,'(A14,F12.6)')'MA_Window =', MA_Window
 !!
 if (myid.eq.0) WRITE(3,'(A14,F12.6)')'STEADY_TIME =', STEADY_TIME
-if (myid.eq.0) WRITE(3,'(A8,F12.6)')'C_smg =', C_smg
 if (myid.eq.0) WRITE(3,'(A8,F12.6)')'C_VMixing =', C_VMixing
 # else
 WRITE(3,'(A14,F12.6)')'T_INTV_mean =', T_INTV_mean
@@ -3471,7 +3517,6 @@ WRITE(3,'(A14,F12.6)')'T_MA_STEP =', T_MA_STEP
 WRITE(3,'(A14,F12.6)')'MA_Window =', MA_Window
 !!
 WRITE(3,'(A14,F12.6)')'STEADY_TIME =', STEADY_TIME
-WRITE(3,'(A8,F12.6)')'C_smg =', C_smg
 WRITE(3,'(A8,F12.6)')'C_VMixing =', C_VMixing
 # endif
 

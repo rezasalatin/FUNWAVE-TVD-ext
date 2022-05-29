@@ -371,9 +371,9 @@ SUBROUTINE SourceTerms
   ! Horizontal Mixing
   IF(H_MIXING)THEN
     nu_smg = &
-    C_smg**2*DX*DY*SQRT(2.0*uMAx**2+2.0*vMAy**2+(uMAy+vMAx)*(uMAy+vMAx))
+    Csmg**2*DX*DY*SQRT(2.0*uMAx**2+2.0*vMAy**2+(uMAy+vMAx)*(uMAy+vMAx))
     !nu_smg = &
-    !C_smg**2*DX*DY*SQRT(2.0*Ux**2+2.0*Vy**2+(Uy+Vx)*(Uy+Vx))
+    !Csmg**2*DX*DY*SQRT(2.0*Ux**2+2.0*Vy**2+(Uy+Vx)*(Uy+Vx))
 
     DO J=Jbeg,Jend
       DO I=Ibeg,Iend
@@ -459,6 +459,7 @@ SUBROUTINE SourceTerms
 
     DO J=Jbeg,Jend
       DO I=Ibeg,Iend
+        IF(0==1)THEN
         VertX(I,J) = 2.0_SP * (1.0_SP/DX* &
         (0.5_SP*(nu_ver_x(I,J)+nu_ver_x(I+1,J)) &
         *1.0_SP/DX*(P(I+1,J)-P(I,J))  &
@@ -476,6 +477,39 @@ SUBROUTINE SourceTerms
         +0.5_SP/DY* &
         (nu_ver_y(I,J+1)*0.5_SP/DX*(P(I+1,J+1)-P(I-1,J+1)) &
         -nu_ver_y(I,J-1)*0.5_SP/DX*(P(I+1,J-1)-P(I-1,J-1))) )
+        ELSE
+        VertX(I,J) = 2.0_SP * (1.0_SP * (1.0_SP/DX*( &
+        0.5_SP*(nu_ver_x(I,J)+nu_ver_x(I+1,J)) &
+        *1.0_SP/DX*(P(I+1,J)-P(I,J))  &
+        -0.5_SP*(nu_ver_x(I-1,J)+nu_ver_x(I,J)) &
+        *1.0_SP/DX*(P(I,J)-P(I-1,J))) ) &
+        +0.5_SP * ( 1.0_SP/DY*( &
+        0.5_SP*(nu_ver_x(I,J)+nu_ver_x(I,J+1)) &
+        *1.0_SP/DY*(P(I,J+1)-P(I,J)) &
+        -0.5_SP*(nu_ver_x(I,J-1)+nu_ver_x(I,J)) &
+        *1.0_SP/DY*(P(I,J)-P(I,J-1))) &
+        + 0.5_SP/DY*( &
+        nu_ver_x(I,J+1) &
+        *0.5_SP/DX*(Q(I+1,J+1)-Q(I-1,J+1)) &
+        -nu_ver_x(I,J-1) &
+        *0.5_SP/DX*(Q(I+1,J-1)-Q(I-1,J-1))) ) )
+
+        VertY(I,J) = 2.0_SP * (1.0_SP * (1.0_SP/DY*( &
+        0.5_SP*(nu_ver_y(I,J)+nu_ver_y(I,J+1)) &
+        *1.0_SP/DY*(Q(I,J+1)-Q(I,J))  &
+        - 0.5_SP*(nu_ver_y(I,J-1)+nu_ver_y(I,J)) &
+        *1.0_SP/DY*(Q(I,J)-Q(I,J-1))) ) &
+        + 0.5_SP * ( 1.0_SP/DX*( &
+        0.5_SP*(nu_ver_y(I,J)+nu_ver_y(I+1,J)) &
+        *1.0_SP/DX*(Q(I+1,J)-Q(I,J)) &
+        -0.5_SP*(nu_ver_y(I-1,J)+nu_ver_y(I,J)) &
+        *1.0_SP/DX*(Q(I,J)-Q(I-1,J))) &
+        + 0.5_SP/DX*( &
+        nu_ver_y(I+1,J) &
+        *0.5_SP/DY*(P(I+1,J+1)-P(I+1,J-1)) &
+        -nu_ver_y(I-1,J)* &
+        0.5_SP/DY*(P(I-1,J+1)-P(I-1,J-1))) ) )
+        ENDIF
       ENDDO
     ENDDO
 

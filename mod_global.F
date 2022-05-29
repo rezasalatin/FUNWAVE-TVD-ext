@@ -304,6 +304,11 @@ REAL(SP),DIMENSION(:,:,:),ALLOCATABLE :: eta_MA_temp
 REAL(SP),DIMENSION(:,:),ALLOCATABLE :: Vor_MA
 
 ! horizontal eddy viscosity
+LOGICAL :: IN_Csmg=.FALSE.
+REAL(SP):: Csmg_fixed
+CHARACTER(LEN=80) Csmg_FILE
+REAL(SP),DIMENSION(:,:),ALLOCATABLE :: Csmg
+
 REAL(SP),DIMENSION(:,:),ALLOCATABLE :: nu_smg,vis_smg_x,vis_smg_y
 REAL(SP),DIMENSION(:,:),ALLOCATABLE :: vis_smg_xMA,vis_smg_yMA,nu_smg_MA
 REAL(SP),DIMENSION(:,:,:),ALLOCATABLE :: vis_smg_xMA_temp, vis_smg_yMA_temp,nu_smg_MA_temp
@@ -317,7 +322,7 @@ REAL(SP),DIMENSION(:,:,:),ALLOCATABLE :: nu_visMA_temp
 ! smagorinsky and wave height
 REAL(SP),DIMENSION(:,:),ALLOCATABLE :: Umean,Vmean,&
 ETAmean,Usum,Vsum,ETAsum
-REAL(SP)::T_INTV_mean = 20.0,T_sum=0.0,C_smg=0.0
+REAL(SP)::T_INTV_mean = 20.0,T_sum=0.0
 ! Chen, Salatin, Current and Vorticity field
 REAL(SP)::T_INTV_UVmean = 20.0,T_sumUVmean=0.0
 ! Chen, Salatin, Oct 2021, Moving Average
