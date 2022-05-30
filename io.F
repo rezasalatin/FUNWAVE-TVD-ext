@@ -3426,22 +3426,22 @@ IF(ierr==1)THEN
 ENDIF
 
 !!!!!!!!!!!!!!!!!!!!!! Csmg input
-CALL READ_LOGICAL(IN_Csmg,FILE_NAME,'Csmg_Matrix',ierr)
+CALL READ_LOGICAL(IN_Csmg,FILE_NAME,'Friction_Matrix',ierr)
 IF(ierr==1)THEN
   IN_Csmg = .FALSE.
 # if defined (PARALLEL)
   if (myid.eq.0) THEN
-    WRITE(*,'(A50)')'Csmg_Matrix Default:  constant Csmg'
-    WRITE(3,'(A50)')'Csmg_Matrix Default:  constant Csmg'
+    WRITE(*,'(A50)')'Csmg Default:  constant Csmg'
+    WRITE(3,'(A50)')'Csmg Default:  constant Csmg'
   endif
 # else
-  WRITE(*,'(A50)')'Csmg_Matrix Default:  constant Csmg'
-  WRITE(3,'(A50)')'Csmg_Matrix Default:  constant Csmg'
+  WRITE(*,'(A50)')'Csmg Default:  constant Csmg'
+  WRITE(3,'(A50)')'Csmg Default:  constant Csmg'
 # endif
 ENDIF
 
 IF(IN_Csmg)THEN
-  CALL READ_STRING(Csmg_file,FILE_NAME,'Csmg_file',ierr)
+  CALL READ_STRING(Csmg_FILE,FILE_NAME,'Csmg_file',ierr)
   IF(ierr==1)THEN
 # if defined (PARALLEL)
     if (myid.eq.0) THEN
@@ -3456,12 +3456,14 @@ IF(IN_Csmg)THEN
     STOP
   ELSE
 # if defined (PARALLEL)
-    if (myid.eq.0) WRITE(3,'(A15,A50)')'Csmg_file:', Csmg_file
+    if (myid.eq.0) WRITE(3,'(A15,A50)')'Csmg_FILE:', Csmg_FILE
 # else
-    WRITE(3,'(A15,A50)')'Csmg_file:', Csmg_file
+    WRITE(3,'(A15,A50)')'Csmg_FILE:', Csmg_FILE
 # endif
   ENDIF
+
 ENDIF ! endif IN_Csmg
+
 
 CALL READ_FLOAT(Csmg_fixed,FILE_NAME,'Csmg',ierr)
 IF(ierr==1)THEN
@@ -3478,9 +3480,9 @@ IF(ierr==1)THEN
 ENDIF
 
 # if defined (PARALLEL)
-if (myid.eq.0) WRITE(3,'(A13,F12.2)')'Csmg = ', Csmg_fixed
+if (myid.eq.0) WRITE(3,'(A13,F12.2)')'Csmg_fixed = ', Csmg_fixed
 # else
-WRITE(3,'(A13,F12.2)')'Csmg = ', Csmg_fixed
+WRITE(3,'(A13,F12.2)')'Csmg_fixed = ', Csmg_fixed
 # endif
 
 !!!!!!!!!!!!!!!!!!!!!!!!!!!!

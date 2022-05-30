@@ -306,7 +306,7 @@ REAL(SP),DIMENSION(:,:),ALLOCATABLE :: Vor_MA
 ! horizontal eddy viscosity
 LOGICAL :: IN_Csmg=.FALSE.
 REAL(SP):: Csmg_fixed
-CHARACTER(LEN=80) Csmg_FILE
+CHARACTER(LEN=80) Csmg_file
 REAL(SP),DIMENSION(:,:),ALLOCATABLE :: Csmg
 
 REAL(SP),DIMENSION(:,:),ALLOCATABLE :: nu_smg,vis_smg_x,vis_smg_y
