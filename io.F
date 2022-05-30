@@ -3426,7 +3426,7 @@ IF(ierr==1)THEN
 ENDIF
 
 !!!!!!!!!!!!!!!!!!!!!! Csmg input
-CALL READ_LOGICAL(IN_Csmg,FILE_NAME,'Friction_Matrix',ierr)
+CALL READ_LOGICAL(IN_Csmg,FILE_NAME,'Csmg_Matrix',ierr)
 IF(ierr==1)THEN
   IN_Csmg = .FALSE.
 # if defined (PARALLEL)
@@ -3465,7 +3465,7 @@ IF(IN_Csmg)THEN
 ENDIF ! endif IN_Csmg
 
 
-CALL READ_FLOAT(Csmg_fixed,FILE_NAME,'C_smg',ierr)
+CALL READ_FLOAT(Csmg_fixed,FILE_NAME,'Csmg',ierr)
 IF(ierr==1)THEN
   Csmg_fixed = 0.0_SP
 # if defined (PARALLEL)
