@@ -251,7 +251,7 @@ SUBROUTINE ALLOCATE_VARIABLES
   Vor_MA=ZERO
 
   ! Reza Salatin, May 2022, horizontal eddy viscosity (with moving ave)
-  ALLOCATE(Csmg(Mloc,Nloc))
+  ALLOCATE(C_smg(Mloc,Nloc))
   ALLOCATE(vis_smg_xMA_temp(Mloc,Nloc,MA_Window))
   vis_smg_xMA_temp=ZERO
   ALLOCATE(vis_smg_yMA_temp(Mloc,Nloc,MA_Window))
@@ -866,35 +866,35 @@ SUBROUTINE INITIALIZATION
   !mixing ! Salatin May 2022
   IF(IN_Csmg) THEN
 # if defined (PARALLEL)
-    call GetFile(Csmg_file,Csmg)
+    call GetFile(Csmg_file,C_smg)
 # else
     OPEN(1,FILE=TRIM(Csmg_file))
     DO J=Jbeg,Jend
-      READ(1,*)(Csmg(I,J),I=Ibeg,Iend)
+      READ(1,*)(C_smg(I,J),I=Ibeg,Iend)
     ENDDO
     CLOSE(1)
     ! ghost cells
     DO I=Ibeg,Iend
       DO J=1,Nghost
-        Csmg(I,J)=Csmg(I,Jbeg)
+        C_smg(I,J)=C_smg(I,Jbeg)
       ENDDO
       DO J=Jend+1,Nloc
-        Csmg(I,J)=Csmg(I,Jend)
+        C_smg(I,J)=C_smg(I,Jend)
       ENDDO
     ENDDO
     DO J=1,Nloc
       DO I=1,Nghost
-        Csmg(I,J)=Csmg(Ibeg,J)
+        C_smg(I,J)=C_smg(Ibeg,J)
       ENDDO
       DO I=Iend+1,Mloc
-        Csmg(I,J)=Csmg(Iend,J)
+        C_smg(I,J)=C_smg(Iend,J)
       ENDDO
     ENDDO
 # endif
   ELSE
     DO J=1,Nloc
       DO I=1,Mloc
-        Csmg(I,J) = Csmg_fixed
+        C_smg(I,J) = Csmg_fixed
       ENDDO
     ENDDO
   ENDIF

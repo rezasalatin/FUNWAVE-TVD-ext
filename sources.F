@@ -371,9 +371,9 @@ SUBROUTINE SourceTerms
   ! Horizontal Mixing
   IF(H_MIXING)THEN
     nu_smg = &
-    Csmg**2*DX*DY*SQRT(2.0*uMAx**2+2.0*vMAy**2+(uMAy+vMAx)*(uMAy+vMAx))
+    C_smg**2*DX*DY*SQRT(2.0*uMAx**2+2.0*vMAy**2+(uMAy+vMAx)*(uMAy+vMAx))
     !nu_smg = &
-    !Csmg**2*DX*DY*SQRT(2.0*Ux**2+2.0*Vy**2+(Uy+Vx)*(Uy+Vx))
+    !C_smg**2*DX*DY*SQRT(2.0*Ux**2+2.0*Vy**2+(Uy+Vx)*(Uy+Vx))
 
     DO J=Jbeg,Jend
       DO I=Ibeg,Iend
