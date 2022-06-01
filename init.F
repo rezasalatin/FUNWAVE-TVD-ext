@@ -105,8 +105,7 @@ SUBROUTINE ALLOCATE_VARIABLES
   nu_smg(Mloc,Nloc), &
   vis_smg_x(Mloc,Nloc), &
   vis_smg_y(Mloc,Nloc), &
-  nu_ver_x(Mloc,Nloc), &
-  nu_ver_y(Mloc,Nloc), &
+  nu_ver(Mloc,Nloc), &
   Num_Zero_Up(Mloc,Nloc), &
   WaveHeightRMS(Mloc,Nloc),  &
   WaveHeightAve(Mloc,Nloc),  &
@@ -409,8 +408,7 @@ SUBROUTINE INITIALIZATION
   nu_smg = ZERO
   vis_smg_x = ZERO
   vis_smg_y = ZERO
-  nu_ver_x = ZERO
-  nu_ver_y = ZERO
+  nu_ver = ZERO
   Num_Zero_Up = 0
   WaveHeightRMS = ZERO
   WaveHeightAve =ZERO

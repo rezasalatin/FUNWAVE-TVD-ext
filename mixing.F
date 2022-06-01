@@ -241,11 +241,7 @@ SUBROUTINE CALCULATE_MEAN(T_INTV_mean,T_INTV_UVmean,T_sum,T_sumUVmean,&
     NumDT2 = NumDT2+1
     !Vorsum =Vor_Instant+Vorsum
     Vorsum =Vor_Instant*DT+Vorsum
-    DO J=1,N
-      DO I=1,M
-        Vor2(I,J) = Vor_Instant(I,J)*Vor_Instant(I,J)
-      ENDDO
-    ENDDO
+    Vor2 = Vor_Instant*Vor_Instant
     Vor2sum=Vor2+Vor2sum
   ENDIF
 
