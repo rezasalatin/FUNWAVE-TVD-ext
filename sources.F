@@ -377,35 +377,6 @@ SUBROUTINE SourceTerms
 
     DO J=Jbeg,Jend
       DO I=Ibeg,Iend
-        IF(0==1)THEN
-        SmgX(I,J) = 1.0_SP/DX*( &
-        0.5_SP*(nu_smg(I,J)+nu_smg(I+1,J)) &
-        *1.0_SP/DX*(P(I+1,J)-P(I,J))  &
-        - 0.5_SP*(nu_smg(I,J)+nu_smg(I-1,J)) &
-        *1.0_SP/DX*(P(I,J)-P(I-1,J))) &
-        + 0.5_SP/DY*( &
-        0.5_SP*(nu_smg(I,J+1)+nu_smg(I,J)) &
-        *1.0_SP/DY*(P(I,J+1)-P(I,J)) &
-        -0.5_SP*(nu_smg(I,J-1)+nu_smg(I,J)) &
-        *1.0_SP/DY*(P(I,J)-P(I,J-1))) &
-        + 1.0_SP/DY*( &
-        nu_smg(I,J+1)*0.5_SP/DX*(Q(I+1,J+1)-Q(I-1,J+1)) &
-        -nu_smg(I,J-1)*0.5_SP/DX*(Q(I+1,J-1)-Q(I-1,J-1)))
-
-        SmgY(I,J) = 1.0_SP/DY*( &
-        0.5_SP*(nu_smg(I,J)+nu_smg(I,J+1)) &
-        *1.0_SP/DY*(Q(I,J+1)-Q(I,J))  &
-        - 0.5_SP*(nu_smg(I,J)+nu_smg(I,J-1)) &
-        *1.0_SP/DY*(Q(I,J)-Q(I,J-1))) &
-        + 0.5_SP/DX*( &
-        0.5_SP*(nu_smg(I+1,J)+nu_smg(I,J)) &
-        *1.0_SP/DX*(Q(I+1,J)-Q(I,J)) &
-        -0.5_SP*(nu_smg(I-1,J)+nu_smg(I,J)) &
-        *1.0_SP/DX*(Q(I,J)-Q(I-1,J))) &
-        + 1.0_SP/DX*( &
-        nu_smg(I+1,J)*0.5_SP/DY*(P(I+1,J+1)-P(I+1,J-1)) &
-        -nu_smg(I-1,J)*0.5_SP/DY*(P(I-1,J+1)-P(I-1,J-1)))
-        ELSE
         SmgX(I,J) = 2.0_SP * (1.0_SP * (1.0_SP/DX*( &
         0.5_SP*(nu_smg(I,J)+nu_smg(I+1,J)) &
         *1.0_SP/DX*(P(I+1,J)-P(I,J))  &
@@ -437,7 +408,6 @@ SUBROUTINE SourceTerms
         *0.5_SP/DY*(P(I+1,J+1)-P(I+1,J-1)) &
         -nu_smg(I-1,J)* &
         0.5_SP/DY*(P(I-1,J+1)-P(I-1,J-1))) ) )
-        ENDIF
       ENDDO
     ENDDO
     ! Save the value to print it
@@ -523,97 +493,42 @@ SUBROUTINE SourceTerms
 
   IF(VISCOSITY_BREAKING.OR.DIFFUSION_SPONGE.OR.WAVEMAKER_VIS)THEN
     ! Viscosity Breaking
-    IF(PQ_scheme)THEN
-      ! depth gradient term
-      DO J=Jbeg,Jend
-        DO I=Ibeg,Iend
-          IF(0==1)THEN
-          ! it turns out P and Q are not exchanged at processor
-          ! interface. it affects edges, make PQ_scheme=false
-          ! Reza Salatin corrected this bug on May 5, 2022
-          Vis_BrkX(I,J) = 0.5_SP/DX*( &
-          nu_vis(I+1,J)* &
-          1.0_SP/DX*(P(I+2,J)-P(I+1,J)) &
-          -nu_vis(I-1,J)* &
-          1.0_SP/DX*(P(I,J)-P(I-1,J)) ) &
-          + 1.0_SP/DY*( &
-          0.5_SP*(nu_vis(I,J+1)+nu_vis(I,J))* &
-          0.5_SP/DY*(P(I,J+1)+P(I+1,J+1)-P(I,J)-P(I+1,J)) &
-          -0.5_SP*(nu_vis(I,J-1)+nu_vis(I,J))* &
-          0.5_SP/DY*(P(I,J)+P(I+1,J)-P(I,J-1)-P(I+1,J-1)) )
+    ! depth gradient term
+    DO J=Jbeg,Jend
+      DO I=Ibeg,Iend
+        Vis_BrkX(I,J) = 1.0_SP * (1.0_SP/DX*( &
+        0.5_SP*(nu_vis(I,J)+nu_vis(I+1,J)) &
+        *1.0_SP/DX*(P(I+1,J)-P(I,J))  &
+        -0.5_SP*(nu_vis(I-1,J)+nu_vis(I,J)) &
+        *1.0_SP/DX*(P(I,J)-P(I-1,J))) ) &
+        +0.5_SP * ( 1.0_SP/DY*( &
+        0.5_SP*(nu_vis(I,J)+nu_vis(I,J+1)) &
+        *1.0_SP/DY*(P(I,J+1)-P(I,J)) &
+        -0.5_SP*(nu_vis(I,J-1)+nu_vis(I,J)) &
+        *1.0_SP/DY*(P(I,J)-P(I,J-1))) &
+        + 0.5_SP/DY*( &
+        nu_vis(I,J+1) &
+        *0.5_SP/DX*(Q(I+1,J+1)-Q(I-1,J+1)) &
+        -nu_vis(I,J-1) &
+        *0.5_SP/DX*(Q(I+1,J-1)-Q(I-1,J-1))) )
 
-          Vis_BrkY(I,J) = 0.5_SP/DY*( &
-          nu_vis(I,J+1)* &
-          1.0_SP/DY*(Q(I,J+2)-Q(I,J+1)) &
-          -nu_vis(I,J-1)* &
-          1.0_SP/DY*(Q(I,J)-Q(I,J-1)) ) &
-          + 1.0_SP/DX*( &
-          0.5_SP*(nu_vis(I+1,J)+nu_vis(I,J))* &
-          0.5_SP/DX*(Q(I+1,J)+Q(I+1,J+1)-Q(I,J)-Q(I,J+1)) &
-          -0.5_SP*(nu_vis(I-1,J)+nu_vis(I,J))* &
-          0.5_SP/DX*(Q(I,J)+Q(I,J+1)-Q(I-1,J)-Q(I-1,J+1)) )
-          ELSE
-          Vis_BrkX(I,J) = 1.0_SP * (1.0_SP/DX*( &
-          0.5_SP*(nu_vis(I,J)+nu_vis(I+1,J)) &
-          *1.0_SP/DX*(P(I+1,J)-P(I,J))  &
-          -0.5_SP*(nu_vis(I-1,J)+nu_vis(I,J)) &
-          *1.0_SP/DX*(P(I,J)-P(I-1,J))) ) &
-          +0.5_SP * ( 1.0_SP/DY*( &
-          0.5_SP*(nu_vis(I,J)+nu_vis(I,J+1)) &
-          *1.0_SP/DY*(P(I,J+1)-P(I,J)) &
-          -0.5_SP*(nu_vis(I,J-1)+nu_vis(I,J)) &
-          *1.0_SP/DY*(P(I,J)-P(I,J-1))) &
-          + 0.5_SP/DY*( &
-          nu_vis(I,J+1) &
-          *0.5_SP/DX*(Q(I+1,J+1)-Q(I-1,J+1)) &
-          -nu_vis(I,J-1) &
-          *0.5_SP/DX*(Q(I+1,J-1)-Q(I-1,J-1))) )
-
-          Vis_BrkY(I,J) = 1.0_SP * (1.0_SP/DY*( &
-          0.5_SP*(nu_vis(I,J)+nu_vis(I,J+1)) &
-          *1.0_SP/DY*(Q(I,J+1)-Q(I,J))  &
-          - 0.5_SP*(nu_vis(I,J-1)+nu_vis(I,J)) &
-          *1.0_SP/DY*(Q(I,J)-Q(I,J-1))) ) &
-          + 0.5_SP * ( 1.0_SP/DX*( &
-          0.5_SP*(nu_vis(I,J)+nu_vis(I+1,J)) &
-          *1.0_SP/DX*(Q(I+1,J)-Q(I,J)) &
-          -0.5_SP*(nu_vis(I-1,J)+nu_vis(I,J)) &
-          *1.0_SP/DX*(Q(I,J)-Q(I-1,J))) &
-          + 0.5_SP/DX*( &
-          nu_vis(I+1,J) &
-          *0.5_SP/DY*(P(I+1,J+1)-P(I+1,J-1)) &
-          -nu_vis(I-1,J)* &
-          0.5_SP/DY*(P(I-1,J+1)-P(I-1,J-1))) )
-          ENDIF
-        ENDDO
+        Vis_BrkY(I,J) = 1.0_SP * (1.0_SP/DY*( &
+        0.5_SP*(nu_vis(I,J)+nu_vis(I,J+1)) &
+        *1.0_SP/DY*(Q(I,J+1)-Q(I,J))  &
+        - 0.5_SP*(nu_vis(I,J-1)+nu_vis(I,J)) &
+        *1.0_SP/DY*(Q(I,J)-Q(I,J-1))) ) &
+        + 0.5_SP * ( 1.0_SP/DX*( &
+        0.5_SP*(nu_vis(I,J)+nu_vis(I+1,J)) &
+        *1.0_SP/DX*(Q(I+1,J)-Q(I,J)) &
+        -0.5_SP*(nu_vis(I-1,J)+nu_vis(I,J)) &
+        *1.0_SP/DX*(Q(I,J)-Q(I-1,J))) &
+        + 0.5_SP/DX*( &
+        nu_vis(I+1,J) &
+        *0.5_SP/DY*(P(I+1,J+1)-P(I+1,J-1)) &
+        -nu_vis(I-1,J)* &
+        0.5_SP/DY*(P(I-1,J+1)-P(I-1,J-1))) )
       ENDDO
-    ELSE
-      DO J=Jbeg,Jend
-        DO I=Ibeg,Iend
-          Vis_BrkX(I,J) = 1.0_SP/DX*( &
-          0.5_SP*(nu_vis(I+1,J)+nu_vis(I,J)) &
-          *1.0_SP/DX*(HU(I+1,J)-HU(I,J)) &
-          -0.5_SP*(nu_vis(I-1,J)+nu_vis(I,J)) &
-          *1.0_SP/DX*(HU(I,J)-HU(I-1,J)) ) &
-          + 1.0_SP/DY*( &
-          0.5_SP*(nu_vis(I,J+1)+nu_vis(I,J)) &
-          *1.0_SP/DY*(HU(I,J+1)-HU(I,J)) &
-          -0.5_SP*(nu_vis(I,J-1)+nu_vis(I,J)) &
-          *1.0_SP/DY*(HU(I,J)-HU(I,J-1)) )
-
-          Vis_BrkY(I,J) = 1.0_SP/DX*( &
-          0.5_SP*(nu_vis(I+1,J)+nu_vis(I,J)) &
-          *1.0_SP/DX*(HV(I+1,J)-HV(I,J)) &
-          -0.5_SP*(nu_vis(I-1,J)+nu_vis(I,J)) &
-          *1.0_SP/DX*(HV(I,J)-HV(I-1,J)) ) &
-          + 1.0_SP/DY*( &
-          0.5_SP*(nu_vis(I,J+1)+nu_vis(I,J)) &
-          *1.0_SP/DY*(HV(I,J+1)-HV(I,J)) &
-          -0.5_SP*(nu_vis(I,J-1)+nu_vis(I,J)) &
-          *1.0_SP/DY*(HV(I,J)-HV(I,J-1)) )
-        ENDDO
-      ENDDO
-    ENDIF
+    ENDDO
     ! add to the source term
     SourceX = SourceX + Vis_BrkX
     SourceY = SourceY + Vis_BrkY
