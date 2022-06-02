@@ -76,6 +76,8 @@ SUBROUTINE SourceTerms
   INTEGER :: kf_index ! Chen, Salatin
   ! variables eddy viscosity terms (horizontal, vertical, breaking)
   REAL(SP),DIMENSION(Mloc,Nloc) :: SmgX,SmgY,Vis_BrkX,Vis_BrkY,VertX,VertY,nu_visMA_SUM
+  REAL(SP),DIMENSION(Mloc,Nloc) :: VorX,VorY
+  INTEGER :: VTYPE
 
   !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
   !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
@@ -370,10 +372,21 @@ SUBROUTINE SourceTerms
 
   ! Horizontal Mixing
   IF(H_MIXING)THEN
-    nu_smg = &
-    C_smg**2*DX*DY*SQRT(2.0*uMAx**2+2.0*vMAy**2+(uMAy+vMAx)*(uMAy+vMAx))
     !nu_smg = &
-    !C_smg**2*DX*DY*SQRT(2.0*Ux**2+2.0*Vy**2+(Uy+Vx)*(Uy+Vx))
+    !C_smg**2*DX*DY*SQRT(2.0*uMAx**2+2.0*vMAy**2+(uMAy+vMAx)*(uMAy+vMAx))
+
+    ! Model 1
+    CALL DERIVATIVE_X(Mloc,Nloc,Ibeg,Iend,Jbeg,Jend,MASK9,DX,Vor_Instant,VorX)
+    VTYPE=2
+    CALL PHI_COLL(Mloc,Nloc,Ibeg,Iend,Jbeg,Jend,Nghost,VorX,VTYPE,PERIODIC)
+    CALL DERIVATIVE_Y(Mloc,Nloc,Ibeg,Iend,Jbeg,Jend,MASK9,DY,Vor_Instant,VorY)
+    VTYPE=3
+    CALL PHI_COLL(Mloc,Nloc,Ibeg,Iend,Jbeg,Jend,Nghost,VorY,VTYPE,PERIODIC)
+    nu_smg=C_smg*DX*DY*DEPTH*SQRT(VorX*VorX+VorY*VorY)
+
+    ! Model 2
+    !nu_smg=C_smg*(DX*DY*DEPTH)**(2.0_SP/3.0_SP)*SQRT(Vor_Instant*Vor_Instant/2)
+
 
     DO J=Jbeg,Jend
       DO I=Ibeg,Iend
@@ -429,25 +442,25 @@ SUBROUTINE SourceTerms
 
     DO J=Jbeg,Jend
       DO I=Ibeg,Iend
-        IF(0==1)THEN
-        VertX(I,J) = 2.0_SP * (1.0_SP/DX* &
-        (0.5_SP*(nu_ver_x(I,J)+nu_ver_x(I+1,J)) &
-        *1.0_SP/DX*(P(I+1,J)-P(I,J))  &
-        -0.5_SP*(nu_ver_x(I,J)+nu_ver_x(I-1,J)) &
-        *1.0_SP/DX*(P(I,J)-P(I-1,J))) &
-        + 0.5_SP/DX* &
-        (nu_ver_x(I+1,J)*0.5_SP/DY*(Q(I+1,J+1)-Q(I+1,J-1)) &
-        -nu_ver_x(I-1,J)*0.5_SP/DY*(Q(I-1,J+1)-Q(I-1,J-1))) )
+        !IF(0==1)THEN
+        !VertX(I,J) = 2.0_SP * (1.0_SP/DX* &
+        !(0.5_SP*(nu_ver_x(I,J)+nu_ver_x(I+1,J)) &
+        !*1.0_SP/DX*(P(I+1,J)-P(I,J))  &
+        !-0.5_SP*(nu_ver_x(I,J)+nu_ver_x(I-1,J)) &
+        !*1.0_SP/DX*(P(I,J)-P(I-1,J))) &
+        !+ 0.5_SP/DX* &
+        !(nu_ver_x(I+1,J)*0.5_SP/DY*(Q(I+1,J+1)-Q(I+1,J-1)) &
+        !-nu_ver_x(I-1,J)*0.5_SP/DY*(Q(I-1,J+1)-Q(I-1,J-1))) )
 
-        VertY(I,J) = 2.0_SP * (1.0_SP/DY* &
-        (0.5_SP*(nu_ver_y(I,J)+nu_ver_y(I,J+1)) &
-        *1.0_SP/DY*(Q(I,J+1)-Q(I,J))  &
-        -0.5_SP*(nu_ver_y(I,J)+nu_ver_y(I,J-1)) &
-        *1.0_SP/DY*(Q(I,J)-Q(I,J-1))) &
-        +0.5_SP/DY* &
-        (nu_ver_y(I,J+1)*0.5_SP/DX*(P(I+1,J+1)-P(I-1,J+1)) &
-        -nu_ver_y(I,J-1)*0.5_SP/DX*(P(I+1,J-1)-P(I-1,J-1))) )
-        ELSE
+        !VertY(I,J) = 2.0_SP * (1.0_SP/DY* &
+        !(0.5_SP*(nu_ver_y(I,J)+nu_ver_y(I,J+1)) &
+        !*1.0_SP/DY*(Q(I,J+1)-Q(I,J))  &
+        !-0.5_SP*(nu_ver_y(I,J)+nu_ver_y(I,J-1)) &
+        !*1.0_SP/DY*(Q(I,J)-Q(I,J-1))) &
+        !+0.5_SP/DY* &
+        !(nu_ver_y(I,J+1)*0.5_SP/DX*(P(I+1,J+1)-P(I-1,J+1)) &
+        !-nu_ver_y(I,J-1)*0.5_SP/DX*(P(I+1,J-1)-P(I-1,J-1))) )
+        !ELSE
         VertX(I,J) = 2.0_SP * (1.0_SP * (1.0_SP/DX*( &
         0.5_SP*(nu_ver_x(I,J)+nu_ver_x(I+1,J)) &
         *1.0_SP/DX*(P(I+1,J)-P(I,J))  &
@@ -479,7 +492,7 @@ SUBROUTINE SourceTerms
         *0.5_SP/DY*(P(I+1,J+1)-P(I+1,J-1)) &
         -nu_ver_y(I-1,J)* &
         0.5_SP/DY*(P(I-1,J+1)-P(I-1,J-1))) ) )
-        ENDIF
+        !ENDIF
       ENDDO
     ENDDO
 
