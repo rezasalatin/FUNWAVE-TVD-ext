@@ -77,6 +77,7 @@ SUBROUTINE SourceTerms
   ! variables eddy viscosity terms (horizontal, vertical, breaking)
   REAL(SP),DIMENSION(Mloc,Nloc) :: SmgX,SmgY,Vis_BrkX,Vis_BrkY,VertX,VertY,nu_visMA_SUM
   REAL(SP),DIMENSION(Mloc,Nloc) :: Vorx,Vory
+  INTEGER :: VTYPE
 
   !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
   !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
