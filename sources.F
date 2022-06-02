@@ -431,10 +431,7 @@ SUBROUTINE SourceTerms
     ! Model 1
     CALL DERIVATIVE_X(Mloc,Nloc,Ibeg,Iend,Jbeg,Jend,MASK9,DX,Vor_Instant,Vorx)
     CALL DERIVATIVE_Y(Mloc,Nloc,Ibeg,Iend,Jbeg,Jend,MASK9,DY,Vor_Instant,Vory)
-    !VTYPE=1
-    !CALL PHI_COLL(Mloc,Nloc,Ibeg,Iend,Jbeg,Jend,Nghost,Vorx,VTYPE)
-    !CALL PHI_COLL(Mloc,Nloc,Ibeg,Iend,Jbeg,Jend,Nghost,Vory,VTYPE)
-    nu_ver = Vorx !C_VMixing*(DX*DY*DEPTH)*SQRT(Vorx*Vorx+Vory*Vory)
+    nu_ver = C_VMixing*(DX*DY*DEPTH)*SQRT(Vorx*Vorx+Vory*Vory)
 
     ! Model 2
     !Vor2 = Vor_Instant*Vor_Instant
