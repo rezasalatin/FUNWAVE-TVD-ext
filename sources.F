@@ -372,10 +372,19 @@ SUBROUTINE SourceTerms
 
   ! Horizontal Mixing
   IF(H_MIXING)THEN
-    nu_smg = &
-    C_smg**2*DX*DY*SQRT(2.0*uMAx**2+2.0*vMAy**2+(uMAy+vMAx)*(uMAy+vMAx))
+    !nu_smg = &
+    !C_smg**2*DX*DY*SQRT(2.0*uMAx**2+2.0*vMAy**2+(uMAy+vMAx)*(uMAy+vMAx))
     !nu_smg = &
     !C_smg**2*DX*DY*SQRT(2.0*Ux**2+2.0*Vy**2+(Uy+Vx)*(Uy+Vx))
+
+    ! Model 1
+    CALL DERIVATIVE_X(Mloc,Nloc,Ibeg,Iend,Jbeg,Jend,MASK9,DX,Vor_Instant,Vorx)
+    CALL DERIVATIVE_Y(Mloc,Nloc,Ibeg,Iend,Jbeg,Jend,MASK9,DY,Vor_Instant,Vory)
+    nu_smg = C_smg*(DX*DY*DEPTH)*SQRT(Vorx*Vorx+Vory*Vory)
+
+    ! Model 2
+    !nu_smg = C_smg*(DX*DY*DEPTH)**(2.0/3.0)*SQRT(Vor_Instant*Vor_Instant/2)
+
 
     DO J=Jbeg,Jend
       DO I=Ibeg,Iend
@@ -423,19 +432,10 @@ SUBROUTINE SourceTerms
   !!!!!!!!!!!!!!!!!!!!!!!!!!!!
   IF(V_MIXING)THEN
 
-    !nu_ver_x = 0.4/6.0*Depth*SQRT(Cd*abs(uMA)*SQRT(uMA*uMA+vMA*vMA))
-    !nu_ver_y = 0.4/6.0*Depth*SQRT(Cd*abs(vMA)*SQRT(uMA*uMA+vMA*vMA))
+    nu_ver_x = 0.4/6.0*Depth*SQRT(Cd*abs(uMA)*SQRT(uMA*uMA+vMA*vMA))
+    nu_ver_y = 0.4/6.0*Depth*SQRT(Cd*abs(vMA)*SQRT(uMA*uMA+vMA*vMA))
     !nu_ver_x = 0.4/6.0*(Depth+Eta)*SQRT(Cd*abs(U)*SQRT(U*U+V*V))
     !nu_ver_y = 0.4/6.0*(Depth+Eta)*SQRT(Cd*abs(V)*SQRT(U*U+V*V))
-
-    ! Model 1
-    CALL DERIVATIVE_X(Mloc,Nloc,Ibeg,Iend,Jbeg,Jend,MASK9,DX,Vor_Instant,Vorx)
-    CALL DERIVATIVE_Y(Mloc,Nloc,Ibeg,Iend,Jbeg,Jend,MASK9,DY,Vor_Instant,Vory)
-    nu_ver = C_VMixing*(DX*DY*DEPTH)*SQRT(Vorx*Vorx+Vory*Vory)
-
-    ! Model 2
-    !Vor2 = Vor_Instant*Vor_Instant
-    !nu_ver = C_VMixing*(DX*DY*DEPTH)**(2.0/3.0)*SQRT(Vor_Instant*Vor_Instant/2)
 
     DO J=Jbeg,Jend
       DO I=Ibeg,Iend
