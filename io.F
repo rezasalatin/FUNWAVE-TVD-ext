@@ -3465,7 +3465,7 @@ IF(IN_Csmg)THEN
 ENDIF ! endif IN_Csmg
 
 
-CALL READ_FLOAT(Csmg_fixed,FILE_NAME,'Csmg',ierr)
+CALL READ_FLOAT(Csmg_fixed,FILE_NAME,'C_smg',ierr)
 IF(ierr==1)THEN
   Csmg_fixed = 0.0_SP
 # if defined (PARALLEL)
