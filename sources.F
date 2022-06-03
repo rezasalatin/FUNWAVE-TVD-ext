@@ -377,10 +377,10 @@ SUBROUTINE SourceTerms
 
     ! Model 1
     CALL DERIVATIVE_X(Mloc,Nloc,Ibeg,Iend,Jbeg,Jend,MASK9,DX,Vor_Instant,VorX)
-    VTYPE=2
+    VTYPE=1
     CALL PHI_COLL(Mloc,Nloc,Ibeg,Iend,Jbeg,Jend,Nghost,VorX,VTYPE,PERIODIC)
     CALL DERIVATIVE_Y(Mloc,Nloc,Ibeg,Iend,Jbeg,Jend,MASK9,DY,Vor_Instant,VorY)
-    VTYPE=3
+    VTYPE=1
     CALL PHI_COLL(Mloc,Nloc,Ibeg,Iend,Jbeg,Jend,Nghost,VorY,VTYPE,PERIODIC)
     nu_smg=C_smg*DX*DY*DEPTH*SQRT(VorX*VorX+VorY*VorY)
 
