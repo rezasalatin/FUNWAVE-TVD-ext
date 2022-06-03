@@ -384,13 +384,15 @@ SUBROUTINE SourceTerms
     CALL PHI_COLL(Mloc,Nloc,Ibeg,Iend,Jbeg,Jend,Nghost,VorY,VTYPE,PERIODIC)
     nu_smg=C_smg*DX*DY*DEPTH*SQRT(VorX*VorX+VorY*VorY)
 
+    nu_smg=VorX
+
     ! Model 2
     !nu_smg=C_smg*(DX*DY*DEPTH)**(2.0_SP/3.0_SP)*SQRT(Vor_Instant*Vor_Instant/2)
 
 
     DO J=Jbeg,Jend
       DO I=Ibeg,Iend
-        SmgX(I,J) = 2.0_SP * (1.0_SP * (1.0_SP/DX*( &
+        SmgX(I,J) = 0.0_SP * 2.0_SP * (1.0_SP * (1.0_SP/DX*( &
         0.5_SP*(nu_smg(I,J)+nu_smg(I+1,J)) &
         *1.0_SP/DX*(P(I+1,J)-P(I,J))  &
         -0.5_SP*(nu_smg(I-1,J)+nu_smg(I,J)) &
@@ -406,7 +408,7 @@ SUBROUTINE SourceTerms
         -nu_smg(I,J-1) &
         *0.5_SP/DX*(Q(I+1,J-1)-Q(I-1,J-1))) ) )
 
-        SmgY(I,J) = 2.0_SP * (1.0_SP * (1.0_SP/DY*( &
+        SmgY(I,J) = 0.0_SP * 2.0_SP * (1.0_SP * (1.0_SP/DY*( &
         0.5_SP*(nu_smg(I,J)+nu_smg(I,J+1)) &
         *1.0_SP/DY*(Q(I,J+1)-Q(I,J))  &
         - 0.5_SP*(nu_smg(I,J-1)+nu_smg(I,J)) &
