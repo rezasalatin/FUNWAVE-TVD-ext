@@ -372,6 +372,7 @@ SUBROUTINE SourceTerms
 
   ! Horizontal Mixing
   IF(H_MIXING)THEN
+    ! Model 0 - default
     !nu_smg = &
     !C_smg**2*DX*DY*SQRT(2.0*uMAx**2+2.0*vMAy**2+(uMAy+vMAx)*(uMAy+vMAx))
 
@@ -383,7 +384,7 @@ SUBROUTINE SourceTerms
     nu_smg=C_smg*DX*DY*DEPTH*SQRT(VorX*VorX+VorY*VorY)
 
     ! Model 2
-    !nu_smg=C_smg*(DX*DY*DEPTH)**(2.0_SP/3.0_SP)*SQRT(Vor_Instant*Vor_Instant/2)
+    nu_smg=C_smg*(DX*DY*DEPTH)**(2.0_SP/3.0_SP)*SQRT(Vor_Instant*Vor_Instant/2)
 
 
     DO J=Jbeg,Jend
