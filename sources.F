@@ -388,7 +388,7 @@ SUBROUTINE SourceTerms
 
     ! Model 3
     nu_smg = &
-    C_smg**2*(DX*DY*DEPTH)**(2.0_SP/3.0_SP)*SQRT(2.0*uMAx**2+2.0*vMAy**2+(uMAy+vMAx)**2)
+    C_smg**2*DX*DY*DEPTH**2/(DX**2+DY**2)*SQRT(2.0*uMAx**2+2.0*vMAy**2+(uMAy+vMAx)**2)
 
 
     DO J=Jbeg,Jend
