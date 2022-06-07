@@ -385,7 +385,7 @@ SUBROUTINE SourceTerms
     nu_smg=C_smg*DX*DY*DEPTH*SQRT(VorX*VorX+VorY*VorY)
 
     ! Model 2
-    !nu_smg=C_smg*(DX*DY*DEPTH)**(2.0_SP/3.0_SP)*SQRT(Vor_Instant*Vor_Instant/2)
+    nu_smg=C_smg*(DX*DY*DEPTH)**(2.0_SP/3.0_SP)*SQRT(Vor_Instant*Vor_Instant/2)
 
     ! Model 3
     !nu_smg = &
