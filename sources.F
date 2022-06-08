@@ -385,14 +385,11 @@ SUBROUTINE SourceTerms
     !nu_smg=C_smg*DX*DY*DEPTH*SQRT(VorX*VorX+VorY*VorY)
 
     ! Model 2
-    !nu_smg=C_smg*(DX*DY*DEPTH)**(2.0_SP/3.0_SP)*SQRT(Vor_Instant*Vor_Instant/2)
+    nu_smg=C_smg*(DX*DY*DEPTH)**(2.0_SP/3.0_SP)*SQRT(Vor_Instant*Vor_Instant/2)
 
     ! Model 3
-    !nu_smg = C_smg**2*DX*DY*DEPTH**2/(DX*DY)/2*CEILING(ABS(Depthx)) &
+    !nu_smg = C_smg**2*DX*DY*DEPTH/SQRT(DX*DY)*CEILING(ABS(Depthx)) &
     !*SQRT(2.0*uMAx**2+2.0*vMAy**2+(uMAy+vMAx)**2)
-
-    nu_smg = C_smg**2*DX*DY*DEPTH/SQRT(DX*DY)*CEILING(ABS(Depthx)) &
-    *SQRT(2.0*uMAx**2+2.0*vMAy**2+(uMAy+vMAx)**2)
 
 
     DO J=Jbeg,Jend
