@@ -377,7 +377,6 @@ SUBROUTINE SourceTerms
     !C_smg**2*DX*DY*SQRT(2.0*uMAx**2+2.0*vMAy**2+(uMAy+vMAx)**2)
 
     ! Model 1
-
     VTYPE=1
     CALL PHI_COLL(Mloc,Nloc,Ibeg,Iend,Jbeg,Jend,Nghost,Vor_Instant,VTYPE,PERIODIC)
     CALL DERIVATIVE_X(Mloc,Nloc,Ibeg,Iend,Jbeg,Jend,MASK9,DX,Vor_Instant,VorX)
@@ -390,6 +389,13 @@ SUBROUTINE SourceTerms
     ! Model 3
     !nu_smg = C_smg**2*DX*DY*DEPTH/SQRT(DX*DY)*CEILING(ABS(Depthx)) &
     !*SQRT(2.0*uMAx**2+2.0*vMAy**2+(uMAy+vMAx)**2)
+
+    ! no mixing in wk region
+    DO J=jlo,jhi
+      DO I=ilo,ihi
+        nu_smg(I,J)=0.0_SP
+      ENDDO
+    ENDDO
 
 
     DO J=Jbeg,Jend
