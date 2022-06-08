@@ -3426,6 +3426,10 @@ IF(ierr==1)THEN
 ENDIF
 
 !!!!!!!!!!!!!!!!!!!!!! Csmg input
+
+! Type of horizontal mixing
+CALL READ_INTEGER(MIX_MODEL,FILE_NAME,'MIX_MODEL',ierr)
+
 CALL READ_LOGICAL(IN_Csmg,FILE_NAME,'Csmg_Matrix',ierr)
 IF(ierr==1)THEN
   IN_Csmg = .FALSE.

@@ -304,6 +304,7 @@ REAL(SP),DIMENSION(:,:,:),ALLOCATABLE :: eta_MA_temp
 REAL(SP),DIMENSION(:,:),ALLOCATABLE :: Vor_MA
 
 ! horizontal eddy viscosity
+INTEGER :: MIX_MODEL
 LOGICAL :: IN_Csmg=.FALSE.
 REAL(SP):: Csmg_fixed
 CHARACTER(LEN=80) Csmg_file
