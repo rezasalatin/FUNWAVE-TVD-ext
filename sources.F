@@ -378,14 +378,14 @@ SUBROUTINE SourceTerms
 
     ! Model 1
 
-    !VTYPE=1
-    !CALL PHI_COLL(Mloc,Nloc,Ibeg,Iend,Jbeg,Jend,Nghost,Vor_Instant,VTYPE,PERIODIC)
-    !CALL DERIVATIVE_X(Mloc,Nloc,Ibeg,Iend,Jbeg,Jend,MASK9,DX,Vor_Instant,VorX)
-    !CALL DERIVATIVE_Y(Mloc,Nloc,Ibeg,Iend,Jbeg,Jend,MASK9,DY,Vor_Instant,VorY)
-    !nu_smg=C_smg*DX*DY*DEPTH*SQRT(VorX*VorX+VorY*VorY)
+    VTYPE=1
+    CALL PHI_COLL(Mloc,Nloc,Ibeg,Iend,Jbeg,Jend,Nghost,Vor_Instant,VTYPE,PERIODIC)
+    CALL DERIVATIVE_X(Mloc,Nloc,Ibeg,Iend,Jbeg,Jend,MASK9,DX,Vor_Instant,VorX)
+    CALL DERIVATIVE_Y(Mloc,Nloc,Ibeg,Iend,Jbeg,Jend,MASK9,DY,Vor_Instant,VorY)
+    nu_smg=C_smg*DX*DY*DEPTH*SQRT(VorX*VorX+VorY*VorY)
 
     ! Model 2
-    nu_smg=C_smg*(DX*DY*DEPTH)**(2.0_SP/3.0_SP)*SQRT(Vor_Instant*Vor_Instant/2)
+    !nu_smg=C_smg*(DX*DY*DEPTH)**(2.0_SP/3.0_SP)*SQRT(Vor_Instant*Vor_Instant/2)
 
     ! Model 3
     !nu_smg = C_smg**2*DX*DY*DEPTH/SQRT(DX*DY)*CEILING(ABS(Depthx)) &
