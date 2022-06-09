@@ -391,11 +391,11 @@ SUBROUTINE SourceTerms
 
     nu_smg = nu_smg * CEILING(ABS(Depthx))
     ! no mixing in wk region
-    DO J=jlo,jhi
-      DO I=ilo,ihi
-        nu_smg(I,J)=0.0_SP
-      ENDDO
-    ENDDO
+    !DO J=jlo,jhi
+    !  DO I=ilo,ihi
+    !    nu_smg(I,J)=0.0_SP
+    !  ENDDO
+    !ENDDO
 
 
     DO J=Jbeg,Jend
