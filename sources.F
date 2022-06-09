@@ -389,7 +389,7 @@ SUBROUTINE SourceTerms
       *SQRT(2.0*uMAx**2+2.0*vMAy**2+(uMAy+vMAx)**2)
     ENDIF
 
-    nu_smg = nu_smg * CEILING(ABS(Depthx))
+    nu_smg = Depthx
     ! no mixing in wk region
     !DO J=jlo,jhi
     !  DO I=ilo,ihi
