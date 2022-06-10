@@ -119,12 +119,13 @@ SUBROUTINE SourceTerms
     ! Choi 2021 experimental design
     ! first part has phase of pi and second has zero deg phase
     DO J=Jbeg,Jend
-      IF(ymk_wk(J)<(Yc_WK-0.25_SP)) THEN
+      ! slide the wavemaker 0.5 m to make some instability
+      IF(ymk_wk(J)<(Yc_WK-0.5_SP-0.25_SP)) THEN
         DO I=ilo,ihi
           WaveMaker_Mass(I,J)=AA*EXP(-Beta_gen*(xmk_wk(I)-Xc_WK)**2) &
           *SIN(rlamda*(ymk_wk(J)-ZERO)-2.0_SP*PI/Tperiod*TIME+PI)
         ENDDO
-      ELSEIF(ymk_wk(J)>(Yc_WK+0.25_SP)) THEN
+      ELSEIF(ymk_wk(J)>(Yc_WK-0.5_SP+0.25_SP)) THEN
         DO I=ilo,ihi
           WaveMaker_Mass(I,J)=AA*EXP(-Beta_gen*(xmk_wk(I)-Xc_WK)**2) &
           *SIN(rlamda*(ymk_wk(J)-ZERO)-2.0_SP*PI/Tperiod*TIME+0.0_SP)
