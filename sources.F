@@ -388,7 +388,7 @@ SUBROUTINE SourceTerms
     ELSEIF(MIX_MODEL.EQ.3)THEN
       !nu_smg = C_smg**2*DX*DY*(DEPTH+ETA)/SQRT(DX*DY) &
       !*SQRT(2.0*uMAx**2+2.0*vMAy**2+(uMAy+vMAx)**2)
-      nu_smg = C_smg**2*(DEPTH+ETA)**2 &
+      nu_smg = C_smg**2*(DX*DY*(DEPTH+ETA))**(2.0_SP/3.0_SP) &
       *SQRT(2.0*uMAx**2+2.0*vMAy**2+(uMAy+vMAx)**2)
     ENDIF
 
