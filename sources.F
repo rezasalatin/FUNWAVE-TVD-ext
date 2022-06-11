@@ -119,13 +119,13 @@ SUBROUTINE SourceTerms
     ! Choi 2021 experimental design
     ! first part has phase of pi and second has zero deg phase
     DO J=Jbeg,Jend
-      ! slide the wavemaker 0.5 m to make some instability
-      IF(ymk_wk(J)<(Yc_WK-0.5_SP-0.25_SP)) THEN
+      ! slide the wavemaker 0.15 m (DY) to make some instability
+      IF(ymk_wk(J)<(Yc_WK-0.25_SP)) THEN
         DO I=ilo,ihi
           WaveMaker_Mass(I,J)=AA*EXP(-Beta_gen*(xmk_wk(I)-Xc_WK)**2) &
           *SIN(rlamda*(ymk_wk(J)-ZERO)-2.0_SP*PI/Tperiod*TIME+PI)
         ENDDO
-      ELSEIF(ymk_wk(J)>(Yc_WK-0.5_SP+0.25_SP)) THEN
+      ELSEIF(ymk_wk(J)>(Yc_WK+0.25_SP)) THEN
         DO I=ilo,ihi
           WaveMaker_Mass(I,J)=AA*EXP(-Beta_gen*(xmk_wk(I)-Xc_WK)**2) &
           *SIN(rlamda*(ymk_wk(J)-ZERO)-2.0_SP*PI/Tperiod*TIME+0.0_SP)
@@ -382,11 +382,11 @@ SUBROUTINE SourceTerms
       CALL PHI_COLL(Mloc,Nloc,Ibeg,Iend,Jbeg,Jend,Nghost,Vor_Instant,VTYPE,PERIODIC)
       CALL DERIVATIVE_X(Mloc,Nloc,Ibeg,Iend,Jbeg,Jend,MASK9,DX,Vor_Instant,VorX)
       CALL DERIVATIVE_Y(Mloc,Nloc,Ibeg,Iend,Jbeg,Jend,MASK9,DY,Vor_Instant,VorY)
-      nu_smg=C_smg*DX*DY*DEPTH*SQRT(VorX*VorX+VorY*VorY)
+      nu_smg=C_smg*DX*DY*(DEPTH+ETA)*SQRT(VorX*VorX+VorY*VorY)
     ELSEIF(MIX_MODEL.EQ.2)THEN
-      nu_smg=C_smg*(DX*DY*DEPTH)**(2.0_SP/3.0_SP)*SQRT(Vor_Instant*Vor_Instant/2)
+      nu_smg=C_smg*(DX*DY*(DEPTH+ETA))**(2.0_SP/3.0_SP)*SQRT(Vor_Instant*Vor_Instant/2)
     ELSEIF(MIX_MODEL.EQ.3)THEN
-      nu_smg = C_smg**2*DX*DY*DEPTH/SQRT(DX*DY) &
+      nu_smg = C_smg**2*DX*DY*(DEPTH+ETA)/SQRT(DX*DY) &
       *SQRT(2.0*uMAx**2+2.0*vMAy**2+(uMAy+vMAx)**2)
     ENDIF
 
