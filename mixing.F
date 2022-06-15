@@ -64,7 +64,7 @@ SUBROUTINE MIXING_STUFF
     WaveHeightAve,Emax,Emin,Num_Zero_Up,Ibeg,Iend,Jbeg,Jend, &
     HrmsSum,HavgSum,ETA2,ETA2sum,SigWaveHeight,ETAvariance, &
     Vor_Instant, Vor_Mean, Vor_Intensity, NumDT1, NumDT2,Vor2,&
-    Vor2sum,Vorsum,nu_break,nu_break_mean)
+    Vor2sum,Vorsum,nu_break,nu_break_mean,nu_break_sum)
   ENDIF    !ykchoi
 
   ! Chen, Salatin, moving average of some properties (U,V,Eta,Vor,Syx)
@@ -98,7 +98,7 @@ SUBROUTINE CALCULATE_MEAN(T_INTV_mean,T_INTV_UVmean,T_sum,T_sumUVmean,&
   WaveHeightAve,Emax,Emin,Num_Zero_Up,Ibeg,Iend,Jbeg,Jend, &
   HrmsSum,HavgSum,ETA2,ETA2sum,SigWaveHeight,ETAvariance, &
   Vor_Instant, Vor_Mean, Vor_Intensity, NumDT1, NumDT2,Vor2, &
-  Vor2sum,Vorsum,nu_break,nu_break_mean)
+  Vor2sum,Vorsum,nu_break,nu_break_mean,nu_break_sum)
 
   ! calculate mean for smagorinsky mixing and wave height
   USE PARAM
