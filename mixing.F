@@ -124,8 +124,7 @@ SUBROUTINE CALCULATE_MEAN(T_INTV_mean,T_INTV_UVmean,T_sum,T_sumUVmean,&
   REAL(SP),DIMENSION(M,N),INTENT(INOUT) :: SigWaveHeight
   !!! determine the surfzone
   REAL(SP),DIMENSION(M,N),INTENT(IN) :: nu_break
-  REAL(SP),DIMENSION(M,N),INTENT(INOUT) :: nu_break_mean
-  REAL(SP),DIMENSION(M,N) :: nu_break_sum
+  REAL(SP),DIMENSION(M,N),INTENT(INOUT) :: nu_break_mean,nu_break_sum
 
   T_sum=T_sum+DT ! for wave height and MSL
   T_sumUVmean=T_sumUVmean+DT ! Chen, Salatin, for current and vortcty field
