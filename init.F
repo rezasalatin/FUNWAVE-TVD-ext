@@ -180,6 +180,10 @@ SUBROUTINE ALLOCATE_VARIABLES
     nu_break=nu_bkg
   ENDIF
 
+  ! to determine the surfzone range
+  ALLOCATE(nu_break_mean(Mloc,Nloc))
+  ALLOCATE(nu_break_sum(Mloc,Nloc))
+
   ALLOCATE(ROLLER_FLUX(Mloc,Nloc),UNDERTOW_U(Mloc,Nloc),UNDERTOW_V(Mloc,Nloc))
 
   IF(WAVEMAKER_VIS)THEN

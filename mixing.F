@@ -64,7 +64,7 @@ SUBROUTINE MIXING_STUFF
     WaveHeightAve,Emax,Emin,Num_Zero_Up,Ibeg,Iend,Jbeg,Jend, &
     HrmsSum,HavgSum,ETA2,ETA2sum,SigWaveHeight,ETAvariance, &
     Vor_Instant, Vor_Mean, Vor_Intensity, NumDT1, NumDT2,Vor2,&
-    Vor2sum,Vorsum)
+    Vor2sum,Vorsum,nu_break,nu_break_mean)
   ENDIF    !ykchoi
 
   ! Chen, Salatin, moving average of some properties (U,V,Eta,Vor,Syx)
@@ -98,7 +98,7 @@ SUBROUTINE CALCULATE_MEAN(T_INTV_mean,T_INTV_UVmean,T_sum,T_sumUVmean,&
   WaveHeightAve,Emax,Emin,Num_Zero_Up,Ibeg,Iend,Jbeg,Jend, &
   HrmsSum,HavgSum,ETA2,ETA2sum,SigWaveHeight,ETAvariance, &
   Vor_Instant, Vor_Mean, Vor_Intensity, NumDT1, NumDT2,Vor2, &
-  Vor2sum,Vorsum)
+  Vor2sum,Vorsum,nu_break,nu_break_mean)
 
   ! calculate mean for smagorinsky mixing and wave height
   USE PARAM
@@ -122,6 +122,10 @@ SUBROUTINE CALCULATE_MEAN(T_INTV_mean,T_INTV_UVmean,T_sum,T_sumUVmean,&
   REAL(SP),DIMENSION(M,N),INTENT(INOUT) :: ETAmean,ETAsum,ETA2,ETA2sum
   REAL(SP),DIMENSION(M,N) :: ETAvariance
   REAL(SP),DIMENSION(M,N),INTENT(INOUT) :: SigWaveHeight
+  !!! determine the surfzone
+  REAL(SP),DIMENSION(M,N),INTENT(IN) :: nu_break
+  REAL(SP),DIMENSION(M,N),INTENT(INOUT) :: nu_break_mean
+  REAL(SP),DIMENSION(M,N) :: nu_break_sum
 
   T_sum=T_sum+DT ! for wave height and MSL
   T_sumUVmean=T_sumUVmean+DT ! Chen, Salatin, for current and vortcty field
@@ -132,16 +136,16 @@ SUBROUTINE CALCULATE_MEAN(T_INTV_mean,T_INTV_UVmean,T_sum,T_sumUVmean,&
     ! variance equation with initially unknown etamean
     ETAsum =ETA*DT+ETAsum
     ETAmean=ETAsum/T_sum
-    DO J=1,N
-      DO I=1,M
-        ETAvariance(I,J) = 1/real(NumDT1-1)*ETA2sum(I,J)&
-        -ETAmean(I,J)*ETAmean(I,J)*real(NumDT1)/real(NumDT1-1)
-      ENDDO
-    ENDDO
+    ETAvariance = 1/real(NumDT1-1)*ETA2sum-real(NumDT1)/real(NumDT1-1)*ETAmean**2
     SigWaveHeight = 4.0*SQRT(ETAvariance)
-
     ETAsum=ZERO
     ETA2sum=ZERO
+
+    ! Salatin, June 2022, to get surfzone range
+    nu_break_sum =nu_break*DT+nu_break_sum
+    nu_break_mean=nu_break_sum/T_sum
+    nu_break_sum=ZERO
+    
     NumDT1=ZERO
     T_sum=T_sum-T_INTV_mean
 
@@ -162,12 +166,9 @@ SUBROUTINE CALCULATE_MEAN(T_INTV_mean,T_INTV_UVmean,T_sum,T_sumUVmean,&
   ELSE
 
     NumDT1 = NumDT1+1
+
     ETAsum=ETA*DT+ETAsum
-    DO J=1,N
-      DO I=1,M
-        ETA2(I,J) = ETA(I,J)*ETA(I,J)
-      ENDDO
-    ENDDO
+    ETA2 = ETA*ETA
     ETA2sum=ETA2+ETA2sum
 
     ! wave height
@@ -192,6 +193,9 @@ SUBROUTINE CALCULATE_MEAN(T_INTV_mean,T_INTV_UVmean,T_sum,T_sumUVmean,&
         endif
       ENDDO
     ENDDO
+
+    ! Salatin, June 2022, to get surfzone range
+    nu_break_sum =nu_break*DT+nu_break_sum
 
   ENDIF  ! end average time
 

@@ -4483,6 +4483,11 @@ SUBROUTINE PREVIEW_MEAN
     call PutFile(TMP_NAME,SigWaveHeight)
   ENDIF
 
+  IF(OUT_NU)THEN
+    TMP_NAME = TRIM(FDIR)//'nubrkmean_'//TRIM(FILE_NAME)
+    call PutFile(TMP_NAME,nu_break_mean)
+  ENDIF
+
 END SUBROUTINE PREVIEW_MEAN
 
 
