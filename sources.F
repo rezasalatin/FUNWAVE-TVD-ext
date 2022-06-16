@@ -390,8 +390,18 @@ SUBROUTINE SourceTerms
       *SQRT(2.0*uMAx**2+2.0*vMAy**2+(uMAy+vMAx)**2)
     ENDIF
 
-    CALL DERIVATIVE_X(Mloc,Nloc,Ibeg,Iend,Jbeg,Jend,MASK9,DX,DEPTH,DEPTHDerX)
-    nu_smg = nu_smg * CEILING(ABS(DEPTHDerX))
+    DO J=Jbeg,Jend
+      DO I=Ibeg,Iend
+        IF(DEPTH(I,J).LE.0.3_SP)THEN
+          nu_smg(I,J)=0.0_SP
+        ELSEIF(DEPTH(I,J).GE.0.6_SP)THEN
+          nu_smg(I,J)=0.0_SP
+        ENDIF
+      ENDDO
+    ENDDO
+
+    !CALL DERIVATIVE_X(Mloc,Nloc,Ibeg,Iend,Jbeg,Jend,MASK9,DX,DEPTH,DEPTHDerX)
+    !nu_smg = nu_smg * CEILING(ABS(DEPTHDerX))
     ! no mixing in wk region
     !DO J=jlo,jhi
     !  DO I=ilo,ihi
