@@ -392,10 +392,11 @@ SUBROUTINE SourceTerms
 
     DO J=Jbeg,Jend
       DO I=Ibeg,Iend
-        IF(DEPTH(I,J).LE.0.35_SP)THEN
+        IF(DEPTH(I,J).LE.0.35_SP.OR.DEPTH(I,J).GE.0.6_SP)THEN
           nu_smg(I,J)=0.0_SP
-        ELSEIF(DEPTH(I,J).GE.0.6_SP)THEN
-          nu_smg(I,J)=0.0_SP
+        ENDIF
+        IF(DEPTH(I,J).GE.0.45_SP.AND.DEPTH(I,J).LE.0.6_SP)THEN
+          nu_smg(I,J)=2.0_SP*nu_smg(I,J)
         ENDIF
       ENDDO
     ENDDO
