@@ -395,6 +395,9 @@ SUBROUTINE SourceTerms
         IF(DEPTH(I,J).LE.0.4_SP.OR.DEPTH(I,J).GE.0.6_SP)THEN
           nu_smg(I,J)=0.0_SP
         ENDIF
+        IF(DEPTH(I,J).GE.0.5_SP.AND.DEPTH(I,J).LE.0.6_SP)THEN
+          nu_smg(I,J)=2.0_SP*nu_smg(I,J)
+        ENDIF
       ENDDO
     ENDDO
 
