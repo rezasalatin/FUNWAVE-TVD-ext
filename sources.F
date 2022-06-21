@@ -105,27 +105,27 @@ SUBROUTINE SourceTerms
   IF(WAVEMAKER(1:6)=='WK_REG')THEN
     AA = TANH(PI/(Time_ramp*Tperiod)*TIME)*D_gen
 
-    ! do not execute this part
-    IF(0==1)THEN
-    DO J=jlo,jhi
-      DO I=ilo,ihi
-        WaveMaker_Mass(I,J)= AA*EXP(-Beta_gen*(xmk_wk(I)-Xc_WK)**2) &
-        *SIN(rlamda*(ymk_wk(J)-ZERO)-2.0_SP*PI/Tperiod*TIME)
-      ENDDO
-    ENDDO
-    ENDIF
+    ! do not execute this part (original code)
+    !IF(0==1)THEN
+    !DO J=jlo,jhi
+    !  DO I=ilo,ihi
+    !    WaveMaker_Mass(I,J)= AA*EXP(-Beta_gen*(xmk_wk(I)-Xc_WK)**2) &
+    !    *SIN(rlamda*(ymk_wk(J)-ZERO)-2.0_SP*PI/Tperiod*TIME)
+    !  ENDDO
+    !ENDDO
+    !ENDIF
 
     ! SPLIT WAVEMAKER INTO TWO with 0.5 m gap in between according to
     ! Choi 2021 experimental design
     ! first part has phase of pi and second has zero deg phase
     DO J=Jbeg,Jend
       ! slide the wavemaker 0.15 m (DY) to make some instability
-      IF(ymk_wk(J)<(Yc_WK-0.25_SP)) THEN
+      IF(ymk_wk(J).LT.(Yc_WK-1.25_SP*DX)) THEN
         DO I=ilo,ihi
           WaveMaker_Mass(I,J)=AA*EXP(-Beta_gen*(xmk_wk(I)-Xc_WK)**2) &
           *SIN(rlamda*(ymk_wk(J)-ZERO)-2.0_SP*PI/Tperiod*TIME+PI)
         ENDDO
-      ELSEIF(ymk_wk(J)>(Yc_WK+0.25_SP)) THEN
+      ELSEIF(ymk_wk(J).GT.(Yc_WK+2.25_SP*DX)) THEN
         DO I=ilo,ihi
           WaveMaker_Mass(I,J)=AA*EXP(-Beta_gen*(xmk_wk(I)-Xc_WK)**2) &
           *SIN(rlamda*(ymk_wk(J)-ZERO)-2.0_SP*PI/Tperiod*TIME+0.0_SP)
@@ -390,6 +390,7 @@ SUBROUTINE SourceTerms
       *SQRT(2.0*uMAx**2+2.0*vMAy**2+(uMAy+vMAx)**2)
     ENDIF
 
+    ! excep a specific range, make nu_smg zero elsewhere
     DO J=Jbeg,Jend
       DO I=Ibeg,Iend
         IF(DEPTH(I,J).LE.0.4_SP.OR.DEPTH(I,J).GE.0.6_SP)THEN
