@@ -391,13 +391,14 @@ SUBROUTINE SourceTerms
     ENDIF
 
     ! excep a specific range, make nu_smg zero elsewhere
-    !DO J=Jbeg,Jend
-    !  DO I=Ibeg,Iend
-    !    IF(DEPTH(I,J).LE.0.4_SP.OR.DEPTH(I,J).GE.0.6_SP)THEN
-    !      nu_smg(I,J)=0.0_SP
-    !    ENDIF
-    !  ENDDO
-    !ENDDO
+    DO J=Jbeg,Jend
+      DO I=Ibeg,Iend
+        !IF(DEPTH(I,J).LE.0.4_SP.OR.DEPTH(I,J).GE.0.6_SP)THEN
+        IF(DEPTH(I,J).GE.0.6_SP)THEN
+          nu_smg(I,J)=0.0_SP
+        ENDIF
+      ENDDO
+    ENDDO
 
     !CALL DERIVATIVE_X(Mloc,Nloc,Ibeg,Iend,Jbeg,Jend,MASK9,DX,DEPTH,DEPTHDerX)
     !nu_smg = nu_smg * CEILING(ABS(DEPTHDerX))
