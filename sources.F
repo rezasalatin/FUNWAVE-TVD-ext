@@ -120,12 +120,12 @@ SUBROUTINE SourceTerms
     ! first part has phase of pi and second has zero deg phase
     DO J=Jbeg,Jend
       ! slide the wavemaker 0.15 m (DY) to make some instability
-      IF(ymk_wk(J).LT.(Yc_WK-1.25_SP*DX)) THEN
+      IF(ymk_wk(J).LT.(Yc_WK-1.0_SP*DY)) THEN
         DO I=ilo,ihi
           WaveMaker_Mass(I,J)=AA*EXP(-Beta_gen*(xmk_wk(I)-Xc_WK)**2) &
           *SIN(rlamda*(ymk_wk(J)-ZERO)-2.0_SP*PI/Tperiod*TIME+PI)
         ENDDO
-      ELSEIF(ymk_wk(J).GT.(Yc_WK+2.25_SP*DX)) THEN
+      ELSEIF(ymk_wk(J).GT.(Yc_WK+2.0_SP*DY)) THEN
         DO I=ilo,ihi
           WaveMaker_Mass(I,J)=AA*EXP(-Beta_gen*(xmk_wk(I)-Xc_WK)**2) &
           *SIN(rlamda*(ymk_wk(J)-ZERO)-2.0_SP*PI/Tperiod*TIME+0.0_SP)
@@ -369,6 +369,59 @@ SUBROUTINE SourceTerms
 # endif
 
   !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+    !!! EDDY VISCOSITY BREAKING
+
+  IF(VISCOSITY_BREAKING.OR.DIFFUSION_SPONGE.OR.WAVEMAKER_VIS)THEN
+    ! Viscosity Breaking
+    ! depth gradient term
+    DO J=Jbeg,Jend
+      DO I=Ibeg,Iend
+        Vis_BrkX(I,J) = 1.0_SP * (1.0_SP/DX*( &
+        0.5_SP*(nu_vis(I,J)+nu_vis(I+1,J)) &
+        *1.0_SP/DX*(P(I+1,J)-P(I,J))  &
+        -0.5_SP*(nu_vis(I-1,J)+nu_vis(I,J)) &
+        *1.0_SP/DX*(P(I,J)-P(I-1,J))) ) &
+        +0.5_SP * ( 1.0_SP/DY*( &
+        0.5_SP*(nu_vis(I,J)+nu_vis(I,J+1)) &
+        *1.0_SP/DY*(P(I,J+1)-P(I,J)) &
+        -0.5_SP*(nu_vis(I,J-1)+nu_vis(I,J)) &
+        *1.0_SP/DY*(P(I,J)-P(I,J-1))) &
+        + 0.5_SP/DY*( &
+        nu_vis(I,J+1) &
+        *0.5_SP/DX*(Q(I+1,J+1)-Q(I-1,J+1)) &
+        -nu_vis(I,J-1) &
+        *0.5_SP/DX*(Q(I+1,J-1)-Q(I-1,J-1))) )
+
+        Vis_BrkY(I,J) = 1.0_SP * (1.0_SP/DY*( &
+        0.5_SP*(nu_vis(I,J)+nu_vis(I,J+1)) &
+        *1.0_SP/DY*(Q(I,J+1)-Q(I,J))  &
+        - 0.5_SP*(nu_vis(I,J-1)+nu_vis(I,J)) &
+        *1.0_SP/DY*(Q(I,J)-Q(I,J-1))) ) &
+        + 0.5_SP * ( 1.0_SP/DX*( &
+        0.5_SP*(nu_vis(I,J)+nu_vis(I+1,J)) &
+        *1.0_SP/DX*(Q(I+1,J)-Q(I,J)) &
+        -0.5_SP*(nu_vis(I-1,J)+nu_vis(I,J)) &
+        *1.0_SP/DX*(Q(I,J)-Q(I-1,J))) &
+        + 0.5_SP/DX*( &
+        nu_vis(I+1,J) &
+        *0.5_SP/DY*(P(I+1,J+1)-P(I+1,J-1)) &
+        -nu_vis(I-1,J)* &
+        0.5_SP/DY*(P(I-1,J+1)-P(I-1,J-1))) )
+      ENDDO
+    ENDDO
+    ! add to the source term
+    SourceX = SourceX + Vis_BrkX
+    SourceY = SourceY + Vis_BrkY
+  ENDIF
+
+  ! moving average of the breaking terms
+  nu_visMA_temp = CSHIFT(nu_visMA_temp,-1,3)
+  nu_visMA_temp(:,:,1) = nu_vis
+  nu_visMA_SUM = SUM(nu_visMA_temp,3)
+  nu_visMA = nu_visMA_SUM/MA_Window
+  temp_output4 = nu_visMA
+
+  !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
   !!! MIXING MODULE
 
   ! Horizontal Mixing
@@ -386,9 +439,13 @@ SUBROUTINE SourceTerms
     ELSEIF(MIX_MODEL.EQ.2)THEN
       nu_smg=C_smg*(DX*DY*(DEPTH+ETA))**(2.0_SP/3.0_SP)*SQRT(Vor_Instant*Vor_Instant/2)
     ELSEIF(MIX_MODEL.EQ.3)THEN
-      nu_smg = C_smg**2*DX*DY*(DEPTH+ETA)**2/(DX**2+DY**2) &
-      *SQRT(2.0*uMAx**2+2.0*vMAy**2+(uMAy+vMAx)**2)
+      !nu_smg = C_smg**2*DX*DY*(DEPTH+ETA)**2/(DX**2+DY**2) &
+      !*SQRT(2.0*uMAx**2+2.0*vMAy**2+(uMAy+vMAx)**2)
+      nu_smg = C_smg**2*DX*DY*SQRT(2.0*uMAx**2+2.0*vMAy**2+(uMAy+vMAx)**2)
     ENDIF
+
+    ! when there is breaking, deactivate the horizontal mixing
+    nu_smg = nu_smg*(1-CEILING(nu_visMA))
 
     ! excep a specific range, make nu_smg zero elsewhere
     DO J=Jbeg,Jend
@@ -523,64 +580,11 @@ SUBROUTINE SourceTerms
     SourceY = SourceY + C_VMixing*VertY
   ENDIF
 
-  !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-  !!! EDDY VISCOSITY BREAKING
-
-  IF(VISCOSITY_BREAKING.OR.DIFFUSION_SPONGE.OR.WAVEMAKER_VIS)THEN
-    ! Viscosity Breaking
-    ! depth gradient term
-    DO J=Jbeg,Jend
-      DO I=Ibeg,Iend
-        Vis_BrkX(I,J) = 1.0_SP * (1.0_SP/DX*( &
-        0.5_SP*(nu_vis(I,J)+nu_vis(I+1,J)) &
-        *1.0_SP/DX*(P(I+1,J)-P(I,J))  &
-        -0.5_SP*(nu_vis(I-1,J)+nu_vis(I,J)) &
-        *1.0_SP/DX*(P(I,J)-P(I-1,J))) ) &
-        +0.5_SP * ( 1.0_SP/DY*( &
-        0.5_SP*(nu_vis(I,J)+nu_vis(I,J+1)) &
-        *1.0_SP/DY*(P(I,J+1)-P(I,J)) &
-        -0.5_SP*(nu_vis(I,J-1)+nu_vis(I,J)) &
-        *1.0_SP/DY*(P(I,J)-P(I,J-1))) &
-        + 0.5_SP/DY*( &
-        nu_vis(I,J+1) &
-        *0.5_SP/DX*(Q(I+1,J+1)-Q(I-1,J+1)) &
-        -nu_vis(I,J-1) &
-        *0.5_SP/DX*(Q(I+1,J-1)-Q(I-1,J-1))) )
-
-        Vis_BrkY(I,J) = 1.0_SP * (1.0_SP/DY*( &
-        0.5_SP*(nu_vis(I,J)+nu_vis(I,J+1)) &
-        *1.0_SP/DY*(Q(I,J+1)-Q(I,J))  &
-        - 0.5_SP*(nu_vis(I,J-1)+nu_vis(I,J)) &
-        *1.0_SP/DY*(Q(I,J)-Q(I,J-1))) ) &
-        + 0.5_SP * ( 1.0_SP/DX*( &
-        0.5_SP*(nu_vis(I,J)+nu_vis(I+1,J)) &
-        *1.0_SP/DX*(Q(I+1,J)-Q(I,J)) &
-        -0.5_SP*(nu_vis(I-1,J)+nu_vis(I,J)) &
-        *1.0_SP/DX*(Q(I,J)-Q(I-1,J))) &
-        + 0.5_SP/DX*( &
-        nu_vis(I+1,J) &
-        *0.5_SP/DY*(P(I+1,J+1)-P(I+1,J-1)) &
-        -nu_vis(I-1,J)* &
-        0.5_SP/DY*(P(I-1,J+1)-P(I-1,J-1))) )
-      ENDDO
-    ENDDO
-    ! add to the source term
-    SourceX = SourceX + Vis_BrkX
-    SourceY = SourceY + Vis_BrkY
-  ENDIF
-
     !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
     temp_output1 = SmgX
     temp_output2 = VertX
     temp_output3 = Vis_BrkX
-
-    ! moving average of the breaking terms
-    nu_visMA_temp = CSHIFT(nu_visMA_temp,-1,3)
-    nu_visMA_temp(:,:,1) = nu_vis
-    nu_visMA_SUM = SUM(nu_visMA_temp,3)
-    nu_visMA = nu_visMA_SUM/MA_Window
-    temp_output4 = nu_visMA
 
     !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
