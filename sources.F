@@ -120,7 +120,7 @@ SUBROUTINE SourceTerms
     ! first part has phase of pi and second has zero deg phase
     DO J=Jbeg,Jend
       ! slide the wavemaker 0.15 m (DY) to make some instability
-      IF(ymk_wk(J).LT.(Yc_WK-2.0_SP*DY)) THEN
+      IF(ymk_wk(J).LT.(Yc_WK-1.0_SP*DY)) THEN
         DO I=ilo,ihi
           WaveMaker_Mass(I,J)=AA*EXP(-Beta_gen*(xmk_wk(I)-Xc_WK)**2) &
           *SIN(rlamda*(ymk_wk(J)-ZERO)-2.0_SP*PI/Tperiod*TIME+PI)
