@@ -125,7 +125,7 @@ SUBROUTINE SourceTerms
           WaveMaker_Mass(I,J)=AA*EXP(-Beta_gen*(xmk_wk(I)-Xc_WK)**2) &
           *SIN(rlamda*(ymk_wk(J)-ZERO)-2.0_SP*PI/Tperiod*TIME+PI)
         ENDDO
-      ELSEIF(ymk_wk(J).GT.(Yc_WK+1.0_SP*DY)) THEN
+      ELSEIF(ymk_wk(J).GT.(Yc_WK+2.0_SP*DY)) THEN
         DO I=ilo,ihi
           WaveMaker_Mass(I,J)=AA*EXP(-Beta_gen*(xmk_wk(I)-Xc_WK)**2) &
           *SIN(rlamda*(ymk_wk(J)-ZERO)-2.0_SP*PI/Tperiod*TIME+0.0_SP)
