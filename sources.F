@@ -112,7 +112,7 @@ SUBROUTINE SourceTerms
         *SIN(rlamda*(ymk_wk(J)-ZERO)-2.0_SP*PI/Tperiod*TIME)
       ENDDO
     ENDDO
-    
+
     ! SPLIT WAVEMAKER INTO TWO with 0.5 m gap in between according to
     ! Choi 2021 experimental design
     ! first part has phase of pi and second has zero deg phase
@@ -442,7 +442,7 @@ SUBROUTINE SourceTerms
     ENDIF
 
     ! when there is breaking, deactivate the horizontal mixing
-    nu_smg = nu_smg*(1-CEILING(nu_visMA))
+    ! nu_smg = nu_smg*(1-CEILING(nu_visMA))
 
     ! excep a specific range, make nu_smg zero elsewhere
     DO J=Jbeg,Jend
