@@ -165,7 +165,7 @@ SUBROUTINE BREAKING(M,N,ETAx,ETAy,ETAT,Cbrk1,Cbrk2,H,MinDepthFrc,&
           propx=SQRT(DX(I,J)*DX(I,J))/MAX(C,SMALL)
           propy=SQRT(DY(I,J)*DY(I,J))/MAX(C,SMALL)
 # endif
-          
+
           !  I did two changes
           !  1) conversion 180/pi
           !  2) add - to get right quadrants
@@ -247,12 +247,14 @@ ABS(ymk-Yc_WK)<Ywidth_WK/2.0_SP)THEN
 
 !         nu_break(I,J) = ZERO
 
-IF(ETAt(I,J)>MIN(tmp2,WAVEMAKER_Cbrk*tmp3))THEN
-  cap1=1.0*(MAX(Depth(I,J),MinDepthFrc)+ETA(I,J))
-  nu_break(I,J)=cap1*WAVEMAKER_Cbrk*tmp3+nu_bkg
-ELSE
-  nu_break(I,J)=ZERO+nu_bkg
-ENDIF
+  ! Chen, Salatin 2022
+  ! change tmp2 to tmp1 in below conditional statement
+  IF(ETAt(I,J)>MIN(tmp1,WAVEMAKER_Cbrk*tmp3))THEN
+    cap1=1.0*(MAX(Depth(I,J),MinDepthFrc)+ETA(I,J))
+    nu_break(I,J)=cap1*WAVEMAKER_Cbrk*tmp3+nu_bkg
+  ELSE
+    nu_break(I,J)=ZERO+nu_bkg
+  ENDIF
 
 ELSE ! outside wavemaker
 
