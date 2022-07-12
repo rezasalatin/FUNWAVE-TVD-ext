@@ -462,17 +462,17 @@ SUBROUTINE SourceTerms
     ENDIF
 
     ! when there is breaking, deactivate the horizontal mixing
-    nu_smg = nu_smg*(1-CEILING(nu_visMA))
+    !nu_smg = nu_smg*(1-CEILING(nu_visMA))
 
     ! excep a specific range, make nu_smg zero elsewhere
-    DO J=Jbeg,Jend
-      DO I=Ibeg,Iend
-        !IF(DEPTH(I,J).LE.0.4_SP.OR.DEPTH(I,J).GE.0.6_SP)THEN
-        IF(DEPTH(I,J).GE.0.55_SP)THEN
-          nu_smg(I,J)=0.0_SP
-        ENDIF
-      ENDDO
-    ENDDO
+    !DO J=Jbeg,Jend
+    !  DO I=Ibeg,Iend
+    !    !IF(DEPTH(I,J).LE.0.4_SP.OR.DEPTH(I,J).GE.0.6_SP)THEN
+    !    IF(DEPTH(I,J).GE.0.55_SP)THEN
+    !      nu_smg(I,J)=0.0_SP
+    !    ENDIF
+    !  ENDDO
+    !ENDDO
 
     DO J=Jbeg,Jend
       DO I=Ibeg,Iend
