@@ -373,7 +373,7 @@ SUBROUTINE SourceTerms
     ! depth gradient term
     DO J=Jbeg,Jend
       DO I=Ibeg,Iend
-        IF(1.EG.1)THEN
+        IF(1.EQ.1)THEN
         Vis_BrkX(I,J) = 1.0_SP * (1.0_SP/DX*( &
         0.5_SP*(nu_vis(I,J)+nu_vis(I+1,J)) &
         *1.0_SP/DX*(P(I+1,J)-P(I,J))  &
