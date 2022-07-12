@@ -447,8 +447,10 @@ SUBROUTINE SourceTerms
   IF(H_MIXING)THEN
     IF(MIX_MODEL.EQ.0)THEN
       ! default
+      ! nu_smg = &
+      ! C_smg**2*DX*DY*SQRT(2.0*uMAx**2+2.0*vMAy**2+(uMAy+vMAx)**2)
       nu_smg = &
-      C_smg**2*DX*DY*SQRT(2.0*uMAx**2+2.0*vMAy**2+(uMAy+vMAx)**2)
+      C_smg**2*DX*DY*SQRT(2.0*Ux**2+2.0*Vy**2+(Uy+Vx)**2)
     ELSEIF(MIX_MODEL.EQ.1)THEN
       VTYPE=1
       CALL PHI_COLL(Mloc,Nloc,Ibeg,Iend,Jbeg,Jend,Nghost,Vor_Instant,VTYPE,PERIODIC)
@@ -457,10 +459,6 @@ SUBROUTINE SourceTerms
       nu_smg=C_smg*DX*DY*(DEPTH+ETA)*SQRT(VorX*VorX+VorY*VorY)
     ELSEIF(MIX_MODEL.EQ.2)THEN
       nu_smg=C_smg*(DX*DY*(DEPTH+ETA))**(2.0_SP/3.0_SP)*SQRT(Vor_Instant*Vor_Instant/2)
-    ELSEIF(MIX_MODEL.EQ.3)THEN
-      !nu_smg = C_smg**2*DX*DY*(DEPTH+ETA)**2/(DX**2+DY**2) &
-      !*SQRT(2.0*uMAx**2+2.0*vMAy**2+(uMAy+vMAx)**2)
-      nu_smg = C_smg**2*DX*DY*SQRT(2.0*uMAx**2+2.0*vMAy**2+(uMAy+vMAx)**2)
     ENDIF
 
     ! when there is breaking, deactivate the horizontal mixing
@@ -475,16 +473,6 @@ SUBROUTINE SourceTerms
         ENDIF
       ENDDO
     ENDDO
-
-    !CALL DERIVATIVE_X(Mloc,Nloc,Ibeg,Iend,Jbeg,Jend,MASK9,DX,DEPTH,DEPTHDerX)
-    !nu_smg = nu_smg * CEILING(ABS(DEPTHDerX))
-    ! no mixing in wk region
-    !DO J=jlo,jhi
-    !  DO I=ilo,ihi
-    !    nu_smg(I,J)=0.0_SP
-    !  ENDDO
-    !ENDDO
-
 
     DO J=Jbeg,Jend
       DO I=Ibeg,Iend
