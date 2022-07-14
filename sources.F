@@ -459,6 +459,8 @@ SUBROUTINE SourceTerms
       nu_smg=C_smg*DX*DY*(DEPTH+ETA)*SQRT(VorX*VorX+VorY*VorY)
     ELSEIF(MIX_MODEL.EQ.2)THEN
       nu_smg=C_smg*(DX*DY*(DEPTH+ETA))**(2.0_SP/3.0_SP)*SQRT(Vor_Instant*Vor_Instant/2)
+    ELSEIF(MIX_MODEL.EQ.3)THEN
+      nu_smg = C_smg**2*DX*DY*DEPTH/SQRT(DX**2+DY**2)*SQRT(2.0*uMAx**2+2.0*vMAy**2+(uMAy+vMAx)**2)
     ENDIF
 
     ! when there is breaking, deactivate the horizontal mixing
