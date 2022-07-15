@@ -268,6 +268,11 @@ SUBROUTINE ALLOCATE_VARIABLES
   ALLOCATE(nu_smg_MA(Mloc,Nloc))
   nu_smg_MA=ZERO
 
+  ALLOCATE(nu_smg_mean(Mloc,Nloc))
+  ALLOCATE(nu_smg_sum(Mloc,Nloc))
+  nu_smg_mean = ZERO
+  nu_smg_sum = ZERO
+
   ALLOCATE(nu_visMA_temp(Mloc,Nloc,MA_Window))
   nu_visMA_temp=ZERO
   ALLOCATE(nu_visMA(Mloc,Nloc))

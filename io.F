@@ -4488,6 +4488,11 @@ SUBROUTINE PREVIEW_MEAN
     call PutFile(TMP_NAME,nu_break_mean)
   ENDIF
 
+  IF(H_MIXING)THEN
+    TMP_NAME = TRIM(FDIR)//'nu_smg_mean_'//TRIM(FILE_NAME)
+    call PutFile(TMP_NAME,nu_smg_mean)
+  ENDIF
+
 END SUBROUTINE PREVIEW_MEAN
 
 
