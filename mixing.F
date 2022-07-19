@@ -243,6 +243,17 @@ SUBROUTINE CALCULATE_MEAN(T_INTV_mean,T_sum,T_INTV_UVmean,T_sumUVmean,&
     nu_break_sum=ZERO
     nu_smg_sum=ZERO
 
+    U_davg_sum = ZERO
+    V_davg_sum = ZERO
+    P_sum = ZERO
+    Q_sum = ZERO
+    UUsum = ZERO
+    UVsum = ZERO
+    VVsum = ZERO
+    WWsum = ZERO
+    FRCXsum = ZERO
+    FRCYsum = ZERO
+
     !!!!!!!! no averaging after the following command
     T_sum=T_sum-T_INTV_mean
 
