@@ -317,146 +317,142 @@ SUBROUTINE MAX_MIN_PROPERTY
 # if defined (METEO)
       IF(OUT_Hmax.OR.WindForce)THEN
 # else
-        IF(OUT_Hmax)THEN
+      IF(OUT_Hmax)THEN
 # endif
-          IF(MASK(I,J).GT.0)THEN
-            IF(Eta(I,J).GT.HeightMax(I,J)) HeightMax(I,J)=Eta(I,J)
+        IF(MASK(I,J).GT.0)THEN
+          IF(Eta(I,J).GT.HeightMax(I,J)) HeightMax(I,J)=Eta(I,J)
+        ENDIF
+      ENDIF
+
+      IF(OUT_Hmin)THEN
+        IF(MASK(I,J).GT.0)THEN
+          IF(Eta(I,J).LT.HeightMin(I,J)) HeightMin(I,J)=Eta(I,J)
+        ENDIF
+      ENDIF
+
+      IF(OUT_Umax)THEN
+        IF(MASK(I,J).GT.0)THEN
+          maxv=SQRT(U(I,J)*U(I,J)+V(I,J)*V(I,J))
+          IF(maxV.GT.VelocityMax(I,J)) VelocityMax(I,J)=maxV
+        ENDIF
+      ENDIF
+
+      IF(OUT_MFmax)THEN
+        IF(MASK(I,J).GT.0)THEN
+          maxv=(U(I,J)*U(I,J)+V(I,J)*V(I,J))*(H(I,J))
+          IF(maxv.GT.MomentumFluxMax(I,J)) MomentumFluxMax(I,J)=maxv
+        ENDIF
+      ENDIF
+
+      !Lauren Schambach 3/2/2020 Matrix of Arrival Time
+      IF(OUT_Time)THEN
+        IF(MASK(I,J).GT.0)THEN !Check if wet
+          IF(ARRTIME(I,J).EQ.0)THEN !Only record time if a value doesnt already exist
+            IF(ABS(Eta(I,J)).GT.ArrTimeMin) ARRTIME(I,J) = TIME !If eta is greater than threshold, record arrival time
           ENDIF
         ENDIF
-
-        IF(OUT_Hmin)THEN
-          IF(MASK(I,J).GT.0)THEN
-            IF(Eta(I,J).LT.HeightMin(I,J)) HeightMin(I,J)=Eta(I,J)
-          ENDIF
-        ENDIF
-
-        IF(OUT_Umax)THEN
-          IF(MASK(I,J).GT.0)THEN
-            maxv=SQRT(U(I,J)*U(I,J)+V(I,J)*V(I,J))
-            IF(maxV.GT.VelocityMax(I,J)) VelocityMax(I,J)=maxV
-          ENDIF
-        ENDIF
-
-        IF(OUT_MFmax)THEN
-          IF(MASK(I,J).GT.0)THEN
-            maxv=(U(I,J)*U(I,J)+V(I,J)*V(I,J))*(H(I,J))
-            IF(maxv.GT.MomentumFluxMax(I,J)) MomentumFluxMax(I,J)=maxv
-          ENDIF
-        ENDIF
-
-
-      ENDDO
+      ENDIF
     ENDDO
+  ENDDO
 
-    IF(OUT_VORmax) THEN
-# if defined (CARTESIAN)
-      ! the vorticity has been calculated in dispersion.F
-# else
-      CALL DERIVATIVE_X(Mloc,Nloc,Ibeg,Iend,Jbeg,Jend,MASK9,DX,V,Vx)
-      CALL DERIVATIVE_Y(Mloc,Nloc,Ibeg,Iend,Jbeg,Jend,MASK9,DY,U,Uy)
-      DO J=Jbeg,Jend
-        DO I=Ibeg,Iend
-          omega_0=ABS(Vx(I,J)-Uy(I,J))
-          IF(omega_0.GT.VorticityMax(I,J)) THEN
-            VorticityMax(I,J)=omega_0
-          ENDIF
-        ENDDO
-      ENDDO
-# endif
-    ENDIF ! max vorticity
-
-
-    ! Chen, Salatin, calculatin of vorticity
+  IF(OUT_VORmax) THEN
 # if defined (CARTESIAN)
     ! the vorticity has been calculated in dispersion.F
 # else
     CALL DERIVATIVE_X(Mloc,Nloc,Ibeg,Iend,Jbeg,Jend,MASK9,DX,V,Vx)
     CALL DERIVATIVE_Y(Mloc,Nloc,Ibeg,Iend,Jbeg,Jend,MASK9,DY,U,Uy)
-    Vor_Instant=Vx-Uy
+    DO J=Jbeg,Jend
+      DO I=Ibeg,Iend
+        omega_0=ABS(Vx(I,J)-Uy(I,J))
+        IF(omega_0.GT.VorticityMax(I,J)) THEN
+          VorticityMax(I,J)=omega_0
+        ENDIF
+      ENDDO
+    ENDDO
 # endif
+  ENDIF ! max vorticity
 
 # if defined (PARALLEL)
-    IF(OUT_VORmax) THEN
-      CALL phi_exch(VorticityMax)
-    ENDIF
+  IF(OUT_VORmax) THEN
+    CALL phi_exch(VorticityMax)
+  ENDIF
 # endif
 
+END SUBROUTINE MAX_MIN_PROPERTY
 
-  END SUBROUTINE MAX_MIN_PROPERTY
-
-  !-------------------------------------------------------------------------------------
-  !
-  !    CHECK_BLOWUP is subroutine to check numerical stability
-  !
-  !    HISTORY:
-  !        01/23/2015 Young-Kwang Choi
-  !        02/15/2016 Fengyan Shi, added the threshold to 100*max_depth
-  !
-  !-------------------------------------------------------------------------------------
-  SUBROUTINE CHECK_BLOWUP
-    USE GLOBAL
-    IMPLICIT NONE
-    ![ykchoi 15.01.23.
-    REAL(SP) :: MaxAbsEta
+!-------------------------------------------------------------------------------------
+!
+!    CHECK_BLOWUP is subroutine to check numerical stability
+!
+!    HISTORY:
+!        01/23/2015 Young-Kwang Choi
+!        02/15/2016 Fengyan Shi, added the threshold to 100*max_depth
+!
+!-------------------------------------------------------------------------------------
+SUBROUTINE CHECK_BLOWUP
+  USE GLOBAL
+  IMPLICIT NONE
+  ![ykchoi 15.01.23.
+  REAL(SP) :: MaxAbsEta
 # if defined (PARALLEL)
-    REAL(SP)::myvar_tmp
+  REAL(SP)::myvar_tmp
 # endif
 
-    MaxAbsEta=MAXVAL( abs(Eta(Ibeg:Iend,Jbeg:Jend)) )
+  MaxAbsEta=MAXVAL( abs(Eta(Ibeg:Iend,Jbeg:Jend)) )
 # if defined (PARALLEL)
-    CALL MPI_ALLREDUCE(MaxAbsEta,myvar_tmp,1,MPI_SP,MPI_MAX,MPI_COMM_WORLD,ier)
-    MaxAbsEta = myvar_tmp
+  CALL MPI_ALLREDUCE(MaxAbsEta,myvar_tmp,1,MPI_SP,MPI_MAX,MPI_COMM_WORLD,ier)
+  MaxAbsEta = myvar_tmp
 # endif
 
-    if (MaxAbsEta > EtaBlowVal) then
+  if (MaxAbsEta > EtaBlowVal) then
 # if defined (PARALLEL)
-      if (myid.eq.0) then
+    if (myid.eq.0) then
 # endif
-        WRITE(*,*) "========================================="
-        WRITE(*,*) "BlowUp Time, MaxAbsEta=", Time, MaxAbsEta
-        WRITE(*,*) "========================================="
+      WRITE(*,*) "========================================="
+      WRITE(*,*) "BlowUp Time, MaxAbsEta=", Time, MaxAbsEta
+      WRITE(*,*) "========================================="
 # if defined (PARALLEL)
-      endif
-# endif
-      ICOUNT=99998;
-      CALL PREVIEW
-
-# if defined (PARALLEL)
-      call MPI_FINALIZE ( ier )
-# else
-      STOP
-# endif
-
     endif
+# endif
+    ICOUNT=99998;
+    CALL PREVIEW
 
+# if defined (PARALLEL)
+    ! 2019/09/04 mayhl: Switched MPI_FINALIZE to MPI_ABORT
+    !call MPI_FINALIZE ( ier )
+    call MPI_ABORT( MPI_COMM_WORLD , 9 , ier )
+# else
+    STOP
+# endif
+  endif
 
-  END SUBROUTINE CHECK_BLOWUP
+END SUBROUTINE CHECK_BLOWUP
 
-  !-------------------------------------------------------------------------------------
-  !
-  !   wall_time_secs is used to calculate current wall time
-  !
-  !   HISTORY:
-  !   Gangfeng Ma, 09/12/2011
-  !
-  !-------------------------------------------------------------------------------------
-  SUBROUTINE wall_time_secs(tcurrent)
-    IMPLICIT NONE
-    INTEGER, dimension(8) :: walltime
-    real, INTENT(OUT) :: tcurrent
-    real :: msecs,secs,mins,hrs,days,months,mscale,years
+!-------------------------------------------------------------------------------------
+!
+!   wall_time_secs is used to calculate current wall time
+!
+!   HISTORY:
+!   Gangfeng Ma, 09/12/2011
+!
+!-------------------------------------------------------------------------------------
+SUBROUTINE wall_time_secs(tcurrent)
+  IMPLICIT NONE
+  INTEGER, dimension(8) :: walltime
+  real, INTENT(OUT) :: tcurrent
+  real :: msecs,secs,mins,hrs,days,months,mscale,years
 
-    call date_and_time(VALUES=walltime)
+  call date_and_time(VALUES=walltime)
 
-    msecs = real(walltime(8))
-    secs = real(walltime(7))
-    mins = real(walltime(6))
-    hrs = real(walltime(5))
-    days = real(walltime(3))
-    months = real(walltime(2))
-    years = real(walltime(1))
+  msecs = real(walltime(8))
+  secs = real(walltime(7))
+  mins = real(walltime(6))
+  hrs = real(walltime(5))
+  days = real(walltime(3))
+  months = real(walltime(2))
+  years = real(walltime(1))
 
-    if((months.eq.1).or.(months.eq.3).or.(months.eq.5).or.  &
+  if((months.eq.1).or.(months.eq.3).or.(months.eq.5).or.  &
     (months.eq.7).or.(months.eq.8).or.(months.eq.10).or.  &
     (months.eq.12)) then
     mscale = 31.0
@@ -528,7 +524,5 @@ SUBROUTINE SHAPIRO_3(M,N,Nghost,MASK,VAR_IN_OUT)
       ENDIF
     ENDDO
   ENDDO
-
-
 END SUBROUTINE SHAPIRO_3
 # endif

@@ -67,7 +67,7 @@ SUBROUTINE SourceTerms
   IMPLICIT NONE
   REAL,DIMENSION(Mloc,Nloc) :: nu_vis
   LOGICAL :: PQ_scheme = .TRUE.
-  REAL(SP) :: xmk,ymk,Dxg,Dyg,WK_Source
+  REAL(SP) :: xmk,ymk,WK_Source
   INTEGER :: kd,kf
   REAL(SP) :: AA                          ! for all WK's (optimized)
   REAL(SP), DIMENSION(Nfreq) :: BB,CC     ! for WK_IRR (optimized)
@@ -82,15 +82,6 @@ SUBROUTINE SourceTerms
   !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
   !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
   !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-
-# if defined (CARTESIAN)
-  DXg=DX
-  DYg=DY
-# else
-  ! only for wavemaker
-  DXg=DX(1,1)
-  DYg=DY(1,1)
-# endif
 
   ! wavemaker fyshi 02/08/2016
   !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
@@ -230,6 +221,11 @@ SUBROUTINE SourceTerms
     nu_vis = nu_break
   ENDIF
 
+# if defined (DEEP_DRAFT_VESSEL)
+  nu_vis = nu_vis + VisVessel_2D
+# endif
+
+
   IF(DIFFUSION_SPONGE)THEN
     ! should include ghost cells 02/28/2017, fyshi
     nu_vis = nu_vis + nu_sponge
@@ -332,11 +328,14 @@ SUBROUTINE SourceTerms
   IF(FRICTION_SPONGE) THEN
     ! note that, compared to wei et al, we used flux.
     ! So need multiply D
-    SourceX = SourceX &
-    -CD_4_SPONGE*U*SQRT(U*U+V*V)*Depth
-    SourceY = SourceY &
-    -CD_4_SPONGE*V*SQRT(U*U+V*V)*Depth
+    SourceX = SourceX-CD_4_SPONGE*U*SQRT(U*U+V*V)*Depth
+    SourceY = SourceY-CD_4_SPONGE*V*SQRT(U*U+V*V)*Depth
   ENDIF
+
+# if defined (DEEP_DRAFT_VESSEL)
+  SourceX = SourceX-CdVessel_2D*U*SQRT(U*U+V*V)
+  SourceX = SourceY-CdVessel_2D*V*SQRT(U*U+V*V)
+# endif
 
   !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
   !!! BREAKWATER
@@ -344,10 +343,8 @@ SUBROUTINE SourceTerms
   IF(BREAKWATER) THEN
     ! note that, compared to wei et al, we used flux.
     ! So need multiply D
-    SourceX = SourceX &
-    -CD_breakwater*U*SQRT(U*U+V*V)*Depth
-    SourceY = SourceY &
-    -CD_BREAKWATER*V*SQRT(U*U+V*V)*Depth
+    SourceX = SourceX-CD_breakwater*U*SQRT(U*U+V*V)*Depth
+    SourceY = SourceY-CD_BREAKWATER*V*SQRT(U*U+V*V)*Depth
   ENDIF
 
   !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
@@ -356,12 +353,9 @@ SUBROUTINE SourceTerms
 # if defined (METEO)
   IF(WindForce)THEN
     SourceX=SourceX &
-    +MASK_WIND*RHO_AW &
-    *Cdw*WindU2D*SQRT(WindU2D*WindU2D + WindV2D*WindV2D)
-
+    +MASK_WIND*RHO_AW*Cdw*WindU2D*SQRT(WindU2D*WindU2D + WindV2D*WindV2D)
     SourceY=SourceY &
-    +MASK_WIND*RHO_AW &
-    *Cdw*WindV2D*SQRT(WindU2D*WindU2D + WindV2D*WindV2D)
+    +MASK_WIND*RHO_AW*Cdw*WindV2D*SQRT(WindU2D*WindU2D + WindV2D*WindV2D)
   ENDIF
 # endif
 

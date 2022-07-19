@@ -50,14 +50,17 @@
 !-------------------------------------------------------------------------------------
 SUBROUTINE UPDATE_MASK
   USE GLOBAL
+# if defined (VESSEL)
+  USE VESSEL_MODULE
+# endif
   IMPLICIT NONE
-  INTEGER,DIMENSION(:,:),ALLOCATABLE :: MASKtmp
+  INTEGER,DIMENSION(:,:),ALLOCATABLE :: MASKtmp,MASK9tmp
   REAL(SP),DIMENSION(:,:),ALLOCATABLE :: ETAtmp
 # if defined (PARALLEL)
   REAL(SP)::myvar
 # endif
 
-  ALLOCATE(MASKtmp(Mloc,Nloc))
+  ALLOCATE(MASKtmp(Mloc,Nloc),MASK9tmp(Mloc,Nloc))
   ALLOCATE(ETAtmp(Mloc,Nloc))
 
   ! for the serial code, MASK at ghost cells keep no change
@@ -77,6 +80,23 @@ SUBROUTINE UPDATE_MASK
       IF(MASK_STRUC(I,J)==1)THEN
         IF(MASK(I,J)<1)THEN
           ! left
+# if defined(UseEtaScreen)
+          IF(MASK(I-1,J)==1.AND.Eta(I-1,J)>EtaScreen(I,J))THEN
+            MASKtmp(I,J)=1
+          ENDIF
+          ! right
+          IF(MASK(I+1,J)==1.AND.Eta(I+1,J)>EtaScreen(I,J))THEN
+            MASKtmp(I,J)=1
+          ENDIF
+          ! bottom
+          IF(MASK(I,J-1)==1.AND.Eta(I,J-1)>EtaScreen(I,j))THEN
+            MASKtmp(I,J)=1
+          ENDIF
+          ! top
+          IF(MASK(I,J+1)==1.AND.Eta(I,J+1)>EtaScreen(I,j))THEN
+            MASKtmp(I,J)=1
+          ENDIF
+# else
           IF(MASK(I-1,J)==1.AND.Eta(I-1,J)>Eta(I,J))THEN
             MASKtmp(I,J)=1
           ENDIF
@@ -92,7 +112,8 @@ SUBROUTINE UPDATE_MASK
           IF(MASK(I,J+1)==1.AND.Eta(I,J+1)>Eta(I,j))THEN
             MASKtmp(I,J)=1
           ENDIF
-          ! drying
+# endif
+        ! drying
         ELSE
           IF(Eta(I,J)<-Depth(I,J))THEN
             MASKtmp(I,J)=0
@@ -131,12 +152,15 @@ SUBROUTINE UPDATE_MASK
   ENDDO
 
   MASK=MASKtmp
-  ETA=ETAtmp
+# if defined(UseEtaScreen)
+  EtaScreen = ETAtmp
+# endif
 
   DO J=Jbeg-1,Jend+1
     DO I=Ibeg-1,Iend+1
       IF(VISCOSITY_BREAKING)THEN
         ! dont use mask9 for viscosity breaking
+        MASK9tmp(I,J)= 1
       ELSE
         MASK9(I,J)=MASK(I,J)*MASK(I-1,J)*MASK(I+1,J)  &
         *MASK(I+1,J+1)*MASK(I,J+1)*MASK(I-1,J+1) &
@@ -144,18 +168,22 @@ SUBROUTINE UPDATE_MASK
         IF(ABS(Eta(I,J))/MAX(DEPTH(I,J),MinDepthFrc)>SWE_ETA_DEP)THEN
           MASK9(I,J)=ZERO
         ENDIF
-
       ENDIF ! end viscosity breaking
-
     ENDDO
   ENDDO
+
+  MASK9 = MASK9tmp
+
+# if defined (DEEP_DRAFT_VESSEL)
+  MASK9 = MASK9tmp*MaskVessel
+# endif
 
 # if defined(PARALLEL)
   CALL PHI_INT_EXCH(MASK)
   CALL PHI_INT_EXCH(MASK9)
 # endif
 
-  DEALLOCATE(MASKtmp)
+  DEALLOCATE(MASKtmp,MASK9tmp)
   DEALLOCATE(ETAtmp)
 
 # if defined (CHECK_MASS_CONSERVATION)

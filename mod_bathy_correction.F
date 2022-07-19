@@ -53,17 +53,17 @@
 
 MODULE BATHY_CORRECTION_MODULE
 USE PARAM
-USE GLOBAL,ONLY : Mloc,Nloc,Nghost,Ibeg,Iend,Jbeg,Jend,DX,DY,Depth
+USE GLOBAL,ONLY : Mloc,Nloc,Nghost,Ibeg,Iend,Jbeg,Jend,DX,DY,Depth,INPUT_FILE_NAME
 USE INPUT_READ
 #if defined (PARALLEL)
-USE GLOBAL,ONLY : myid,ier, npx,npy,PX,PY
+USE GLOBAL,ONLY : myid,ier,npx,npy,PX,PY
 USE MPI
 # endif
 IMPLICIT NONE
 SAVE
 
 REAL(SP),DIMENSION(:,:),ALLOCATABLE :: Depth0, Depth1,Gradx0,Grady0, &
-Gradx,Grady,Depth_org
+  Gradx,Grady,Depth_org
 INTEGER,DIMENSION(:,:),ALLOCATABLE :: MASK0
 REAL(SP) :: SmoothBelowDepth, SlopeCap
 
@@ -76,7 +76,7 @@ CONTAINS
 
 SUBROUTINE CORRECTION
   USE GLOBAL,ONLY : itmp1,itmp2,itmp3,itmp4,SMALL,LARGE,tmp1,tmp2,tmp3, &
-  MinDepthFrc
+      MinDepthFrc
 
   USE INPUT_READ
   IMPLICIT NONE
@@ -95,7 +95,7 @@ SUBROUTINE CORRECTION
   threshold = 0.05_SP
 
   ! read vessel number and folder from input.txt
-  FILE_NAME='input.txt'
+  FILE_NAME=INPUT_FILE_NAME
 
 
   CALL READ_FLOAT(SmoothBelowDepth,FILE_NAME,'SmoothBelowDepth',ierr)

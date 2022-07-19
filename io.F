@@ -102,35 +102,36 @@ SUBROUTINE OUTPUT
 
 
   ! preview
+  IF(TIME>=PLOT_START_TIME)THEN
 
-  PLOT_COUNT=PLOT_COUNT+DT
-  IF(PLOT_COUNT>=PLOT_INTV)THEN
-    PLOT_COUNT=PLOT_COUNT-PLOT_INTV
-    CALL PREVIEW
-  ENDIF
+    PLOT_COUNT=PLOT_COUNT+DT
+    IF(PLOT_COUNT>=PLOT_INTV)THEN
+      PLOT_COUNT=PLOT_COUNT-PLOT_INTV
+      CALL PREVIEW
+    ENDIF
 # if defined (VESSEL)
-  PLOT_COUNT_VESSEL=PLOT_COUNT_VESSEL+DT
-  IF(PLOT_COUNT_VESSEL>=PLOT_INTV_VESSEL)THEN
-    PLOT_COUNT_VESSEL=PLOT_COUNT_VESSEL-PLOT_INTV_VESSEL
-    CALL OUTPUT_VESSEL
-  ENDIF
+    PLOT_COUNT_VESSEL=PLOT_COUNT_VESSEL+DT
+    IF(PLOT_COUNT_VESSEL>=PLOT_INTV_VESSEL)THEN
+      PLOT_COUNT_VESSEL=PLOT_COUNT_VESSEL-PLOT_INTV_VESSEL
+      CALL OUTPUT_VESSEL
+    ENDIF
 # endif
 # if defined (SEDIMENT)
-  PLOT_COUNT_SEDIMENT=PLOT_COUNT_SEDIMENT+DT
-  IF(PLOT_COUNT_SEDIMENT>=PLOT_INTV_SEDIMENT)THEN
-    PLOT_COUNT_SEDIMENT=PLOT_COUNT_SEDIMENT-PLOT_INTV_SEDIMENT
-    CALL OUTPUT_SEDIMENT
-  ENDIF
+    PLOT_COUNT_SEDIMENT=PLOT_COUNT_SEDIMENT+DT
+    IF(PLOT_COUNT_SEDIMENT>=PLOT_INTV_SEDIMENT)THEN
+      PLOT_COUNT_SEDIMENT=PLOT_COUNT_SEDIMENT-PLOT_INTV_SEDIMENT
+      CALL OUTPUT_SEDIMENT
+    ENDIF
 # endif
 # if defined (TRACKING)
-  PLOT_COUNT_TRACKING=PLOT_COUNT_TRACKING+DT
-  IF(PLOT_COUNT_TRACKING>=PLOT_INTV_TRACKING)THEN
-    PLOT_COUNT_TRACKING=PLOT_COUNT_TRACKING-PLOT_INTV_TRACKING
-    CALL OUTPUT_TRACKING
-  ENDIF
+    PLOT_COUNT_TRACKING=PLOT_COUNT_TRACKING+DT
+    IF(PLOT_COUNT_TRACKING>=PLOT_INTV_TRACKING)THEN
+      PLOT_COUNT_TRACKING=PLOT_COUNT_TRACKING-PLOT_INTV_TRACKING
+      CALL OUTPUT_TRACKING
+    ENDIF
 # endif
 
-
+  ENDIF ! end plot start time
 
 END SUBROUTINE OUTPUT
 
@@ -161,6 +162,9 @@ SUBROUTINE READ_INPUT
   INTEGER :: I_comp
   LOGICAL :: INPUT_PHASE = .FALSE.
 
+  !>by Zhouteng Ye
+  CHARACTER(LEN=80)::INPUT_NAME=''
+
   ![ykchoi
   CHARACTER(LEN=80)::FDIR=' '
   !ykchoi]
@@ -176,7 +180,17 @@ SUBROUTINE READ_INPUT
   OPEN(3,FILE='LOG.txt')
 
   ! read everything from input.txt
-  FILE_NAME='input.txt'
+  !>by Zhouteng Ye
+  !> Get the argument from the command.
+  !> If no input in command, file name is 'input.txt' (same as before)
+  !> If the input comes with other name, read the correponding file
+  CALL GETARG(1,INPUT_NAME)
+  if (INPUT_NAME .eq. '') Then
+    FILE_NAME='input.txt'
+  Else
+    FILE_NAME=INPUT_NAME
+  endif
+  INPUT_FILE_NAME=FILE_NAME
 
   ! title
   CALL READ_STRING(TITLE,FILE_NAME,'TITLE',ierr)
@@ -664,6 +678,20 @@ SUBROUTINE READ_INPUT
   ENDIF
   !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
+  CALL READ_INTEGER(StationOutputBuffer,FILE_NAME,'StationOutputBuffer',ierr)
+    IF(ierr==1)THEN
+      StationOutputBuffer = 1000
+# if defined (PARALLEL)
+      if (myid.eq.0) THEN
+        WRITE(*,'(A80)')'StationOutputBuffer not specified, use default:1000'
+        WRITE(3,'(A80)')'StationOutputBuffer not specified, use default:1000'
+      endif
+# else
+      WRITE(*,'(A80)')'StationOutputBuffer not specified, use default:1000'
+      WRITE(3,'(A80)')'StationOutputBuffer not specified, use default:1000'
+# endif
+    ENDIF
+
   CALL READ_FLOAT(SCREEN_INTV,FILE_NAME,'SCREEN_INTV',ierr)
   IF(ierr==1)THEN
     SCREEN_INTV = 1.0
@@ -703,8 +731,24 @@ SUBROUTINE READ_INPUT
     INI_UVZ = .FALSE.
   ENDIF
   IF(INI_UVZ)THEN
-    CALL READ_STRING(ETA_FILE,FILE_NAME,'ETA_FILE',ierr)
 
+    CALL READ_LOGICAL(BED_DEFORMATION,FILE_NAME,'BED_DEFORMATION',ierr)
+    IF(ierr==1)THEN
+      BED_DEFORMATION = .FALSE.
+    ENDIF
+    IF(BED_DEFORMATION)THEN
+# if defined (PARALLEL)
+      if (myid.eq.0) THEN
+        WRITE(*,'(A50)')'Bathymetry is adjusted based on Bed deformation.'
+        WRITE(3,'(A50)')'Bathymetry is adjusted based on Bed deformation.'
+      endif
+# else
+        WRITE(*,'(A50)')'Bathymetry is adjusted based on Bed deformation.'
+        WRITE(3,'(A50)')'Bathymetry is adjusted based on Bed deformation.'
+# endif
+    ENDIF ! end bed deformation
+
+    CALL READ_STRING(ETA_FILE,FILE_NAME,'ETA_FILE',ierr)
     IF(ierr==1)THEN
 # if defined (PARALLEL)
       if (myid.eq.0) THEN
@@ -1953,23 +1997,22 @@ ELSE
     WRITE(3,'(A25,A50)')'Ntheta for TMA or JON', 'NOT DEFINED, USE 24'
 # endif
   ENDIF
-
 ENDIF ! 1D or not
 
-IF(WaveMaker(1:6)=='TMA_1D'  &
-.OR.WaveMaker(1:6)=='JON_1D')THEN
-ThetaPeak = 0.0_SP
-ELSE
-  CALL READ_FLOAT(ThetaPeak,FILE_NAME,'ThetaPeak',ierr)
-  IF(ierr==1)THEN
-    ThetaPeak = 0.0_SP
+!IF(WaveMaker(1:6)=='TMA_1D'  &
+!.OR.WaveMaker(1:6)=='JON_1D')THEN
+!ThetaPeak = 0.0_SP
+!ELSE
+CALL READ_FLOAT(ThetaPeak,FILE_NAME,'ThetaPeak',ierr)
+IF(ierr==1)THEN
+  ThetaPeak = 0.0_SP
 # if defined (PARALLEL)
-    if (myid.eq.0) WRITE(3,'(A25,A50)')'ThetaPeak', 'NOT DEFINED, USE 0.0'
+  if (myid.eq.0) WRITE(3,'(A25,A50)')'ThetaPeak', 'NOT DEFINED, USE 0.0'
 # else
-    WRITE(3,'(A25,A50)')'ThetaPeak', 'NOT DEFINED, USE 0.0'
+  WRITE(3,'(A25,A50)')'ThetaPeak', 'NOT DEFINED, USE 0.0'
 # endif
-  ENDIF ! end ierr
-ENDIF ! 1D or not
+ENDIF ! end ierr
+!ENDIF ! 1D or not
 
 IF(WaveMaker(1:6)=='TMA_1D'  &
 .OR.WaveMaker(1:6)=='JON_1D')THEN
@@ -2372,76 +2415,73 @@ IF(WaveMaker(1:3)=='ABS'.OR.WaveMaker(1:11)=='LEFT_BC_IRR') THEN
 
     IF(WAVE_DATA_TYPE(1:6)=='TMA_1D'  &
     .OR.WAVE_DATA_TYPE(1:6)=='JON_1D')THEN
-    Ntheta = 1
-  ELSE
-    CALL READ_INTEGER(Ntheta,FILE_NAME,'Ntheta',ierr)
-    IF(ierr==1)THEN
-      Ntheta = 24
+      Ntheta = 1
+    ELSE
+      CALL READ_INTEGER(Ntheta,FILE_NAME,'Ntheta',ierr)
+      IF(ierr==1)THEN
+        Ntheta = 24
 # if defined (PARALLEL)
-      if (myid.eq.0) WRITE(3,'(A25,A50)')'Ntheta for TMA or JON', 'NOT DEFINED, USE 24'
+        if (myid.eq.0) WRITE(3,'(A25,A50)')'Ntheta for TMA or JON', 'NOT DEFINED, USE 24'
 # else
-      WRITE(3,'(A25,A50)')'Ntheta for TMA or JON', 'NOT DEFINED, USE 24'
+        WRITE(3,'(A25,A50)')'Ntheta for TMA or JON', 'NOT DEFINED, USE 24'
 # endif
-    ENDIF
+      ENDIF
+    ENDIF ! 1D or not
 
-  ENDIF ! 1D or not
-
-  IF(WAVE_DATA_TYPE(1:6)=='TMA_1D'  &
-  .OR.WAVE_DATA_TYPE(1:6)=='JON_1D')THEN
-  ThetaPeak = 0.0_SP
-ELSE
-  CALL READ_FLOAT(ThetaPeak,FILE_NAME,'ThetaPeak',ierr)
-  IF(ierr==1)THEN
-    ThetaPeak = 0.0_SP
+    IF(WAVE_DATA_TYPE(1:6)=='TMA_1D'  &
+    .OR.WAVE_DATA_TYPE(1:6)=='JON_1D')THEN
+      ThetaPeak = 0.0_SP
+    ELSE
+      CALL READ_FLOAT(ThetaPeak,FILE_NAME,'ThetaPeak',ierr)
+      IF(ierr==1)THEN
+        ThetaPeak = 0.0_SP
 # if defined (PARALLEL)
-    if (myid.eq.0) WRITE(3,'(A25,A50)')'ThetaPeak', 'NOT DEFINED, USE 0.0'
+        if (myid.eq.0) WRITE(3,'(A25,A50)')'ThetaPeak', 'NOT DEFINED, USE 0.0'
 # else
-    WRITE(3,'(A25,A50)')'ThetaPeak', 'NOT DEFINED, USE 0.0'
+        WRITE(3,'(A25,A50)')'ThetaPeak', 'NOT DEFINED, USE 0.0'
 # endif
-  ENDIF ! end ierr
-ENDIF ! 1D or not
+      ENDIF ! end ierr
+    ENDIF ! 1D or not
 
-IF(WAVE_DATA_TYPE(1:6)=='TMA_1D'  &
-.OR.WAVE_DATA_TYPE(1:6)=='JON_1D')THEN
+!IF(WAVE_DATA_TYPE(1:6)=='TMA_1D'  &
+!.OR.WAVE_DATA_TYPE(1:6)=='JON_1D')THEN
 ! do nothing
-ELSE
-  CALL READ_FLOAT(Sigma_Theta,FILE_NAME,'Sigma_Theta',ierr)
-  IF(ierr==1)THEN
-    Sigma_Theta = 10.0_SP
+!ELSE
+CALL READ_FLOAT(Sigma_Theta,FILE_NAME,'Sigma_Theta',ierr)
+    IF(ierr==1)THEN
+      Sigma_Theta = 10.0_SP
 # if defined (PARALLEL)
-    if (myid.eq.0) WRITE(3,'(A25,A50)')'Sigma_Theta', 'NOT DEFINED, USE 10.0'
+      if (myid.eq.0) WRITE(3,'(A25,A50)')'Sigma_Theta', 'NOT DEFINED, USE 10.0'
 # else
-    WRITE(3,'(A25,A50)')'Sigma_Theta', 'NOT DEFINED, USE 10.0'
+      WRITE(3,'(A25,A50)')'Sigma_Theta', 'NOT DEFINED, USE 10.0'
 # endif
-  ENDIF ! end ierr
+    ENDIF ! end ierr
 
-ENDIF ! 1D or not
+!ENDIF ! 1D or not
 
 
 # if defined (PARALLEL)
-if (myid.eq.0) WRITE(3,'(A12,I12)')'Nfreq=  ', Nfreq
-if (myid.eq.0) WRITE(3,'(A12,I12)')'Ntheta=  ', Ntheta
-if (myid.eq.0) WRITE(3,'(A12,F12.2)')'FreqPeak=  ', FreqPeak
-if (myid.eq.0) WRITE(3,'(A12,F12.2)')'FreqMin =  ', FreqMin
-if (myid.eq.0) WRITE(3,'(A12,F12.2)')'FreqMax =  ', FreqMax
-if (myid.eq.0) WRITE(3,'(A12,F12.2)')'Hmo     =  ', Hmo
-if (myid.eq.0) WRITE(3,'(A12,F12.2)')'GammaTMA=  ', GammaTMA
-if (myid.eq.0) WRITE(3,'(A12,F12.2)')'ThetaPeak= ', ThetaPeak
-if (myid.eq.0) WRITE(3,'(A13,F12.2)')'Sigma_Theta=', Sigma_Theta
+    if (myid.eq.0) WRITE(3,'(A12,I12)')'Nfreq=  ', Nfreq
+    if (myid.eq.0) WRITE(3,'(A12,I12)')'Ntheta=  ', Ntheta
+    if (myid.eq.0) WRITE(3,'(A12,F12.2)')'FreqPeak=  ', FreqPeak
+    if (myid.eq.0) WRITE(3,'(A12,F12.2)')'FreqMin =  ', FreqMin
+    if (myid.eq.0) WRITE(3,'(A12,F12.2)')'FreqMax =  ', FreqMax
+    if (myid.eq.0) WRITE(3,'(A12,F12.2)')'Hmo     =  ', Hmo
+    if (myid.eq.0) WRITE(3,'(A12,F12.2)')'GammaTMA=  ', GammaTMA
+    if (myid.eq.0) WRITE(3,'(A12,F12.2)')'ThetaPeak= ', ThetaPeak
+    if (myid.eq.0) WRITE(3,'(A13,F12.2)')'Sigma_Theta=', Sigma_Theta
 # else
-WRITE(3,'(A12,I12)')'Nfreq=  ', Nfreq
-WRITE(3,'(A12,I12)')'Ntheta=  ', Ntheta
-WRITE(3,'(A12,F12.2)')'FreqPeak=  ', FreqPeak
-WRITE(3,'(A12,F12.2)')'FreqMin =  ', FreqMin
-WRITE(3,'(A12,F12.2)')'FreqMax =  ', FreqMax
-WRITE(3,'(A12,F12.2)')'Hmo     =  ', Hmo
-WRITE(3,'(A12,F12.2)')'GammaTMA=  ', GammaTMA
-WRITE(3,'(A12,F12.2)')'ThetaPeak= ', ThetaPeak
-WRITE(3,'(A13,F12.2)')'Sigma_Theta=', Sigma_Theta
+    WRITE(3,'(A12,I12)')'Nfreq=  ', Nfreq
+    WRITE(3,'(A12,I12)')'Ntheta=  ', Ntheta
+    WRITE(3,'(A12,F12.2)')'FreqPeak=  ', FreqPeak
+    WRITE(3,'(A12,F12.2)')'FreqMin =  ', FreqMin
+    WRITE(3,'(A12,F12.2)')'FreqMax =  ', FreqMax
+    WRITE(3,'(A12,F12.2)')'Hmo     =  ', Hmo
+    WRITE(3,'(A12,F12.2)')'GammaTMA=  ', GammaTMA
+    WRITE(3,'(A12,F12.2)')'ThetaPeak= ', ThetaPeak
+    WRITE(3,'(A13,F12.2)')'Sigma_Theta=', Sigma_Theta
 # endif
-
-
-ENDIF ! end if data or tma
+  ENDIF ! end if data or tma
 ENDIF ! end absorbing-generating or left bc wave maker
 
 # if defined (PARALLEL)
@@ -2888,12 +2928,12 @@ IF(ierr==1)THEN
   VISCOSITY_BREAKING = .TRUE.
 # if defined (PARALLEL)
   if (myid.eq.0) THEN
-    WRITE(*,'(A60)')'VISCOSITY_BREAKING Default:  SWE Breaking'
-    WRITE(3,'(A60)')'VISCOSITY_BREAKING Default:  SWE Breaking'
+    WRITE(*,'(A60)')'VISCOSITY_BREAKING Default:  VIS Breaking'
+    WRITE(3,'(A60)')'VISCOSITY_BREAKING Default:  VIS Breaking'
   endif
 # else
-  WRITE(*,'(A60)')'VISCOSITY_BREAKING Default:  SWE Breaking'
-  WRITE(3,'(A60)')'VISCOSITY_BREAKING Default:  SWE Breaking'
+  WRITE(*,'(A60)')'VISCOSITY_BREAKING Default:  VIS Breaking'
+  WRITE(3,'(A60)')'VISCOSITY_BREAKING Default:  VIS Breaking'
 # endif
 ENDIF
 
@@ -2976,19 +3016,19 @@ IF(ierr==1)THEN
   Cd_fixed = 0.0_SP
 # if defined (PARALLEL)
   if (myid.eq.0) THEN
-    WRITE(*,'(A40)')'Cd_fixed Default:  0.0'
-    WRITE(3,'(A40)')'Cd_fixed Default:  0.0'
+    WRITE(*,'(A40)')'Cd_fixed Default:  0.0, possibly you used FRICTION_MATRIX'
+    WRITE(3,'(A40)')'Cd_fixed Default:  0.0, possibly you used FRICTION_MATRIX'
   endif
 # else
-  WRITE(*,'(A40)')'Cd_fixed Default:  0.0'
-  WRITE(3,'(A40)')'Cd_fixed Default:  0.0'
+  WRITE(*,'(A40)')'Cd_fixed Default:  0.0, possibly you used FRICTION_MATRIX'
+  WRITE(3,'(A40)')'Cd_fixed Default:  0.0, possibly you used FRICTION_MATRIX'
 # endif
 ENDIF
 
 # if defined (PARALLEL)
-if (myid.eq.0) WRITE(3,'(A13,F12.2)')'Cd_fixed         =', Cd_fixed
+if (myid.eq.0) WRITE(3,'(A35,F12.2)')'Cd_fixed (if you used fixed Cd) =', Cd_fixed
 # else
-WRITE(3,'(A13,F12.2)')'Cd_fixed         =', Cd_fixed
+WRITE(3,'(A35,F12.2)')'Cd_fixed (if you used fixed Cd) =', Cd_fixed
 # endif
 
 # if defined (PARALLEL)
@@ -3115,29 +3155,29 @@ WRITE(3,'(A12,F12.2)')'FroudeCap=', FroudeCap
 ! MinDepth etc
 CALL READ_FLOAT(MinDepth,FILE_NAME,'MinDepth',ierr)
 IF(ierr==1)THEN
-  MinDepth = 0.1_SP
+  MinDepth = 0.02_SP
 # if defined (PARALLEL)
   if (myid.eq.0) THEN
-    WRITE(*,'(A40)')'MinDepth Default:  0.1 m'
-    WRITE(3,'(A40)')'MinDepth Default:  0.1 m'
+    WRITE(*,'(A40)')'MinDepth Default:  0.02 m'
+    WRITE(3,'(A40)')'MinDepth Default:  0.2 m'
   endif
 # else
-  WRITE(*,'(A40)')'MinDepth Default:  0.1 m'
-  WRITE(3,'(A40)')'MinDepth Default:  0.1 m'
+  WRITE(*,'(A40)')'MinDepth Default:  0.02 m'
+  WRITE(3,'(A40)')'MinDepth Default:  0.02 m'
 # endif
 ENDIF
 
 CALL READ_FLOAT(MinDepthFrc,FILE_NAME,'MinDepthFrc',ierr)
 IF(ierr==1)THEN
-  MinDepthFrc = 0.1_SP
+  MinDepthFrc = 0.02_SP
 # if defined (PARALLEL)
   if (myid.eq.0) THEN
-    WRITE(*,'(A40)')'MinDepthFrc Default:  0.1 m'
-    WRITE(3,'(A40)')'MinDepthFrc Default:  0.1 m'
+    WRITE(*,'(A40)')'MinDepthFrc Default:  0.02 m'
+    WRITE(3,'(A40)')'MinDepthFrc Default:  0.02 m'
   endif
 # else
-  WRITE(*,'(A40)')'MinDepthFrc Default:  0.1 m'
-  WRITE(3,'(A40)')'MinDepthFrc Default:  0.1 m'
+  WRITE(*,'(A40)')'MinDepthFrc Default:  0.02 m'
+  WRITE(3,'(A40)')'MinDepthFrc Default:  0.02 m'
 # endif
 ENDIF
 
@@ -3164,6 +3204,53 @@ if (myid.eq.0) WRITE(3,'(A13,F12.6)')'MinDepthFrc=', MinDepthFrc
 WRITE(3,'(A13,F12.2)')'MinDepthFrc=', MinDepthFrc
 # endif
 
+! Lauren - Arrival Time - Wave height threshold (in m) to pick up arrival time
+
+CALL READ_LOGICAL(OUT_Time,FILE_NAME,'OUT_Time',ierr)
+IF(ierr==1)THEN
+  OUT_Time = .FALSE.
+# if defined (PARALLEL)
+  if (myid.eq.0) THEN
+    WRITE(*,'(A60)')'Dont record wave arrival time'
+    WRITE(3,'(A60)')'Dont record wave arrival time'
+  endif
+# else
+  WRITE(*,'(A60)')'Dont record wave arrival time'
+  WRITE(3,'(A60)')'Dont record wave arrival time'
+# endif
+ELSE
+# if defined (PARALLEL)
+  if (myid.eq.0) THEN
+    WRITE(*,'(A60)')'Record wave arrival time'
+    WRITE(3,'(A60)')'Record wave arrival time'
+  endif
+# else
+  WRITE(*,'(A60)')'Record wave arrival time'
+  WRITE(3,'(A60)')'Record wave arrival time'
+# endif
+ENDIF
+
+IF(OUT_Time)THEN
+  CALL READ_FLOAT(ArrTimeMin,FILE_NAME,'ArrTimeMinH',ierr)
+  IF(ierr==1)THEN
+    ArrTimeMin = 0.001 ! set equal to 0.1 cm if no threshold is given
+# if defined (PARALLEL)
+    if (myid.eq.0) THEN
+      WRITE(*,'(A40)')'ArrTimeMinH Default:  0.001 m'
+      WRITE(3,'(A40)')'ArrTimeMinH Default:  0.001 m'
+    endif
+# else
+    WRITE(*,'(A40)')'ArrTimeMinH Default:  0.001 m'
+    WRITE(3,'(A40)')'ArrTimeMinH Default:  0.001 m'
+# endif
+  ENDIF
+# if defined (PARALLEL)
+  if (myid.eq.0) WRITE(3,'(A10,F12.6)')'ArrTimeMinH', ArrTimeMin
+# else
+  WRITE(3,'(A10,F12.6)')'ArrTimeMinH=', ArrTimeMin
+# endif
+ENDIF
+! end Laurens modification
 
 # if defined (PARALLEL)
 if (myid.eq.0) WRITE(3,*)'                                         '
@@ -3658,6 +3745,9 @@ CALL READ_LOGICAL(OUT_DEPTH,FILE_NAME,'DEPTH_OUT',ierr)
 CALL READ_LOGICAL(OUT_U,FILE_NAME,'U',ierr)
 CALL READ_LOGICAL(OUT_V,FILE_NAME,'V',ierr)
 CALL READ_LOGICAL(OUT_ETA,FILE_NAME,'ETA',ierr)
+# if defined(UseEtaScreen)
+CALL READ_LOGICAL(OUT_EtaScreen,FILE_NAME,'ETAscreen',ierr)
+# endif
 CALL READ_LOGICAL(OUT_Hmax,FILE_NAME,'Hmax',ierr)
 CALL READ_LOGICAL(OUT_Hmin,FILE_NAME,'Hmin',ierr)
 CALL READ_LOGICAL(OUT_Umax,FILE_NAME,'Umax',ierr)
@@ -3686,6 +3776,8 @@ CALL READ_LOGICAL(OUT_ROLLER,FILE_NAME,'ROLLER',ierr)
 CALL READ_LOGICAL(OUT_UNDERTOW,FILE_NAME,'UNDERTOW',ierr)
 CALL READ_LOGICAL(OUT_NU,FILE_NAME,'OUT_NU',ierr)
 CALL READ_LOGICAL(OUT_TMP,FILE_NAME,'TMP',ierr)
+CALL READ_LOGICAL(OUT_Radiation,FILE_NAME,'Radiation',ierr)
+
 CALL READ_LOGICAL(OUT_RUNUP,FILE_NAME,'RUNUP',ierr) ! Chen, Salatin
 CALL READ_LOGICAL(OUT_VOR,FILE_NAME,'VOR',ierr) ! Chen, Salatin
 CALL READ_LOGICAL(OUT_RadStr,FILE_NAME,'RadStr',ierr) ! Chen, Salatin
@@ -3720,6 +3812,9 @@ if (myid.eq.0)   then
   WRITE(3,'(A15,L2)')'OUT_U',OUT_U
   WRITE(3,'(A15,L2)')'OUT_V',OUT_V
   WRITE(3,'(A15,L2)')'OUT_ETA',OUT_ETA
+# if defined (UseEtaScreen)
+  WRITE(3,'(A15,L2)')'OUT_ETAscreen',OUT_EtaScreen
+# endif
   WRITE(3,'(A15,L2)')'OUT_Hmax',OUT_Hmax
   WRITE(3,'(A15,L2)')'OUT_Hmin',OUT_Hmin
   WRITE(3,'(A15,L2)')'OUT_Umax',OUT_Umax
@@ -3748,16 +3843,16 @@ if (myid.eq.0)   then
   WRITE(3,'(A15,L2)')'OUT_UNDERTOW',OUT_UNDERTOW
   WRITE(3,'(A15,L2)')'OUT_NU',OUT_NU
   WRITE(3,'(A15,L2)')'OUT_TMP',OUT_TMP
+  WRITE(3,'(A15,L2)')'OUT_TIME',OUT_Time
+
   WRITE(3,'(A15,L2)')'OUT_RUNUP',OUT_RUNUP ! Chen, Salatin
   WRITE(3,'(A15,L2)')'OUT_VOR',OUT_VOR ! Chen, Salatin
   WRITE(3,'(A15,L2)')'OUT_RadStr',OUT_RadStr ! Chen, Salatin
   WRITE(3,'(A15,L2)')'OUT_uvMA',OUT_uvMA ! Chen, Salatin
   WRITE(3,'(A15,L2)')'OUT_etaMA',OUT_etaMA ! Chen, Salatin
   WRITE(3,'(A15,L2)')'OUT_VorMA',OUT_VorMA ! Chen, Salatin
-
   WRITE(3,'(A15,L2)')'HRZ MIXING',H_MIXING ! Chen, Salatin
   WRITE(3,'(A15,L2)')'VRT MIXING',V_MIXING ! Chen, Salatin
-
 # if defined (PARALLEL)
 endif
 # endif
@@ -3792,21 +3887,26 @@ SUBROUTINE STATIONS
   IMPLICIT NONE
 
   INTEGER :: iunit
+  INTEGER, DIMENSION(:),ALLOCATABLE :: BufferCount
+  REAL(SP),DIMENSION(:,:,:),ALLOCATABLE :: ZUV_Buffer
   REAL(SP) :: dum1,dum2
-  REAL(SP) :: eta_sta,u_sta,v_sta,vor_sta,Syx_x_sta ! Chen, Salatin
+  REAL(SP) :: eta_sta,u_sta,v_sta,vor_sta ! Chen, Salatin
   CHARACTER(LEN=80)::FILE_NAME=' '
   CHARACTER(LEN=80)::TMP_NAME=' '
   CHARACTER(LEN=80)::FDIR=' '
   LOGICAL :: FirstCallStation = .TRUE.
-  SAVE FirstCallStation
+  SAVE FirstCallStation,BufferCount,ZUV_Buffer
 
   ! initialize stations
   FDIR=TRIM(RESULT_FOLDER)
   if (FirstCallStation) then
     FirstCallStation = .FALSE.
     ALLOCATE(ista(NumberStations),&
-    jsta(NumberStations),&
-    nsta(NumberStations))
+      jsta(NumberStations),&
+      nsta(NumberStations))
+    ALLOCATE(BufferCount(NumberStations), &
+      ZUV_Buffer(StationOutputBuffer,NumberStations,5))
+      BufferCount = 0
     ! calculate how many output components
 
     ! check existing
@@ -3874,16 +3974,32 @@ do i=1,NumberStations
       u_sta=ZERO
       v_sta=ZERO
       vor_sta=ZERO
-      Syx_x_sta=ZERO
     ELSE  ! to avoid topography on nested water surface
       eta_sta=eta(ista(i),jsta(i))
       u_sta=u(ista(i),jsta(i))
       v_sta=v(ista(i),jsta(i))
       vor_sta=Vor_Instant(ista(i),jsta(i))
-      Syx_x_sta=Syx_x(ista(i),jsta(i))
     ENDIF
-    write (iunit,'(6E16.5E4)') &
-    time, eta_sta,u_sta,v_sta,vor_sta,Syx_x_sta
+    IF(BufferCount(i)<StationOutputBuffer.AND.TIME<TOTAL_TIME)THEN
+      BufferCount(i) = BufferCount(i) +1
+      ZUV_BUFFER(BufferCount(i),i,1)=time
+      ZUV_BUFFER(BufferCount(i),i,2)=eta_sta
+      ZUV_BUFFER(BufferCount(i),i,3)=u_sta
+      ZUV_BUFFER(BufferCount(i),i,4)=v_sta
+      ZUV_BUFFER(BufferCount(i),i,5)=vor_sta
+    ELSE
+      DO j=1,StationOutputBuffer
+        write (iunit,'(5E16.5E4)') (ZUV_BUFFER(j,i,k),k=1,5)
+      ENDDO
+      BufferCount(i) = 0
+      ZUV_BUFFER(:,i,1)=TOTAL_TIME
+      ZUV_BUFFER(:,i,2:5)=ZERO
+# if defined (PARALLEL)
+      if (myid.eq.0) WRITE(*,*) 'WRITE OUT STATAION ...'
+# else
+      WRITE(*,*) 'WRITE OUT STATIONS ...'
+# endif
+    ENDIF
   endif
 enddo
 
@@ -3917,21 +4033,26 @@ SUBROUTINE STATIONS_SPHERICAL_IJ
   IMPLICIT NONE
 
   INTEGER :: iunit
+  INTEGER, DIMENSION(:),ALLOCATABLE :: BufferCount
+  REAL(SP),DIMENSION(:,:,:),ALLOCATABLE :: ZUV_Buffer
   REAL(SP) :: dum1,dum2
-  REAL(SP) :: eta_sta,u_sta,v_sta,vor_sta,Syx_x_sta
+  REAL(SP) :: eta_sta,u_sta,v_sta,vor_sta
   CHARACTER(LEN=80)::FILE_NAME=' '
   CHARACTER(LEN=80)::TMP_NAME=' '
   CHARACTER(LEN=80)::FDIR=' '
   LOGICAL :: FirstCallStation = .TRUE.
-  SAVE FirstCallStation
+  SAVE FirstCallStation,BufferCount,ZUV_Buffer
 
   ! initialize stations
   FDIR=TRIM(RESULT_FOLDER)
   if (FirstCallStation) then
     FirstCallStation = .FALSE.
     ALLOCATE(ista(NumberStations),&
-    jsta(NumberStations),&
-    nsta(NumberStations))
+      jsta(NumberStations),&
+      nsta(NumberStations))
+    ALLOCATE(BufferCount(NumberStations), &
+      ZUV_Buffer(StationOutputBuffer,NumberStations,5))
+    BufferCount = 0
 
     ! calculate how many output components
 
@@ -3983,16 +4104,34 @@ do i=1,NumberStations
       u_sta=ZERO
       v_sta=ZERO
       vor_sta=ZERO
-      Syx_x_sta=ZERO
     ELSE  ! to avoid topography on nested water surface
       eta_sta=eta(ista(i),jsta(i))
       u_sta=u(ista(i),jsta(i))
       v_sta=v(ista(i),jsta(i))
       vor_sta=Vor_Instant(ista(i),jsta(i))
-      Syx_x_sta=Syx_x(ista(i),jsta(i))
     ENDIF
-    write (iunit,'(6E16.5E4)') time, eta_sta,&
-    u_sta,v_sta,vor_sta,Syx_x_sta
+
+    IF(BufferCount(i)<StationOutputBuffer.AND.TIME<TOTAL_TIME)THEN
+      BufferCount(i) = BufferCount(i) +1
+      ZUV_BUFFER(BufferCount(i),i,1)=time
+      ZUV_BUFFER(BufferCount(i),i,2)=eta_sta
+      ZUV_BUFFER(BufferCount(i),i,3)=u_sta
+      ZUV_BUFFER(BufferCount(i),i,4)=v_sta
+      ZUV_BUFFER(BufferCount(i),i,5)=vor_sta
+    ELSE
+      DO j=1,StationOutputBuffer
+        write (iunit,'(5E16.5E4)') (ZUV_BUFFER(j,i,k),k=1,5)
+      ENDDO
+      BufferCount(i) = 0
+      ZUV_BUFFER(:,i,1)=TOTAL_TIME
+      ZUV_BUFFER(:,i,2:5)=ZERO
+
+# if defined (PARALLEL)
+      if (myid.eq.0) WRITE(*,*) 'WRITE OUT STATAION ...'
+# else
+      WRITE(*,*) 'WRITE OUT STATIONS ...'
+# endif
+    ENDIF ! end buffer
   endif
 enddo
 
@@ -4021,13 +4160,15 @@ SUBROUTINE STATIONS
   IMPLICIT NONE
 
   INTEGER :: iunit
+  INTEGER, DIMENSION(:),ALLOCATABLE :: BufferCount
+  REAL(SP),DIMENSION(:,:,:),ALLOCATABLE :: ZUV_Buffer
   REAL(SP) :: dum1,dum2
-  REAL(SP) :: eta_sta,u_sta,v_sta,vor_sta,Syx_x_sta
+  REAL(SP) :: eta_sta,u_sta,v_sta,vor_sta
   CHARACTER(LEN=80)::FILE_NAME=' '
   CHARACTER(LEN=80)::TMP_NAME=' '
   CHARACTER(LEN=80)::FDIR=' '
   LOGICAL :: FirstCallStationSP = .TRUE.
-  SAVE FirstCallStationSP
+  SAVE FirstCallStationSP,BufferCount,ZUV_Buffer
 
 
   ! initialize stations
@@ -4035,10 +4176,14 @@ SUBROUTINE STATIONS
   if (FirstCallStationSP) then
     FirstCallStationSP = .FALSE.
     ALLOCATE(ista(NumberStations),&
-    jsta(NumberStations),&
-    nsta(NumberStations))
-    !       ALLOCATE(envelope(Mloc,Nloc))
-    !       envelope = 0.d0
+      jsta(NumberStations),&
+      nsta(NumberStations))
+    ALLOCATE(BufferCount(NumberStations), &
+      ZUV_Buffer(StationOutputBuffer,NumberStations,4))
+    BufferCount = 0
+    !ALLOCATE(envelope(Mloc,Nloc))
+    !envelope = 0.d0
+
     open(100,FILE=TRIM(STATIONS_FILE))
     do i=1,NumberStations
       read(100,*) dum1,dum2
@@ -4092,21 +4237,33 @@ do i=1,NumberStations
       u_sta=ZERO
       v_sta=ZERO
       vor_sta=ZERO
-      Syx_x_sta=ZERO
     ELSE  ! to avoid topography on nested water surface
       eta_sta=eta(ista(i),jsta(i))
       u_sta=u(ista(i),jsta(i))
       v_sta=v(ista(i),jsta(i))
       vor_sta=Vor_Instant(ista(i),jsta(i))
-      Syx_x_sta=Syx_x(ista(i),jsta(i))
     ENDIF
 
-    write (iunit,'(6E16.5E4)') time, eta_sta,&
-    u_sta,v_sta,vor_sta,Syx_x_sta
-
-    !          write (iunit,*) time, eta(ista(i),jsta(i)),u(ista(i),jsta(i)),&
-    !                                v(ista(i),jsta(i))
-
+    IF(BufferCount(i)<StationOutputBuffer.AND.TIME<TOTAL_TIME)THEN
+      BufferCount(i) = BufferCount(i) +1
+      ZUV_BUFFER(BufferCount(i),i,1)=time
+      ZUV_BUFFER(BufferCount(i),i,2)=eta_sta
+      ZUV_BUFFER(BufferCount(i),i,3)=u_sta
+      ZUV_BUFFER(BufferCount(i),i,4)=v_sta
+      ZUV_BUFFER(BufferCount(i),i,5)=vor_sta
+    ELSE
+      DO j=1,StationOutputBuffer
+        write (iunit,'(5E16.5E4)') (ZUV_BUFFER(j,i,k),k=1,5)
+      ENDDO
+      BufferCount(i) = 0
+      ZUV_BUFFER(:,i,1)=TOTAL_TIME
+      ZUV_BUFFER(:,i,2:5)=ZERO
+# if defined (PARALLEL)
+      if (myid.eq.0) WRITE(*,*) 'WRITE OUT STATAION ...'
+# else
+      WRITE(*,*) 'WRITE OUT STATIONS ...'
+# endif
+    ENDIF ! end buffer
   endif
 enddo
 
@@ -4333,7 +4490,7 @@ SUBROUTINE PREVIEW
   ! sediment
 # if defined (SEDIMENT)
   TMP_NAME = TRIM(FDIR)//'C_'//TRIM(FILE_NAME)
-  call PutFile(TMP_NAME,CH *Sdensity*1000.0_SP)
+  call PutFile(TMP_NAME,CH *Sdensity*RHO_WATER)
   TMP_NAME = TRIM(FDIR)//'Pick_'//TRIM(FILE_NAME)
   call PutFile(TMP_NAME,Pickup)
   TMP_NAME = TRIM(FDIR)//'Depo_'//TRIM(FILE_NAME)
@@ -4378,45 +4535,20 @@ SUBROUTINE PREVIEW
     TMP_NAME = TRIM(FDIR)//'vMA_'//TRIM(FILE_NAME)
     call PutFile(TMP_NAME,vMA)
   ENDIF
-  ! Chen, Salatin, output moving average of the surface elevation
-  IF(OUT_etaMA)THEN
-    TMP_NAME = TRIM(FDIR)//'etaMA_'//TRIM(FILE_NAME)
-    call PutFile(TMP_NAME,eta_MA)
-  ENDIF
   ! Chen, Salatin, output moving average of the vorticity
   IF(OUT_VorMA)THEN
     TMP_NAME = TRIM(FDIR)//'VorMA_'//TRIM(FILE_NAME)
     call PutFile(TMP_NAME,Vor_MA)
   ENDIF
   ! Chen, Salatin, output Smagorinsky and vertical eddy viscosity
-  IF(OUT_uvMA)THEN
+  IF(H_MIXING)THEN
     TMP_NAME = TRIM(FDIR)//'nu_smg_'//TRIM(FILE_NAME)
     call PutFile(TMP_NAME,nu_smg)
+    TMP_NAME = TRIM(FDIR)//'SmgX_'//TRIM(FILE_NAME)
+    call PutFile(TMP_NAME,temp_output1)
+    TMP_NAME = TRIM(FDIR)//'VisBrkX_'//TRIM(FILE_NAME)
+    call PutFile(TMP_NAME,temp_output3)
   ENDIF
-
-  ! variables to get output
-  TMP_NAME = TRIM(FDIR)//'SmgX_'//TRIM(FILE_NAME)
-  call PutFile(TMP_NAME,temp_output1)
-  TMP_NAME = TRIM(FDIR)//'VertX_'//TRIM(FILE_NAME)
-  call PutFile(TMP_NAME,temp_output2)
-  TMP_NAME = TRIM(FDIR)//'VisBrkX_'//TRIM(FILE_NAME)
-  call PutFile(TMP_NAME,temp_output3)
-  TMP_NAME = TRIM(FDIR)//'nuVis_MA_'//TRIM(FILE_NAME)
-  call PutFile(TMP_NAME,temp_output4)
-
-  IF(H_MIXING)THEN
-    TMP_NAME = TRIM(FDIR)//'vis_smg_x_'//TRIM(FILE_NAME)
-    call PutFile(TMP_NAME,vis_smg_x)
-    TMP_NAME = TRIM(FDIR)//'vis_smg_y_'//TRIM(FILE_NAME)
-    call PutFile(TMP_NAME,vis_smg_y)
-    TMP_NAME = TRIM(FDIR)//'vis_smg_xMA_'//TRIM(FILE_NAME)
-    call PutFile(TMP_NAME,vis_smg_xMA)
-    TMP_NAME = TRIM(FDIR)//'vis_smg_yMA_'//TRIM(FILE_NAME)
-    call PutFile(TMP_NAME,vis_smg_yMA)
-    TMP_NAME = TRIM(FDIR)//'nu_smg_MA_'//TRIM(FILE_NAME)
-    call PutFile(TMP_NAME,nu_smg_MA)
-  ENDIF
-
   IF(V_MIXING)THEN
     TMP_NAME = TRIM(FDIR)//'nu_verx_'//TRIM(FILE_NAME)
     call PutFile(TMP_NAME,nu_ver_x)
@@ -4488,11 +4620,6 @@ SUBROUTINE PREVIEW_MEAN
     call PutFile(TMP_NAME,nu_break_mean)
   ENDIF
 
-  IF(H_MIXING)THEN
-    TMP_NAME = TRIM(FDIR)//'nu_smg_mean_'//TRIM(FILE_NAME)
-    call PutFile(TMP_NAME,nu_smg_mean)
-  ENDIF
-
 END SUBROUTINE PREVIEW_MEAN
 
 
@@ -4541,19 +4668,58 @@ SUBROUTINE PREVIEW_MEAN_UV
   IF(OUT_Umean)THEN
     TMP_NAME = TRIM(FDIR)//'umean_'//TRIM(FILE_NAME)
     call PutFile(TMP_NAME,Umean)
+    tmpout = P_mean / Max(Depth+ETAmean,MinDepthFrc)
+    TMP_NAME = TRIM(FDIR)//'ulagm_'//TRIM(FILE_NAME)
+    call PutFile(TMP_NAME,tmpout)
   ENDIF
 
   IF(OUT_Vmean)THEN
     TMP_NAME = TRIM(FDIR)//'vmean_'//TRIM(FILE_NAME)
     call PutFile(TMP_NAME,Vmean)
+    tmpout = Q_mean / Max(Depth+ETAmean,MinDepthFrc)
+    TMP_NAME = TRIM(FDIR)//'vlagm_'//TRIM(FILE_NAME)
+    call PutFile(TMP_NAME,tmpout)
   ENDIF
-
   ! Chen, Salatin
   IF(OUT_VOR)THEN
     TMP_NAME = TRIM(FDIR)//'Vormean_'//TRIM(FILE_NAME)
     call PutFile(TMP_NAME,Vor_Mean)
     TMP_NAME = TRIM(FDIR)//'VorIntensity_'//TRIM(FILE_NAME)
     call PutFile(TMP_NAME,Vor_Intensity)
+  ENDIF
+
+  IF(H_MIXING)THEN
+    TMP_NAME = TRIM(FDIR)//'nu_smg_mean_'//TRIM(FILE_NAME)
+    call PutFile(TMP_NAME,nu_smg_mean)
+  ENDIF
+
+  ! output FRCYsum,FRCYmean
+  ! DxSxx,DySxy,DySyy,DxSxy,PgrdX,PgrdY,DxUUH,DyUVH,DyVVH,DxUVH
+  IF(OUT_Radiation)THEN
+    TMP_NAME = TRIM(FDIR)//'DxSxx_'//TRIM(FILE_NAME)
+    call PutFile(TMP_NAME,DxSxx)
+    TMP_NAME = TRIM(FDIR)//'DySxy_'//TRIM(FILE_NAME)
+    call PutFile(TMP_NAME,DySxy)
+    TMP_NAME = TRIM(FDIR)//'DySyy_'//TRIM(FILE_NAME)
+    call PutFile(TMP_NAME,DySyy)
+    TMP_NAME = TRIM(FDIR)//'DxSxy_'//TRIM(FILE_NAME)
+    call PutFile(TMP_NAME,DxSxy)
+    TMP_NAME = TRIM(FDIR)//'PgrdX_'//TRIM(FILE_NAME)
+    call PutFile(TMP_NAME,PgrdX)
+    TMP_NAME = TRIM(FDIR)//'PgrdY_'//TRIM(FILE_NAME)
+    call PutFile(TMP_NAME,PgrdY)
+    TMP_NAME = TRIM(FDIR)//'DxUUH_'//TRIM(FILE_NAME)
+    call PutFile(TMP_NAME,DxUUH)
+    TMP_NAME = TRIM(FDIR)//'DyUVH_'//TRIM(FILE_NAME)
+    call PutFile(TMP_NAME,DyUVH)
+    TMP_NAME = TRIM(FDIR)//'DyVVH_'//TRIM(FILE_NAME)
+    call PutFile(TMP_NAME,DyVVH)
+    TMP_NAME = TRIM(FDIR)//'DxUVH_'//TRIM(FILE_NAME)
+    call PutFile(TMP_NAME,DxUVH)
+    TMP_NAME = TRIM(FDIR)//'FRCX_'//TRIM(FILE_NAME)
+    call PutFile(TMP_NAME,FRCXmean)
+    TMP_NAME = TRIM(FDIR)//'FRCY_'//TRIM(FILE_NAME)
+    call PutFile(TMP_NAME,FRCYmean)
   ENDIF
 
 END SUBROUTINE PREVIEW_MEAN_UV

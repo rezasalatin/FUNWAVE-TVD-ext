@@ -76,6 +76,7 @@ INTEGER :: px,py
 INTEGER :: NumberStations
 INTEGER,DIMENSION(:),ALLOCATABLE :: ista,jsta,nsta
 REAL(SP):: PLOT_INTV_STATION,PLOT_COUNT_STATION
+INTEGER :: StationOutputBuffer
 
 ! runup data
 REAL(SP):: WRITE_COUNT_RUNUP,WRITE_INTV_RUNUP
@@ -90,6 +91,8 @@ INTEGER :: filter_count=0, filter_interval = 1
 # endif
 
 ! define parameters
+! [mayhl] Added global input file name for modules
+CHARACTER(LEN=80) INPUT_FILE_NAME
 CHARACTER(LEN=80) TITLE
 CHARACTER(LEN=80) ReadType
 CHARACTER(LEN=80) DEPTH_TYPE
@@ -134,9 +137,11 @@ REAL(SP):: DX,DY
 # else
 REAL(SP) :: Lon_West,Lat_South,Dphi,Dtheta
 # endif
+! DXg and DYg for wavemaker only
+REAL(SP) :: DXg,DYg
 REAL(SP)::  DT,TIME,TOTAL_TIME,PLOT_INTV,PLOT_COUNT,&
-SCREEN_INTV,SCREEN_COUNT, &
-DT_fixed
+            SCREEN_INTV,SCREEN_COUNT, &
+            DT_fixed,PLOT_START_TIME
 REAL(SP) :: HOTSTART_INTV,HOTSTART_COUNT
 INTEGER :: icount=-1  ! for output file number
 INTEGER :: icount_mean=0  ! for output H,Eta mean file number
@@ -148,10 +153,9 @@ INTEGER :: icount_runup=0  ! Chen, Salatin
 INTEGER :: NumDT1=0  ! for Hsig Chen, Salatin
 INTEGER :: NumDT2=0  ! for Vor intensity Chen, Salatin
 
-INTEGER,DIMENSION(:),ALLOCATABLE::loop_index !Chen, Salatin
-
 REAL(SP) :: MinDepth=0.001
 REAL(SP) :: MinDepthFrc=0.5
+REAL(SP) :: ArrTimeMin=0.001
 REAL(SP) :: CFL=0.15_SP
 REAL(SP) :: FroudeCap=10.0_SP
 REAL(SP) :: SWE_ETA_DEP=0.7_SP
@@ -160,7 +164,7 @@ LOGICAL :: BATHY_CORRECTION = .FALSE.
 LOGICAL :: BREAKWATER = .FALSE.
 
 REAL(SP),DIMENSION(:,:),ALLOCATABLE :: &
-BreakWaterWidth,CD_breakwater
+      BreakWaterWidth,CD_breakwater
 REAL(SP) :: BreakWaterAbsorbCoef
 
 ! coordinates for Cartesian only
@@ -229,10 +233,10 @@ DUtxx,DUtxy,DVtxy,DVtyy,DUtx,DVty,&
 Fx,Fy,U,V,HU,HV,&
 Gx,Gy,P,Q,SourceX,SourceY,Int2Flo, &
 tmp4preview,HeightMax,HeightMin,VelocityMax,&
-MomentumFluxMax,VorticityMax
+MomentumFluxMax,VorticityMax,ARRTIME
 # if defined (ITERATION)
 REAL(SP),DIMENSION(:,:),ALLOCATABLE :: Ui,Vi,ETAi,&
-UbarOld,VbarOld,EtaOld
+      UbarOld,VbarOld,EtaOld
 INTEGER :: Ki
 LOGICAL :: ACCURATE = .FALSE.
 # endif
@@ -240,33 +244,36 @@ LOGICAL :: ACCURATE = .FALSE.
 ! wetting and drying
 INTEGER,DIMENSION(:,:),ALLOCATABLE :: MASK,MASK_STRUC,MASK9
 REAL(SP) :: Dmass,WetArea,DwetEta
+# if defined(UseEtaScreen)
+REAL(SP),DIMENSION(:,:),ALLOCATABLE :: EtaScreen
+# endif
 ! wave maker
 LOGICAL :: EqualEnergy = .FALSE.
 LOGICAL :: WaveMakerCurrentBalance = .FALSE.
 REAL(SP) :: WaveMakerCd
 REAL(SP)::AMP_SOLI,DEP_SOLI,LAG_SOLI, CPH_SOLI,XWAVEMAKER, &
-Xc,Yc, WID,Xc_WK,Tperiod,AMP_WK,DEP_WK,Theta_WK, &
-rlamda,Time_ramp,D_gen,Beta_gen,Width_WK,Delta_WK,&
-Ywidth_WK,Yc_WK
+      Xc,Yc, WID,Xc_WK,Tperiod,AMP_WK,DEP_WK,Theta_WK, &
+      rlamda,Time_ramp,D_gen,Beta_gen,Width_WK,Delta_WK,&
+      Ywidth_WK,Yc_WK
 LOGICAL :: SolitaryPositiveDirection = .TRUE.
 REAL(SP),DIMENSION(:,:),ALLOCATABLE :: D_gen_ir,rlamda_ir,phase_ir
 REAL(SP),DIMENSION(:),ALLOCATABLE :: Beta_gen_ir,omgn_ir
 REAL(SP),DIMENSION(:),ALLOCATABLE :: omgn2D
 REAL(SP),DIMENSION(:,:),ALLOCATABLE :: Wavemaker_Mass
 REAL(SP) :: FreqMin,FreqMax,FreqPeak,GammaTMA,Hmo,ThetaPeak,&
-Sigma_Theta
+      Sigma_Theta
 REAL(SP),DIMENSION(:,:,:),ALLOCATABLE ::Cm,Sm
 INTEGER :: Nfreq,Ntheta
 REAL(SP)::x1_Nwave = 5.0, &
-x2_Nwave = 5.0, &
-a0_Nwave = 1.0, &
-gamma_Nwave = -3.0, &
-dep_Nwave = 1.0
+      x2_Nwave = 5.0, &
+      a0_Nwave = 1.0, &
+      gamma_Nwave = -3.0, &
+      dep_Nwave = 1.0
 !      for measure time series
 REAL(SP),DIMENSION(:,:),ALLOCATABLE :: WAVE_COMP
 REAL(SP),DIMENSION(:),ALLOCATABLE :: Beta_genS,D_genS
 REAL(SP),DIMENSION(:,:),ALLOCATABLE :: Beta_gen2D,D_gen2D,rlamda2D, &
-Phase2D
+      Phase2D
 REAL(SP),DIMENSION(:),ALLOCATABLE :: Freq,Dire
 REAL(SP) :: PeakPeriod
 INTEGER :: NumWaveComp,NumFreq,NumDir
@@ -283,14 +290,62 @@ REAL(SP) :: ROLLER_SWITCH
 ! sponge
 REAL(SP),DIMENSION(:,:),ALLOCATABLE :: SPONGE,SpongeMaker
 REAL(SP)::Sponge_west_width,Sponge_east_width, &
-Sponge_south_width,Sponge_north_width, &
-R_sponge,A_sponge
+      Sponge_south_width,Sponge_north_width, &
+      R_sponge,A_sponge
 
+! smagorinsky and wave height
+REAL(SP),DIMENSION(:,:),ALLOCATABLE :: Umean,Vmean,&
+      ETAmean,Usum,Vsum,ETAsum, nu_smg, &
+      UUsum,UUmean,UVsum,UVmean,VVsum,VVmean, &
+      WWsum,WWmean,FRCXsum,FRCXmean,FRCYsum,FRCYmean,Wsurf, &
+      DxSxx,DySxy,DySyy,DxSxy,PgrdX,PgrdY,DxUUH,DyUVH,DyVVH,DxUVH, &
+      P_center,Q_center,U_davg,V_davg,U_davg_sum,V_davg_sum, &
+      U_davg_mean,V_davg_mean,P_sum,Q_sum, &
+      P_mean,Q_mean
 
-! Vorticity and Vor Intensity ! Chen, Salatin
+REAL(SP)::T_INTV_mean = 20.0,T_sum=0.0
+REAL(SP),DIMENSION(:,:),ALLOCATABLE :: &
+      WaveHeightRMS,WaveHeightAve,Emax,Emin,&
+      HrmsSum,HavgSum
+INTEGER, DIMENSION(:,:),ALLOCATABLE :: Num_Zero_Up
+REAL(SP),DIMENSION(:,:),ALLOCATABLE :: ETA2,ETA2sum,ETA2mean,SigWaveHeight,ETAvariance
+
+! depth H=Eta+Depth,
+REAL(SP),DIMENSION(:,:),ALLOCATABLE :: Depth,H,&
+      DepthNode,Depthx,Depthy
+REAL(SP)::Depth_Flat,SLP,Xslp
+! updating variables
+REAL(SP),DIMENSION(:,:),ALLOCATABLE::Ubar0,Vbar0,Eta0,&
+      Ubar,Vbar,Eta
+! water level, fyshi 03/29/2016
+REAL(SP) :: WaterLevel = 0.0
+
+! horizontal eddy viscosity
+INTEGER :: MIX_MODEL
+LOGICAL :: IN_Csmg=.FALSE.
+REAL(SP):: Csmg_fixed
+CHARACTER(LEN=80) Csmg_file
+REAL(SP),DIMENSION(:,:),ALLOCATABLE :: C_smg
+
+REAL(SP),DIMENSION(:,:),ALLOCATABLE :: vis_smg_x,vis_smg_y
+REAL(SP),DIMENSION(:,:),ALLOCATABLE :: vis_smg_xMA,vis_smg_yMA,nu_smg_MA
+REAL(SP),DIMENSION(:,:,:),ALLOCATABLE :: vis_smg_xMA_temp, vis_smg_yMA_temp,nu_smg_MA_temp
+REAL(SP),DIMENSION(:,:),ALLOCATABLE :: nu_smg_mean,nu_smg_sum
+! vertical eddy viscosity
+REAL(SP),DIMENSION(:,:),ALLOCATABLE :: nu_ver_x,nu_ver_y
+REAL(SP) :: C_VMixing=1.0
+! viscosity BREAKING MA
+REAL(SP),DIMENSION(:,:),ALLOCATABLE :: nu_visMA
+REAL(SP),DIMENSION(:,:,:),ALLOCATABLE :: nu_visMA_temp
+! Chen, Salatin, Current and Vorticity field
+REAL(SP)::T_INTV_UVmean = 20.0,T_sumUVmean=0.0
+! Chen, Salatin, Oct 2021, Moving Average
+REAL(SP)::T_MA_STEP=1.0,T_MA_Sum=0.0
+INTEGER :: MA_Window=1
+! Chen, Salatin ! Vorticity and Vor Intensity
 REAL(SP),DIMENSION(:,:),ALLOCATABLE :: Vor_Instant,Vor_Mean,&
-Vor_Intensity,Vor2,&
-Vor2sum,Vorsum,Vorsum2
+      Vor_Intensity,Vor2,&
+      Vor2sum,Vorsum,Vorsum2
 
 ! Chen, Salatin, Oct 2021, Radiation Stress
 REAL(SP),DIMENSION(:,:),ALLOCATABLE :: Syx_x
@@ -303,113 +358,60 @@ REAL(SP),DIMENSION(:,:),ALLOCATABLE :: eta_MA
 REAL(SP),DIMENSION(:,:,:),ALLOCATABLE :: eta_MA_temp
 REAL(SP),DIMENSION(:,:),ALLOCATABLE :: Vor_MA
 
-! horizontal eddy viscosity
-INTEGER :: MIX_MODEL
-LOGICAL :: IN_Csmg=.FALSE.
-REAL(SP):: Csmg_fixed
-CHARACTER(LEN=80) Csmg_file
-REAL(SP),DIMENSION(:,:),ALLOCATABLE :: C_smg
-
-REAL(SP),DIMENSION(:,:),ALLOCATABLE :: nu_smg,vis_smg_x,vis_smg_y
-REAL(SP),DIMENSION(:,:),ALLOCATABLE :: vis_smg_xMA,vis_smg_yMA,nu_smg_MA
-REAL(SP),DIMENSION(:,:,:),ALLOCATABLE :: vis_smg_xMA_temp, vis_smg_yMA_temp,nu_smg_MA_temp
-REAL(SP),DIMENSION(:,:),ALLOCATABLE :: nu_smg_mean,nu_smg_sum
-
-! vertical eddy viscosity
-REAL(SP),DIMENSION(:,:),ALLOCATABLE :: nu_ver_x,nu_ver_y
-REAL(SP) :: C_VMixing=1.0
-! viscosity BREAKING MA
-REAL(SP),DIMENSION(:,:),ALLOCATABLE :: nu_visMA
-REAL(SP),DIMENSION(:,:,:),ALLOCATABLE :: nu_visMA_temp
-
-! smagorinsky and wave height
-REAL(SP),DIMENSION(:,:),ALLOCATABLE :: Umean,Vmean,&
-ETAmean,Usum,Vsum,ETAsum
-REAL(SP)::T_INTV_mean = 20.0,T_sum=0.0
-! Chen, Salatin, Current and Vorticity field
-REAL(SP)::T_INTV_UVmean = 20.0,T_sumUVmean=0.0
-! Chen, Salatin, Oct 2021, Moving Average
-REAL(SP)::T_MA_STEP=1.0,T_MA_Sum=0.0
-INTEGER :: MA_Window=1
-!!
-REAL(SP),DIMENSION(:,:),ALLOCATABLE :: &
-WaveHeightRMS,WaveHeightAve,Emax,Emin,&
-HrmsSum,HavgSum
-INTEGER, DIMENSION(:,:),ALLOCATABLE :: Num_Zero_Up
-REAL(SP),DIMENSION(:,:),ALLOCATABLE :: ETA2,ETA2sum,SigWaveHeight,ETAvariance
-
-! depth H=Eta+Depth,
-REAL(SP),DIMENSION(:,:),ALLOCATABLE :: Depth,H,&
-DepthNode,Depthx,Depthy
-REAL(SP)::Depth_Flat,SLP,Xslp
-
-! updating variables
-REAL(SP),DIMENSION(:,:),ALLOCATABLE::Ubar0,Vbar0,Eta0,&
-Ubar,Vbar,Eta
-
-! water level, fyshi 03/29/2016
-REAL(SP) :: WaterLevel = 0.0
-
 # if defined(COUPLING)
 ! coupling
 CHARACTER(LEN=80) COUPLING_FILE
 INTEGER :: icount_coupling = 1
 INTEGER :: N_COUPLING_EAST,&
-N_COUPLING_WEST,&
-N_COUPLING_SOUTH,&
-N_COUPLING_NORTH,&
-N_COUPLING_DATA,&
-J_START_EAST,&
-J_START_WEST,&
-I_START_SOUTH,&
-I_START_NORTH
+      N_COUPLING_WEST,&
+      N_COUPLING_SOUTH,&
+      N_COUPLING_NORTH,&
+      N_COUPLING_DATA,&
+      J_START_EAST,&
+      J_START_WEST,&
+      I_START_SOUTH,&
+      I_START_NORTH
 REAL(SP),DIMENSION(:,:),ALLOCATABLE::U_COUPLING_EAST,&
-V_COUPLING_EAST,Z_COUPLING_EAST,&
-U_COUPLING_WEST,V_COUPLING_WEST,Z_COUPLING_WEST,&
-U_COUPLING_SOUTH,V_COUPLING_SOUTH,Z_COUPLING_SOUTH,&
-U_COUPLING_NORTH,V_COUPLING_NORTH,Z_COUPLING_NORTH
+      V_COUPLING_EAST,Z_COUPLING_EAST,&
+      U_COUPLING_WEST,V_COUPLING_WEST,Z_COUPLING_WEST,&
+      U_COUPLING_SOUTH,V_COUPLING_SOUTH,Z_COUPLING_SOUTH,&
+      U_COUPLING_NORTH,V_COUPLING_NORTH,Z_COUPLING_NORTH
 REAL(SP) :: TIME_COUPLING_1,TIME_COUPLING_2
 INTEGER :: Kstart_EAST,Kend_EAST,Kshift_EAST,&
-Kstart_WEST,Kend_WEST,Kshift_WEST,&
-Kstart_SOUTH,Kend_SOUTH,Kshift_SOUTH,&
-Kstart_NORTH,Kend_NORTH,Kshift_NORTH
+      Kstart_WEST,Kend_WEST,Kshift_WEST,&
+      Kstart_SOUTH,Kend_SOUTH,Kshift_SOUTH,&
+      Kstart_NORTH,Kend_NORTH,Kshift_NORTH
 LOGICAL :: IN_DOMAIN_EAST,IN_DOMAIN_WEST,&
-IN_DOMAIN_SOUTH,IN_DOMAIN_NORTH
+      IN_DOMAIN_SOUTH,IN_DOMAIN_NORTH
 # endif
 
 ! output logical parameters
 INTEGER :: OUTPUT_RES = 1
 LOGICAL :: OUT_U=.FALSE., OUT_V=.FALSE.,OUT_ETA=.FALSE., &
-OUT_MASK=.FALSE.,OUT_SXL=.FALSE.,OUT_SXR=.FALSE.,&
-OUT_SYL=.FALSE., OUT_SYR=.FALSE.,&
-OUT_SourceX=.FALSE., OUT_SourceY=.FALSE., &
-OUT_P=.FALSE., OUT_Q=.FALSE., &
-OUT_Fx=.FALSE., OUT_Fy=.FALSE.,&
-OUT_Gx=.FALSE., OUT_Gy=.FALSE.,&
-OUT_MASK9=.FALSE., OUT_DEPTH=.FALSE., &
-OUT_TMP=.FALSE., OUT_AGE=.FALSE.,OUT_NU=.FALSE., &
-OUT_Hmax=.FALSE., &
-OUT_Hmin=.FALSE., &
-OUT_Umax=.FALSE.
+# if defined(UseEtaScreen)
+      OUT_ETASCREEN=.FALSE., &
+# endif
+      OUT_MASK=.FALSE.,OUT_SXL=.FALSE.,OUT_SXR=.FALSE.,&
+      OUT_SYL=.FALSE., OUT_SYR=.FALSE.,&
+      OUT_SourceX=.FALSE., OUT_SourceY=.FALSE., &
+      OUT_P=.FALSE., OUT_Q=.FALSE., &
+      OUT_Fx=.FALSE., OUT_Fy=.FALSE.,&
+      OUT_Gx=.FALSE., OUT_Gy=.FALSE.,&
+      OUT_MASK9=.FALSE., OUT_DEPTH=.FALSE., &
+      OUT_TMP=.FALSE., OUT_AGE=.FALSE.,OUT_NU=.FALSE., &
+      OUT_Hmax=.FALSE., &
+      OUT_Hmin=.FALSE., &
+      OUT_Umax=.FALSE.
 LOGICAL :: OUT_MFmax=.FALSE., &
-OUT_VORmax=.FALSE., &
-OUT_ROLLER = .FALSE., &
-OUT_UNDERTOW = .FALSE.
+      OUT_VORmax=.FALSE., &
+      OUT_ROLLER = .FALSE., &
+      OUT_UNDERTOW = .FALSE.
 
 LOGICAL :: OUT_Umean=.FALSE.,OUT_Vmean=.FALSE.,&
-OUT_ETAmean=.FALSE.,&
-OUT_WaveHeight = .FALSE.,&
-OUT_WaveHeightSig = .FALSE.    !ykchoi
-LOGICAL :: OUT_Runup=.FALSE. ! Chen, Salatin
-LOGICAL :: OUT_VOR=.FALSE. ! Chen, Salatin
-! Chen, Salatin, Oct 2021, Radiation StormPressureTotal
-LOGICAL :: OUT_RadStr=.FALSE.
-! Chen, Salatin for moving average of u and v
-LOGICAL :: OUT_uvMA=.FALSE.
-! Chen, Salatin for moving average of eta
-LOGICAL :: OUT_etaMA=.FALSE.
-! Chen, Salatin for moving average of vorticity
-LOGICAL :: OUT_VorMA=.FALSE.
+      OUT_ETAmean=.FALSE.,&
+      OUT_WaveHeight = .FALSE.,&
+      OUT_WaveHeightSig = .FALSE., &
+      OUT_Radiation = .FALSE.
 
 !# if defined (CARTESIAN)
 ! periodic boundary conditions
@@ -429,15 +431,15 @@ REAL(SP) :: MAX_SLOPE
 
 ! absorbing-generating wavemaker
 REAL(SP) :: Dep_Ser,WidthWaveMaker,&
-R_sponge_wavemaker,A_sponge_wavemaker
+      R_sponge_wavemaker,A_sponge_wavemaker
 
 REAL(SP),DIMENSION(:,:),ALLOCATABLE :: Amp_Ser,Phase_LEFT
 REAL(SP),DIMENSION(:),ALLOCATABLE :: Per_Ser,Phase_Ser,&
-Theta_Ser
+      Theta_Ser
 REAL(SP),DIMENSION(:),ALLOCATABLE :: Segma_Ser,Wave_Number_Ser
 REAL(SP) :: Stokes_Drift_Ser
 REAL(SP),DIMENSION(:,:,:),ALLOCATABLE ::Cm_eta,Sm_eta, &
-Cm_u,Sm_u,Cm_v,Sm_v
+      Cm_u,Sm_u,Cm_v,Sm_v
 !       LOGICAL :: WAVE_DATA = .FALSE.
 CHARACTER(LEN=80) WAVE_DATA_TYPE
 
@@ -447,8 +449,9 @@ REAL(SP),DIMENSION(:,:),ALLOCATABLE :: ROLLER_FLUX,UNDERTOW_U,UNDERTOW_V
 REAL(SP) :: Cbrk1=0.65,Cbrk2=0.35,T_brk
 ! use T_brk to judge breakers
 LOGICAL :: INI_UVZ=.FALSE.
+LOGICAL :: BED_DEFORMATION = .FALSE.
 
-REAL(SP),DIMENSION(:,:),ALLOCATABLE :: nu_break,nu_sponge,nu_break_mean,nu_break_sum
+REAL(SP),DIMENSION(:,:),ALLOCATABLE :: nu_break,nu_sponge
 REAL(SP) :: nu_bkg
 LOGICAL :: DIFFUSION_SPONGE = .FALSE.
 LOGICAL :: DIRECT_SPONGE = .FALSE.
@@ -467,14 +470,30 @@ REAL(SP) :: STEADY_TIME
 REAL(SP) :: visbrk, WAVEMAKER_visbrk
 LOGICAL :: WAVEMAKER_VIS=.FALSE.
 !	 REAL(SP) :: PLOT_SMALLINTV
+
+
+REAL(SP),DIMENSION(:,:),ALLOCATABLE :: nu_break_mean,nu_break_sum
+LOGICAL :: OUT_Runup=.FALSE. ! Chen, Salatin
+LOGICAL :: OUT_VOR=.FALSE. ! Chen, Salatin
+! Chen, Salatin, Oct 2021, Radiation StormPressureTotal
+LOGICAL :: OUT_RadStr=.FALSE.
+! Chen, Salatin for moving average of u and v
+LOGICAL :: OUT_uvMA=.FALSE.
+! Chen, Salatin for moving average of eta
+LOGICAL :: OUT_etaMA=.FALSE.
+! Chen, Salatin for moving average of vorticity
+LOGICAL :: OUT_VorMA=.FALSE.
+
 ! Chen, Salatin, Mixing is better to be determined in the input file
 LOGICAL :: H_MIXING=.FALSE.
 LOGICAL :: V_MIXING=.FALSE.
 
 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 ! Chen, Salatin
+INTEGER,DIMENSION(:),ALLOCATABLE :: loop_index
 INTEGER :: jlo,jhi,ilo,ihi
 REAL(SP), DIMENSION(:),ALLOCATABLE :: xmk_wk, ymk_wk !Chen, Salatin (July 19, 2021)
+REAL(SP)::alpha_c ! coherence percentage for WK_NEW_IRR
 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 ! two additional variables to save some output
 REAL(SP), DIMENSION(:,:),ALLOCATABLE :: temp_output1,temp_output2

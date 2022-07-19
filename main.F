@@ -148,6 +148,7 @@ Program FUNWAVE_TVD
   USE TRACER
 # endif
 
+  USE TIDE_MODULE
   IMPLICIT NONE
 
   !     INTEGER::ISTAGE ! moved to mod_global 09/12/2017
@@ -202,6 +203,7 @@ Program FUNWAVE_TVD
 
   CALL INITIALIZATION
 
+  CALL TIDE_INITIAL
 
 # if defined (DEBUG)
 #    if defined (PARALLEL)
@@ -268,9 +270,6 @@ Program FUNWAVE_TVD
 # if defined (SEDIMENT)
     CHH0=CHH
 # endif
-
-
-    CALL UPDATE_MASK
 
 # if defined (DEBUG)
 #    if defined (PARALLEL)
@@ -354,6 +353,13 @@ Program FUNWAVE_TVD
 
       CALL ESTIMATE_HUV(ISTAGE)
 
+      ! etascreen was added, update_mask was moved here from outside RK
+      CALL UPDATE_MASK
+
+      IF(TIDAL_BC)THEN
+        CALL TIDE_BC
+      ENDIF
+
 # if defined (DEBUG)
 #    if defined (PARALLEL)
       IF(myid==0) WRITE(*,*) 'ESTIMATE_HUV'
@@ -393,6 +399,13 @@ Program FUNWAVE_TVD
 
       IF(WaveMaker(1:3)=='ABS') THEN
         CALL ABSORBING_GENERATING_BC
+# if defined (DEBUG)
+# if defined (PARALLEL)
+        IF(myid==0) WRITE(*,*) 'ABS wavemaker'
+# else
+        WRITE(*,*) 'ABS wavemaker'
+# endif
+# endif
       ENDIF
 
       IF(WaveMaker(1:11)=='LEFT_BC_IRR') THEN
@@ -414,13 +427,19 @@ Program FUNWAVE_TVD
 
     CALL MIXING_STUFF
 
+# if defined (DEBUG)
+# if defined (PARALLEL)
+    IF(myid==0) WRITE(*,*) 'MIXING_STUFF'
+# else
+    WRITE(*,*) 'MIXING_STUFF'
+# endif
+# endif
+
 # if defined (TRACKING)
     CALL TRACK_XY
 # endif
 
-
     !  find maximum eta velocity
-
     IF (OUT_Hmax.OR.OUT_Hmin.OR.OUT_Umax.OR.OUT_MFmax.OR.OUT_VORmax)THEN
       CALL MAX_MIN_PROPERTY
     ENDIF
@@ -435,14 +454,22 @@ Program FUNWAVE_TVD
 #    endif
 # endif
 
-  END DO
+  ENDDO
+
+  IF(NumberStations>0)THEN
+# if defined (SPHERICAL_IJ_STATION)
+    ! use IJ for coupling purpose
+    CALL STATIONS_SPHERICAL_IJ
+# else
+    CALL STATIONS
+# endif
+  ENDIF
 
 # if defined (COUPLING)
   CLOSE(11)
 # endif
 
 # if defined (VESSEL)
-
   DO Kves = 201,200+NumVessel
     CLOSE(Kves)
   ENDDO

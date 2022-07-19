@@ -58,11 +58,21 @@ SUBROUTINE MIXING_STUFF
   !ykchoi (be careful)
   !I think Umean, Vmean is not using in other routine.
   IF( time >= STEADY_TIME )THEN
-    CALL CALCULATE_MEAN(T_INTV_mean,T_INTV_UVmean,T_sum,T_sumUVmean,&
-    DT,Mloc,Nloc,U,V,ETA,ETA0,&
+    CALL CALCULATE_MEAN(T_INTV_mean,T_sum,T_INTV_UVmean,T_sumUVmean,&
+    DT,DXg,DYg,Mloc,Nloc,U,V,Wsurf,ETA,ETA0,&
     Umean,Vmean,ETAmean,Usum,Vsum,ETAsum,WaveHeightRMS, &
     WaveHeightAve,Emax,Emin,Num_Zero_Up,Ibeg,Iend,Jbeg,Jend, &
-    HrmsSum,HavgSum,ETA2,ETA2sum,SigWaveHeight,ETAvariance, &
+    HrmsSum,HavgSum, &
+    !ykchoi
+    ETA2sum,ETA2mean,SigWaveHeight, &
+    UUsum,UUmean,UVsum,UVmean,VVsum,VVmean, &
+    WWsum,WWmean,FRCXsum,FRCXmean,FRCYsum,FRCYmean, &
+    DxSxx,DySxy,DySyy,DxSxy,PgrdX,PgrdY,DxUUH,DyUVH,DyVVH,DxUVH,&
+    Cd,Depth,U_davg,V_davg,U_davg_sum,V_davg_sum, &
+    U_davg_mean,V_davg_mean,P_center,Q_center,P_sum,Q_sum, &
+    P_mean,Q_mean,MinDepthFrc,&
+    ! Salatin
+    ETA2,ETAvariance,&
     Vor_Instant, Vor_Mean, Vor_Intensity, NumDT1, NumDT2,Vor2,&
     Vor2sum,Vorsum,nu_break,nu_break_mean,nu_break_sum,nu_smg_mean,nu_smg_sum,nu_smg)
   ENDIF    !ykchoi
@@ -91,37 +101,60 @@ END SUBROUTINE MIXING_STUFF
 !                 Young-Kwang Choi added some time-averaging stuff
 !
 !-------------------------------------------------------------------------------------
-SUBROUTINE CALCULATE_MEAN(T_INTV_mean,T_INTV_UVmean,T_sum,T_sumUVmean,&
-  DT,M,N,U,V,ETA,ETA0,&
-  Umean,Vmean,ETAmean,Usum,Vsum,ETAsum,&
-  WaveHeightRMS, &
+SUBROUTINE CALCULATE_MEAN(T_INTV_mean,T_sum,T_INTV_UVmean,T_sumUVmean,&
+  DT,DXg,DYg,Mloc,Nloc,U,V,Wsurf,ETA,ETA0,&
+  Umean,Vmean,ETAmean,Usum,Vsum,ETAsum,WaveHeightRMS, &
   WaveHeightAve,Emax,Emin,Num_Zero_Up,Ibeg,Iend,Jbeg,Jend, &
-  HrmsSum,HavgSum,ETA2,ETA2sum,SigWaveHeight,ETAvariance, &
-  Vor_Instant, Vor_Mean, Vor_Intensity, NumDT1, NumDT2,Vor2, &
+  HrmsSum,HavgSum, &
+  !ykchoi
+  ETA2sum,ETA2mean,SigWaveHeight, &
+  UUsum,UUmean,UVsum,UVmean,VVsum,VVmean, &
+  WWsum,WWmean,FRCXsum,FRCXmean,FRCYsum,FRCYmean, &
+  DxSxx,DySxy,DySyy,DxSxy,PgrdX,PgrdY,DxUUH,DyUVH,DyVVH,DxUVH,&
+  Cd,Depth,U_davg,V_davg,U_davg_sum,V_davg_sum, &
+  U_davg_mean,V_davg_mean,P_center,Q_center,P_sum,Q_sum, &
+  P_mean,Q_mean,MinDepthFrc,&
+  ! Salatin
+  ETA2,ETAvariance,&
+  Vor_Instant, Vor_Mean, Vor_Intensity, NumDT1, NumDT2,Vor2,&
   Vor2sum,Vorsum,nu_break,nu_break_mean,nu_break_sum,nu_smg_mean,nu_smg_sum,nu_smg)
-
   ! calculate mean for smagorinsky mixing and wave height
   USE PARAM
   IMPLICIT NONE
   INTEGER, INTENT(IN) :: M,N,Ibeg,Iend,Jbeg,Jend
-  REAL(SP),DIMENSION(M,N),INTENT(IN)::U,V,ETA,ETA0
-  REAL(SP),INTENT(IN) :: T_INTV_mean,T_INTV_UVmean,DT
+  REAL(SP),DIMENSION(M,N),INTENT(IN)::U,V,ETA,ETA0,Wsurf,Cd,Depth
+  REAL(SP),INTENT(IN) :: T_INTV_mean,DT,DXg,DYg,MinDepthFrc
   REAL(SP),DIMENSION(M,N),INTENT(OUT) :: Umean,Vmean
   REAL(SP),DIMENSION(M,N),INTENT(OUT) :: WaveHeightRMS,WaveHeightAve
-  REAL(SP),DIMENSION(M,N),INTENT(INOUT) :: Usum,Vsum
+  REAL(SP),DIMENSION(M,N),INTENT(INOUT) ::ETAmean
+  REAL(SP),DIMENSION(M,N),INTENT(INOUT) :: Usum,Vsum,ETAsum
   REAL(SP),DIMENSION(M,N),INTENT(INOUT) :: HrmsSum,HavgSum
-  REAL(SP),INTENT(OUT) :: T_sum,T_sumUVmean
+  REAL(SP),INTENT(OUT) :: T_sum
   REAL(SP)::Tmpe,Tmp_0
   REAL(SP),DIMENSION(M,N),INTENT(INOUT) :: Emax,Emin
   INTEGER,DIMENSION(M,N),INTENT(INOUT) :: Num_Zero_Up
+  REAL(SP),DIMENSION(M,N),INTENT(OUT) :: UUmean,UUsum,UVmean,UVsum,VVmean,VVsum
+  REAL(SP),DIMENSION(M,N),INTENT(OUT) :: WWmean,WWsum
+  REAL(SP),DIMENSION(M,N),INTENT(OUT) :: FRCXmean,FRCXsum
+  REAL(SP),DIMENSION(M,N),INTENT(OUT) :: FRCYmean,FRCYsum
+  REAL(SP),DIMENSION(M,N),INTENT(OUT) :: DxSxx,DySxy,DySyy,DxSxy, &
+                                        PgrdX,PgrdY,DxUUH,DyUVH, &
+                                        DyVVH,DxUVH
+  REAL(SP),DIMENSION(M,N),INTENT(OUT) :: U_davg,V_davg,U_davg_sum,V_davg_sum, &
+                                         U_davg_mean,V_davg_mean,&
+                                         P_center,Q_center,P_sum,Q_sum, &
+                                         P_mean,Q_mean
+  !ykchoi
+  REAL(SP),DIMENSION(M,N),INTENT(INOUT) :: ETA2sum,ETA2mean,SigWaveHeight
   !!! Chen, Salatin
+  REAL(SP),INTENT(IN) :: T_INTV_UVmean
+  REAL(SP),INTENT(OUT) :: T_sumUVmean
   INTEGER,INTENT(INOUT) :: NumDT1, NumDT2
   REAL(SP),DIMENSION(M,N),INTENT(INOUT) :: Vor_Instant,Vor_Mean,Vor_Intensity
   REAL(SP),DIMENSION(M,N),INTENT(INOUT) :: Vor2,Vor2sum,Vorsum
   REAL(SP),DIMENSION(M,N) :: Vor_Variance
-  REAL(SP),DIMENSION(M,N),INTENT(INOUT) :: ETAmean,ETAsum,ETA2,ETA2sum
+  REAL(SP),DIMENSION(M,N),INTENT(INOUT) :: ETA2
   REAL(SP),DIMENSION(M,N) :: ETAvariance
-  REAL(SP),DIMENSION(M,N),INTENT(INOUT) :: SigWaveHeight
   !!! determine the surfzone
   REAL(SP),DIMENSION(M,N),INTENT(IN) :: nu_break,nu_smg
   REAL(SP),DIMENSION(M,N),INTENT(INOUT) :: nu_break_mean,nu_break_sum
@@ -138,19 +171,79 @@ SUBROUTINE CALCULATE_MEAN(T_INTV_mean,T_INTV_UVmean,T_sum,T_sumUVmean,&
     ETAmean=ETAsum/T_sum
     ETAvariance = 1/real(NumDT1-1)*ETA2sum-real(NumDT1)/real(NumDT1-1)*ETAmean**2
     SigWaveHeight = 4.0*SQRT(ETAvariance)
-    ETAsum=ZERO
-    ETA2sum=ZERO
+
+    U_davg_sum=U_davg*DT+U_davg_sum
+    V_davg_sum=V_davg*DT+V_davg_sum
+    P_sum=P_center*DT+P_sum
+    Q_sum=Q_center*DT+Q_sum
+    UUsum = (U_davg-U_davg_mean)*(U_davg-U_davg_mean)*(Eta-ETAmean+Depth)*DT + UUsum
+    UVsum = (U_davg-U_davg_mean)*(V_davg-V_davg_mean)*(Eta-ETAmean+Depth)*DT + UVsum
+    VVsum = (V_davg-V_davg_mean)*(V_davg-V_davg_mean)*(Eta-ETAmean+Depth)*DT + VVsum
+    WWsum = 0.25*Wsurf*Wsurf*(Eta-ETAmean+Depth)*DT + WWsum
+    FRCXsum = U*SQRT(U*U+V*V)*DT + FRCXsum
+    FRCYsum = V*SQRT(U*U+V*V)*DT + FRCYsum
+
+    U_davg_mean = U_davg_sum/T_sum
+    V_davg_mean = V_davg_sum/T_sum
+    P_mean = P_sum/T_sum
+    Q_mean = Q_sum/T_sum
+    UUmean = UUsum/T_sum
+    UVmean = UVsum/T_sum
+    VVmean = VVsum/T_sum
+    WWmean = WWsum/T_sum
+    FRCXmean = FRCXsum/T_sum
+    FRCYmean = FRCYsum/T_sum
+
+  ! radiation stresses,
+    DO J=Jbeg,Jend
+    DO I=Ibeg,Iend
+      DxSxx(I,J) = (UUmean(I+1,J)-UUmean(I-1,J))/2.0/DXg &
+                  -(WWmean(I+1,J)-WWmean(I-1,J))/2.0/DXg &
+                  +0.5*9.80*(ETA2mean(I+1,J)-ETA2mean(I-1,J))/2.0/DXg
+      DySxy(I,J) = (UVmean(I,J+1)-UVmean(I,J-1))/2.0/DYg
+      DySyy(I,J) = (VVmean(I,J+1)-VVmean(I,J-1))/2.0/DYg &
+                  -(WWmean(I,J+1)-WWmean(I,J-1))/2.0/DYg &
+                  +0.5*9.80*(ETA2mean(I,J+1)-ETA2mean(I,J-1))/2.0/DYg
+      DxSxy(I,J) = (UVmean(I+1,J)-UVmean(I-1,J))/2.0/DXg
+      PgrdX(I,J) = 9.80*(Depth(I,J)+ETAmean(I,J))* &
+                   (ETAmean(I+1,J)-ETAmean(I-1,J))/2.0/DXg
+      PgrdY(I,J) = 9.80*(Depth(I,J)+ETAmean(I,J))* &
+                   (ETAmean(I,J+1)-ETAmean(I,J-1))/2.0/DYg
+      DxUUH(I,J) = (P_mean(I+1,J)*P_mean(I+1,J)/ &
+                   Max(Depth(I+1,J)+ETAmean(I+1,J),MinDepthFrc) - &
+                   P_mean(I-1,J)*P_mean(I-1,J)/ &
+                   Max(Depth(I-1,J)+ETAmean(I-1,J),MinDepthFrc))/2.0/DXg
+      DyUVH(I,J) = (P_mean(I,J+1)*Q_mean(I,J+1)/ &
+                   Max(Depth(I,J+1)+ETAmean(I,J+1),MinDepthFrc) - &
+                   P_mean(I,J-1)*Q_mean(I,J-1)/ &
+                   Max(Depth(I,J-1)+ETAmean(I,J-1),MinDepthFrc))/2.0/DYg
+      DyVVH(I,J) = (Q_mean(I,J+1)*Q_mean(I,J+1)/ &
+                   Max(Depth(I,J+1)+ETAmean(I,J+1),MinDepthFrc) - &
+                   Q_mean(I,J-1)*Q_mean(I,J-1)/ &
+                   Max(Depth(I,J-1)+ETAmean(I,J-1),MinDepthFrc))/2.0/DYg
+      DxUVH(I,J) = (P_mean(I+1,J)*Q_mean(I+1,J)/ &
+                   Max(Depth(I+1,J)+ETAmean(I+1,J),MinDepthFrc) - &
+                   P_mean(I-1,J)*Q_mean(I-1,J)/ &
+                   Max(Depth(I-1,J)+ETAmean(I-1,J),MinDepthFrc))/2.0/DXg
+      FRCXmean(I,J) = FRCXmean(I,J)*Cd(I,J)
+      FRCYmean(I,J) = FRCYmean(I,J)*Cd(I,J)
+    ENDDO
+    ENDDO
 
     ! Salatin, June 2022, to get surfzone range
     nu_break_sum =nu_break*DT+nu_break_sum
     nu_break_mean=nu_break_sum/T_sum
-    nu_break_sum=ZERO
 
     nu_smg_sum =nu_smg*DT+nu_smg_sum
     nu_smg_mean=nu_smg_sum/T_sum
+
+    ETAsum=ZERO
+    ETA2sum=ZERO
+    NumDT1=ZERO
+    nu_break_sum=ZERO
     nu_smg_sum=ZERO
 
-    NumDT1=ZERO
+    !!!!!!!! no averaging after the following command
     T_sum=T_sum-T_INTV_mean
 
     ! Average and RMS wave height
@@ -167,6 +260,7 @@ SUBROUTINE CALCULATE_MEAN(T_INTV_mean,T_INTV_UVmean,T_sum,T_sumUVmean,&
     ENDDO
 
     CALL PREVIEW_MEAN
+
   ELSE
 
     NumDT1 = NumDT1+1
@@ -175,10 +269,23 @@ SUBROUTINE CALCULATE_MEAN(T_INTV_mean,T_INTV_UVmean,T_sum,T_sumUVmean,&
     ETA2 = ETA*ETA
     ETA2sum=ETA2+ETA2sum
 
-    ! wave height
     ! Chen, Salatin
-    ETAmean = ETAsum/T_sum ! effective for long simulations,
-    ! for short simulation just comment it
+    !ETAmean = ETAsum/T_sum ! This is a on the fly calculation of ETAmean to use
+                           ! instead of ETAmean = 0 when the averaging time has
+                           ! not yet reached
+
+    ! fyshi added radiation calc 06/07/2022
+    U_davg_sum=U_davg*DT+U_davg_sum
+    V_davg_sum=V_davg*DT+V_davg_sum
+    P_sum=P_center*DT+P_sum
+    Q_sum=Q_center*DT+Q_sum
+    UUsum = (U_davg-U_davg_mean)*(U_davg-U_davg_mean)*(Eta-ETAmean+Depth)*DT + UUsum
+    UVsum = (U_davg-U_davg_mean)*(V_davg-V_davg_mean)*(Eta-ETAmean+Depth)*DT + UVsum
+    VVsum = (V_davg-V_davg_mean)*(V_davg-V_davg_mean)*(Eta-ETAmean+Depth)*DT + VVsum
+    WWsum = 0.25*Wsurf*Wsurf*(Eta-ETAmean+Depth)*DT + WWsum
+    FRCXsum = U*SQRT(U*U+V*V)*DT + FRCXsum
+    FRCYsum = V*SQRT(U*U+V*V)*DT + FRCYsum
+
     DO J=1,N
       DO I=1,M
         if(Eta(i,j)>Emax(i,j)) Emax(i,j) = Eta(i,j)
