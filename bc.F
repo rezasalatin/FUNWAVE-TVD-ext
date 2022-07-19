@@ -447,18 +447,22 @@ SUBROUTINE EXCHANGE
 # if defined (CARTESIAN)
   ! ---------------------------- VTYPE = 1 -------------------------------
   VTYPE=1
-  CALL PHI_COLL(Mloc,Nloc,Ibeg,Iend,Jbeg,Jend,Nghost,&
-  Eta,VTYPE,PERIODIC)
+  CALL PHI_COLL(Mloc,Nloc,Ibeg,Iend,Jbeg,Jend,Nghost,Eta,VTYPE,PERIODIC)
+
+  ! for radiation stress
+  CALL PHI_COLL(Mloc,Nloc,Ibeg,Iend,Jbeg,Jend,Nghost,Wsurf,VTYPE,PERIODIC)
+  CALL PHI_COLL(Mloc,Nloc,Ibeg,Iend,Jbeg,Jend,Nghost,P_center,VTYPE,PERIODIC)
+  CALL PHI_COLL(Mloc,Nloc,Ibeg,Iend,Jbeg,Jend,Nghost,Q_center,VTYPE,PERIODIC)
+  CALL PHI_COLL(Mloc,Nloc,Ibeg,Iend,Jbeg,Jend,Nghost,U_davg,VTYPE,PERIODIC)
+  CALL PHI_COLL(Mloc,Nloc,Ibeg,Iend,Jbeg,Jend,Nghost,V_davg,VTYPE,PERIODIC)
 
   IF(VISCOSITY_BREAKING) THEN
-    CALL PHI_COLL(Mloc,Nloc,Ibeg,Iend,Jbeg,Jend,Nghost,&
-    AGE_BREAKING,VTYPE,PERIODIC)
+    CALL PHI_COLL(Mloc,Nloc,Ibeg,Iend,Jbeg,Jend,Nghost,AGE_BREAKING,VTYPE,PERIODIC)
   ENDIF
 
   !ykchoi (08.19.2015) :: new variable (WAVEMAKER_VIS)
   IF(VISCOSITY_BREAKING .OR. WAVEMAKER_VIS) THEN
-    CALL PHI_COLL(Mloc,Nloc,Ibeg,Iend,Jbeg,Jend,Nghost,&
-    nu_break,VTYPE,PERIODIC)
+    CALL PHI_COLL(Mloc,Nloc,Ibeg,Iend,Jbeg,Jend,Nghost,nu_break,VTYPE,PERIODIC)
   ENDIF
 
   IF(VISCOSITY_BREAKING .OR. DIFFUSION_SPONGE .OR. WAVEMAKER_VIS)THEN
@@ -469,26 +473,29 @@ SUBROUTINE EXCHANGE
   ENDIF
 
   rMASK = MASK ! for periodic boundary condition
-  CALL PHI_COLL(Mloc,Nloc,Ibeg,Iend,Jbeg,Jend,Nghost,&
-  rMASK,VTYPE,PERIODIC)
+  CALL PHI_COLL(Mloc,Nloc,Ibeg,Iend,Jbeg,Jend,Nghost,rMASK,VTYPE,PERIODIC)
   MASK = rMASK
   ! ---------------------------- VTYPE = 2 -------------------------------
   VTYPE=2
-  CALL PHI_COLL(Mloc,Nloc,Ibeg,Iend,Jbeg,Jend,Nghost,&
-  U,VTYPE,PERIODIC)
-  CALL PHI_COLL(Mloc,Nloc,Ibeg,Iend,Jbeg,Jend,Nghost,&
-  HU,VTYPE,PERIODIC)
+  CALL PHI_COLL(Mloc,Nloc,Ibeg,Iend,Jbeg,Jend,Nghost,U,VTYPE,PERIODIC)
+  CALL PHI_COLL(Mloc,Nloc,Ibeg,Iend,Jbeg,Jend,Nghost,HU,VTYPE,PERIODIC)
   ! ---------------------------- VTYPE = 3 -------------------------------
   VTYPE=3
-  CALL PHI_COLL(Mloc,Nloc,Ibeg,Iend,Jbeg,Jend,Nghost,&
-  V,VTYPE,PERIODIC)
-  CALL PHI_COLL(Mloc,Nloc,Ibeg,Iend,Jbeg,Jend,Nghost,&
-  HV,VTYPE,PERIODIC)
+  CALL PHI_COLL(Mloc,Nloc,Ibeg,Iend,Jbeg,Jend,Nghost,V,VTYPE,PERIODIC)
+  CALL PHI_COLL(Mloc,Nloc,Ibeg,Iend,Jbeg,Jend,Nghost,HV,VTYPE,PERIODIC)
 # else
   ! not cartesian
   ! ---------------------------- VTYPE = 1 -------------------------------
   VTYPE=1
   CALL PHI_COLL(Mloc,Nloc,Ibeg,Iend,Jbeg,Jend,Nghost,Eta,VTYPE)
+
+  ! for radiation stress
+  CALL PHI_COLL(Mloc,Nloc,Ibeg,Iend,Jbeg,Jend,Nghost,Wsurf,VTYPE)
+  CALL PHI_COLL(Mloc,Nloc,Ibeg,Iend,Jbeg,Jend,Nghost,P_center,VTYPE)
+  CALL PHI_COLL(Mloc,Nloc,Ibeg,Iend,Jbeg,Jend,Nghost,Q_center,VTYPE)
+  CALL PHI_COLL(Mloc,Nloc,Ibeg,Iend,Jbeg,Jend,Nghost,U_davg,VTYPE)
+  CALL PHI_COLL(Mloc,Nloc,Ibeg,Iend,Jbeg,Jend,Nghost,V_davg,VTYPE)
+
   ! ---------------------------- VTYPE = 2 -------------------------------
   VTYPE=2
   CALL PHI_COLL(Mloc,Nloc,Ibeg,Iend,Jbeg,Jend,Nghost,U,VTYPE)
@@ -655,20 +662,17 @@ SUBROUTINE PHI_COLL(Mloc,Nloc,Ibeg,Iend,Jbeg,Jend,Nghost,PHI,VTYPE)
   USE GLOBAL,ONLY : WaveMaker
 
 # if defined (COUPLING)
-  USE GLOBAL,ONLY : IN_DOMAIN_WEST,IN_DOMAIN_EAST, &
-  IN_DOMAIN_SOUTH,IN_DOMAIN_NORTH
+  USE GLOBAL,ONLY : IN_DOMAIN_WEST,IN_DOMAIN_EAST,IN_DOMAIN_SOUTH,IN_DOMAIN_NORTH
 # endif
 
 # if defined (PARALLEL)
 # if defined (COUPLING)
-  USE GLOBAL, ONLY : n_east,n_west,n_suth,n_nrth, &
-  comm2d, ier,myid,PX,PY,&
-  NumberProcessor,ProcessorID, &
-  IN_DOMAIN_WEST,IN_DOMAIN_EAST,IN_DOMAIN_SOUTH,IN_DOMAIN_NORTH
+  USE GLOBAL, ONLY : n_east,n_west,n_suth,n_nrth,comm2d, ier,myid,PX,PY,&
+      NumberProcessor,ProcessorID, &
+      IN_DOMAIN_WEST,IN_DOMAIN_EAST,IN_DOMAIN_SOUTH,IN_DOMAIN_NORTH
 # else
-  USE GLOBAL, ONLY : n_east,n_west,n_suth,n_nrth, &
-  comm2d, ier,myid,PX,PY,&
-  NumberProcessor,ProcessorID
+  USE GLOBAL, ONLY : n_east,n_west,n_suth,n_nrth,comm2d, ier,myid,PX,PY,&
+      NumberProcessor,ProcessorID
 # endif
 # endif
 
@@ -788,7 +792,7 @@ SUBROUTINE PHI_COLL(Mloc,Nloc,Ibeg,Iend,Jbeg,Jend,Nghost,PHI,VTYPE)
 # if defined (COUPLING)
       IF(.NOT.IN_DOMAIN_WEST)THEN
 # endif
-        IF(WaveMaker(1:11)=='LEFT_BC_IRR')THEN
+        IF(WaveMaker(1:3)=='ABS'.OR.WaveMaker(1:11)=='LEFT_BC_IRR')THEN
           ! do nothing
         ELSE
           DO J=Jbeg,Jend
@@ -883,7 +887,7 @@ SUBROUTINE PHI_COLL(Mloc,Nloc,Ibeg,Iend,Jbeg,Jend,Nghost,PHI,VTYPE)
 # if defined (COUPLING)
       IF(.NOT.IN_DOMAIN_WEST)THEN
 # endif
-        IF(WaveMaker(1:11)=='LEFT_BC_IRR')THEN
+        IF(WaveMaker(1:3)=='ABS'.OR.WaveMaker(1:11)=='LEFT_BC_IRR')THEN
           ! do nothing
         ELSE
           DO J=Jbeg,Jend
@@ -976,7 +980,7 @@ SUBROUTINE PHI_COLL(Mloc,Nloc,Ibeg,Iend,Jbeg,Jend,Nghost,PHI,VTYPE)
       IF(.NOT.IN_DOMAIN_WEST)THEN
 # endif
 
-        IF(WaveMaker(1:11)=='LEFT_BC_IRR')THEN
+        IF(WaveMaker(1:3)=='ABS'.OR.WaveMaker(1:11)=='LEFT_BC_IRR')THEN
           ! do nothing
         ELSE
           DO J=Jbeg,Jend

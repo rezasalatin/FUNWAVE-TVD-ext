@@ -1,4 +1,3 @@
-! start some modification based on Choi
 !------------------------------------------------------------------------------------
 !
 !      FILE main.F
@@ -54,12 +53,24 @@ SUBROUTINE FLUXES
      USE GLOBAL
      IMPLICIT NONE
 
-     IF(HIGH_ORDER(1:3)=='FOU') THEN
-       CALL CONSTRUCTION_HO
+      IF(HIGH_ORDER(1:3)=='FOU') THEN       !ykchoi (08/28/2016)
+
+      ! for the fourth-order, Choi used 4th + combined minmod and van leer
+      ! it is more stable than 4th + minmod
+
+!  Choi s tests show this is unstable combination, switched off 08/31/2016
+!     IF(HIGH_ORDER(1:9)=='FOURTHMIN') THEN   !ykchoi (08/28/2016)
+!       CALL CONSTRUCTION_HO_minmod
+!       CALL WAVE_SPEED(Mloc,Nloc,Mloc1,Nloc1,UxL,UxR,VyL,VyR,HxL,HxR,HyL,HyR, &
+!            SxL,SxR,SyL,SyR)
+
+       CALL CONSTRUCTION_HO   ! note choi used the name construction_ho_vanleer
+                              ! I changed back for consistency
+
        CALL WAVE_SPEED(Mloc,Nloc,Mloc1,Nloc1,UxL,UxR,VyL,VyR,HxL,HxR,HyL,HyR, &
             SxL,SxR,SyL,SyR)
 
-     ELSE
+      ELSE
        CALL DelxyFun
        CALL CONSTRUCTION
        CALL WAVE_SPEED(Mloc,Nloc,Mloc1,Nloc1,UxL,UxR,VyL,VyR,HxL,HxR,HyL,HyR, &
@@ -166,15 +177,22 @@ SUBROUTINE DelxyFun
      USE GLOBAL
 
 ! compute DelxFun
-
+# if defined(UseEtaScreen)
+      CALL DelxFun(DX,Mloc,Nloc,EtaScreen,DelxEtar)
+# else
       CALL DelxFun(DX,Mloc,Nloc,Eta,DelxEtar)
+# endif
       CALL DelxFun(DX,Mloc,Nloc,U,DelxU)
       CALL DelxFun(DX,Mloc,Nloc,V,DelxV)
       CALL DelxFun(DX,Mloc,Nloc,HU,DelxHU)
       CALL DelxFun(DX,Mloc,Nloc,HV,DelxHV)
 
 ! compute DelyFun
+# if defined(UseEtaScreen)
+      CALL DelyFun(DY,Mloc,Nloc,EtaScreen,DelyEtar)
+# else
       CALL DelyFun(DY,Mloc,Nloc,Eta,DelyEtar)
+# endif
       CALL DelyFun(DY,Mloc,Nloc,U,DelyU)
       CALL DelyFun(DY,Mloc,Nloc,V,DelyV)
       CALL DelyFun(DY,Mloc,Nloc,HV,DelyHV)
@@ -400,6 +418,7 @@ END SUBROUTINE WAVE_SPEED
 !    05/06/2010 Fengyan Shi
 !    08/06/2015 Young-Kwang Choi, added DelxU4 and DelxU4 terms
 !    09/07/2015 Young-Kwang Choi, added MASK9u and MAST9v
+!    06/29/2017 Young-Kwang Choi, fix a bug in dimension of DelxU4 ..
 !
 !-------------------------------------------------------------------------------------
 SUBROUTINE CONSTRUCTION
@@ -407,8 +426,8 @@ SUBROUTINE CONSTRUCTION
      IMPLICIT NONE
 # if defined (CARTESIAN)
 ! ykchoi (15. 08. 06.)
-     REAL(SP),DIMENSION(Mloc1,Nloc) :: DelxU4, DelxV4
-     REAL(SP),DIMENSION(Mloc,Nloc1) :: DelyV4, DelyU4
+     REAL(SP),DIMENSION(Mloc,Nloc) :: DelxU4, DelxV4
+     REAL(SP),DIMENSION(Mloc,Nloc) :: DelyV4, DelyU4
 # endif
 
 ![ykchoi	(09.07.2015)
@@ -427,7 +446,11 @@ SUBROUTINE CONSTRUCTION
      CALL CONSTRUCT_X(Mloc,Mloc1,Nloc,DX,V,DelxV,VxL,VxR,Kappa)
      CALL CONSTRUCT_X(Mloc,Mloc1,Nloc,DX,HU,DelxHU,HUxL,HUxR,Kappa)
      CALL CONSTRUCT_X(Mloc,Mloc1,Nloc,DX,HV,DelxHV,HVxL,HVxR,Kappa)
+# if defined(UseEtaScreen)
+     CALL CONSTRUCT_X(Mloc,Mloc1,Nloc,DX,EtaScreen,DelxEtar,EtaRxL,EtaRxR,Kappa)
+# else
      CALL CONSTRUCT_X(Mloc,Mloc1,Nloc,DX,Eta,DelxEtar,EtaRxL,EtaRxR,Kappa)
+# endif
      HxL=EtaRxL+Depthx
      HxR=EtaRxR+Depthx
 # if defined (CARTESIAN)
@@ -527,12 +550,17 @@ SUBROUTINE CONSTRUCTION
 
 # endif
 
+
 ! construct in y-direction
      CALL CONSTRUCT_Y(Mloc,Nloc,Nloc1,DY,U,DelyU,UyL,UyR,Kappa)
      CALL CONSTRUCT_Y(Mloc,Nloc,Nloc1,DY,V,DelyV,VyL,VyR,Kappa)
      CALL CONSTRUCT_Y(Mloc,Nloc,Nloc1,DY,HV,DelyHV,HVyL,HVyR,Kappa)
      CALL CONSTRUCT_Y(Mloc,Nloc,Nloc1,DY,HU,DelyHU,HUyL,HUyR,Kappa)
+# if defined(UseEtaScreen)
+     CALL CONSTRUCT_Y(Mloc,Nloc,Nloc1,DY,EtaScreen,DelyEtar,EtaRyL,EtaRyR,Kappa)
+# else
      CALL CONSTRUCT_Y(Mloc,Nloc,Nloc1,DY,Eta,DelyEtar,EtaRyL,EtaRyR,Kappa)
+# endif
      HyL=EtaRyL+Depthy
      HyR=EtaRyR+Depthy
 
@@ -593,7 +621,7 @@ SUBROUTINE CONSTRUCTION
      FyL=Gamma3*HyL*UyL*VyL*Gamma3
      FyR=Gamma3*HyR*UyR*VyR*Gamma3
 # endif
-
+! $$$ fyshi
 
 # if defined (CARTESIAN)
 
@@ -640,6 +668,7 @@ END SUBROUTINE CONSTRUCTION
 !     06/20/2010 Fengyan Shi
 !     06/01/2011 Jeff Harris,
 !                replaced limiter function, saving 1/3 time
+!     08/31/2016 Choi removed kappa because 3rd order and 2nd order are identical
 !
 !-------------------------------------------------------------------------------------
 SUBROUTINE CONSTRUCT_Y(M,N,N1,DY,Vin,Din,OutL,OutR,Kappa)
@@ -655,38 +684,36 @@ SUBROUTINE CONSTRUCT_Y(M,N,N1,DY,Vin,Din,OutL,OutR,Kappa)
      REAL(SP),INTENT(IN) :: Kappa
      REAL(SP),INTENT(OUT),DIMENSION(M,N1)::OutL,OutR
 
-     DO J=2,N
-     DO I=1,M
-# if defined (CARTESIAN)
-       OutL(I,J)=Vin(I,J-1)+0.25*DY      &
-               *((1.0_SP-kappa)*Din(I,J-1)+(1.0_SP+kappa)*Din(I,J-1))
-       OutR(I,J)=Vin(I,J)-0.25*DY     &
-               *((1.0_SP+kappa)*Din(I,J)+(1.0_SP-kappa)*Din(I,J))
-# else
-       OutL(I,J)=Vin(I,J-1)+0.25*DY(I,J-1)      &
-               *((1.0_SP-kappa)*Din(I,J-1)+(1.0_SP+kappa)*Din(I,J-1))
-       OutR(I,J)=Vin(I,J)-0.25*DY(I,J)     &
-               *((1.0_SP+kappa)*Din(I,J)+(1.0_SP-kappa)*Din(I,J))
-# endif
-     ENDDO
-     ENDDO
 
+![ykchoi (08/28/2016)
+! The "kappa" is meaningless in above routines.
+! Thus, above routines can be simplified as follwoing.
+! This is piecewise linear reconstruction using van Leer limiter (Zhou et al., 2001)
      DO I=1,M
+
+        DO J=2,N
 # if defined (CARTESIAN)
-       OutL(I,N1)=Vin(I,N)+0.25*DY      &
-               *((1.0_SP-kappa)*Din(I,N)+(1.0_SP+kappa)*Din(I,N))
-       OutR(I,1)=Vin(I,1)-0.25*DY     &
-               *((1.0_SP+kappa)*Din(I,1)+(1.0_SP-kappa)*Din(I,1))
+           OutL(I,J) = Vin(I,J-1) + 0.5_SP*DY*Din(I,J-1)
+           OutR(I,J) = Vin(I,J) - 0.5_SP*DY*Din(I,J)
 # else
-       OutL(I,N1)=Vin(I,N)+0.25*DY(I,N)      &
-               *((1.0_SP-kappa)*Din(I,N)+(1.0_SP+kappa)*Din(I,N))
-       OutR(I,1)=Vin(I,1)-0.25*DY(I,1)     &
-               *((1.0_SP+kappa)*Din(I,1)+(1.0_SP-kappa)*Din(I,1))
+           OutL(I,J) = Vin(I,J-1) + 0.5_SP*DY(I,J-1)*Din(I,J-1)
+           OutR(I,J) = Vin(I,J) - 0.5_SP*DY(I,J)*Din(I,J)
 # endif
-       OutL(I,1)=OutR(I,1)
-       OutR(I,N1)=OutL(I,N1)
+        ENDDO
+
+# if defined (CARTESIAN)
+        OutL(I,N1) = Vin(I,N) + 0.5_SP*DY*Din(I,N)
+        OutR(I,1) = Vin(I,1) - 0.5_SP*DY*Din(I,1)
+# else
+        OutL(I,N1) = Vin(I,N) + 0.5_SP*DY(I,N)*Din(I,N)
+        OutR(I,1) = Vin(I,1) - 0.5_SP*DY(I,1)*Din(I,1)
+# endif
+        OutL(I,1)=OutR(I,1)
+        OutR(I,N1)=OutL(I,N1)
 
      ENDDO
+!ykchoi]
+
 
 END SUBROUTINE CONSTRUCT_Y
 
@@ -698,6 +725,7 @@ END SUBROUTINE CONSTRUCT_Y
 !      06/20/2010 Fengyan Shi
 !      06/01/2011 Jeff Harris, replaced limiter function, saving 1/3 time
 ! add third order in the code.
+!     08/31/2016 Choi removed kappa because 3rd order and 2nd order are identical
 !
 !-------------------------------------------------------------------------------------
 SUBROUTINE CONSTRUCT_X(M,M1,N,DX,Vin,Din,OutL,OutR,Kappa)
@@ -713,37 +741,33 @@ SUBROUTINE CONSTRUCT_X(M,M1,N,DX,Vin,Din,OutL,OutR,Kappa)
      REAL(SP),INTENT(IN)::Kappa
      REAL(SP),INTENT(OUT),DIMENSION(M1,N)::OutL,OutR
 
+![ykchoi (08/28/2016)
+! The "kappa" is meaningless in above routines.
+! Thus, above routines can be simplified as follwoing.
+! This is piecewise linear reconstruction using van Leer limiter (Zhou et al., 2001)
      DO J=1,N
-     DO I=2,M
-# if defined (CARTESIAN)
-       OutL(I,J)=Vin(I-1,J)+0.25*DX      &
-               *((1.0_SP-kappa)*Din(I-1,J)+(1.0_SP+kappa)*Din(I-1,J))
-       OutR(I,J)=Vin(I,J)-0.25*DX     &
-               *((1.0_SP+kappa)*Din(I,J)+(1.0_SP-kappa)*Din(I,J))
-# else
-       OutL(I,J)=Vin(I-1,J)+0.25*DX(I-1,J)      &
-               *((1.0_SP-kappa)*Din(I-1,J)+(1.0_SP+kappa)*Din(I-1,J))
-       OutR(I,J)=Vin(I,J)-0.25*DX(I,J)     &
-               *((1.0_SP+kappa)*Din(I,J)+(1.0_SP-kappa)*Din(I,J))
-# endif
-     ENDDO
-     ENDDO
 
-     DO J=1,N
+	  DO I=2,M
 # if defined (CARTESIAN)
-       OutL(M1,J)=Vin(M,J)+0.25*DX      &
-               *((1.0_SP-kappa)*Din(M,J)+(1.0_SP+kappa)*Din(M,J))
-       OutR(1,J)=Vin(1,J)-0.25*DX     &
-               *((1.0_SP+kappa)*Din(1,J)+(1.0_SP-kappa)*Din(1,J))
+          OutL(I,J) = Vin(I-1,J) + 0.5_SP*DX*Din(I-1,J)
+          OutR(I,J) = Vin(I,J) - 0.5_SP*DX*Din(I,J)
 # else
-       OutL(M1,J)=Vin(M,J)+0.25*DX(M,J)      &
-               *((1.0_SP-kappa)*Din(M,J)+(1.0_SP+kappa)*Din(M,J))
-       OutR(1,J)=Vin(1,J)-0.25*DX(1,J)     &
-               *((1.0_SP+kappa)*Din(1,J)+(1.0_SP-kappa)*Din(1,J))
+          OutL(I,J) = Vin(I-1,J) + 0.5_SP*DX(I-1,J)*Din(I-1,J)
+          OutR(I,J) = Vin(I,J) - 0.5_SP*DX(I,J)*Din(I,J)
 # endif
-       OutL(1,J)=OutR(1,J)
-       OutR(M1,J)=OutL(M1,J)
+        ENDDO
+# if defined (CARTESIAN)
+        OutL(M1,J) = Vin(M,J) + 0.5_SP*DX*Din(M,J)
+        OutR(1,J) = Vin(1,J) - 0.5_SP*DX*Din(1,J)
+# else
+        OutL(M1,J) = Vin(M,J) + 0.5_SP*DX(M,J)*Din(M,J)
+        OutR(1,J) = Vin(1,J) - 0.5_SP*DX(1,J)*Din(1,J)
+# endif
+        OutL(1,J) = OutR(1,J)
+        OutR(M1,J) = OutL(M1,J)
+
      ENDDO
+!ykchoi]
 
 END SUBROUTINE CONSTRUCT_X
 
@@ -756,9 +780,12 @@ END SUBROUTINE CONSTRUCT_X
 !      09/07/2010 Fengyan Shi
 !             use dummy variables
 !      09/07/2015 Young-Kwang Choi, added MASK9u and MASK9v
+!      08/31/2016 Choi noticed 4th-order + minmod is not stable
+!                 I changed construction_ho to _minmod to keep
+!                 this subroutine for further tests
 !
 !-------------------------------------------------------------------------------------
-SUBROUTINE CONSTRUCTION_HO
+SUBROUTINE CONSTRUCTION_HO_minmod
      USE GLOBAL
      IMPLICIT NONE
 # if defined (CARTESIAN)
@@ -778,21 +805,25 @@ SUBROUTINE CONSTRUCTION_HO
 !ykchoi]
 
 ! construct in x-direction
-     CALL CONSTRUCT_HO_X(Mloc,Nloc,Mloc1,Ibeg,Iend,Jbeg,Jend,DX,MASK,U,UxL,UxR)
-     CALL CONSTRUCT_HO_X(Mloc,Nloc,Mloc1,Ibeg,Iend,Jbeg,Jend,DX,MASK,V,VxL,VxR)
-     CALL CONSTRUCT_HO_X(Mloc,Nloc,Mloc1,Ibeg,Iend,Jbeg,Jend,DX,MASK,HU,HUxL,HUxR)
-     CALL CONSTRUCT_HO_X(Mloc,Nloc,Mloc1,Ibeg,Iend,Jbeg,Jend,DX,MASK,HV,HVxL,HVxR)
-     CALL CONSTRUCT_HO_X(Mloc,Nloc,Mloc1,Ibeg,Iend,Jbeg,Jend,DX,MASK,Eta,EtaRxL,EtaRxR)
+     CALL CONSTRUCT_HO_X(Mloc,Nloc,Mloc1,Ibeg,Iend,Jbeg,Jend,MASK,U,UxL,UxR)
+     CALL CONSTRUCT_HO_X(Mloc,Nloc,Mloc1,Ibeg,Iend,Jbeg,Jend,MASK,V,VxL,VxR)
+     CALL CONSTRUCT_HO_X(Mloc,Nloc,Mloc1,Ibeg,Iend,Jbeg,Jend,MASK,HU,HUxL,HUxR)
+     CALL CONSTRUCT_HO_X(Mloc,Nloc,Mloc1,Ibeg,Iend,Jbeg,Jend,MASK,HV,HVxL,HVxR)
+# if defined(UseEtaScreen)
+     CALL CONSTRUCT_HO_X(Mloc,Nloc,Mloc1,Ibeg,Iend,Jbeg,Jend,MASK,EtaScreen,EtaRxL,EtaRxR)
+# else
+     CALL CONSTRUCT_HO_X(Mloc,Nloc,Mloc1,Ibeg,Iend,Jbeg,Jend,MASK,Eta,EtaRxL,EtaRxR)
+# endif
 
 ! dispersion
      HxL=EtaRxL+Depthx
      HxR=EtaRxR+Depthx
 # if defined (CARTESIAN)
      IF(DISPERSION)THEN
-      CALL CONSTRUCT_HO_X(Mloc,Nloc,Mloc1,Ibeg,Iend,Jbeg,Jend,DX,MASK,U4,U4xL,U4xR)
+      CALL CONSTRUCT_HO_X(Mloc,Nloc,Mloc1,Ibeg,Iend,Jbeg,Jend,MASK,U4,U4xL,U4xR)
 
 	!ykchoi :: Following V4xL, V4xR terms should be computed.
-	CALL CONSTRUCT_HO_X(Mloc,Nloc,Mloc1,Ibeg,Iend,Jbeg,Jend,DX,MASK,V4,V4xL,V4xR)
+	CALL CONSTRUCT_HO_X(Mloc,Nloc,Mloc1,Ibeg,Iend,Jbeg,Jend,MASK,V4,V4xL,V4xR)
      ENDIF
 
 !ykchoi (09.07.2015)
@@ -817,10 +848,10 @@ SUBROUTINE CONSTRUCTION_HO
 # else
 # if defined(ZALPHA)
      IF(DISPERSION)THEN
-      CALL CONSTRUCT_HO_X(Mloc,Nloc,Mloc1,Ibeg,Iend,Jbeg,Jend,DX,MASK,U4,U4xL,U4xR)
+      CALL CONSTRUCT_HO_X(Mloc,Nloc,Mloc1,Ibeg,Iend,Jbeg,Jend,MASK,U4,U4xL,U4xR)
 
 	!ykchoi :: Following V4xL, V4xR terms should be computed.
-	CALL CONSTRUCT_HO_X(Mloc,Nloc,Mloc1,Ibeg,Iend,Jbeg,Jend,DX,MASK,V4,V4xL,V4xR)
+	CALL CONSTRUCT_HO_X(Mloc,Nloc,Mloc1,Ibeg,Iend,Jbeg,Jend,MASK,V4,V4xL,V4xR)
      ENDIF
 
      PL(1:Mloc1,1:Nloc)=HUxL(1:Mloc1,1:Nloc) &
@@ -872,21 +903,25 @@ SUBROUTINE CONSTRUCTION_HO
 # endif
 
 ! construct in y-direction
-     CALL CONSTRUCT_HO_Y(Mloc,Nloc,Nloc1,Ibeg,Iend,Jbeg,Jend,DY,MASK,U,UyL,UyR)
-     CALL CONSTRUCT_HO_Y(Mloc,Nloc,Nloc1,Ibeg,Iend,Jbeg,Jend,DY,MASK,V,VyL,VyR)
-     CALL CONSTRUCT_HO_Y(Mloc,Nloc,Nloc1,Ibeg,Iend,Jbeg,Jend,DY,MASK,HV,HVyL,HVyR)
-     CALL CONSTRUCT_HO_Y(Mloc,Nloc,Nloc1,Ibeg,Iend,Jbeg,Jend,DY,MASK,HU,HUyL,HUyR)
-     CALL CONSTRUCT_HO_Y(Mloc,Nloc,Nloc1,Ibeg,Iend,Jbeg,Jend,DY,MASK,Eta,EtaRyL,EtaRyR)
+     CALL CONSTRUCT_HO_Y(Mloc,Nloc,Nloc1,Ibeg,Iend,Jbeg,Jend,MASK,U,UyL,UyR)
+     CALL CONSTRUCT_HO_Y(Mloc,Nloc,Nloc1,Ibeg,Iend,Jbeg,Jend,MASK,V,VyL,VyR)
+     CALL CONSTRUCT_HO_Y(Mloc,Nloc,Nloc1,Ibeg,Iend,Jbeg,Jend,MASK,HV,HVyL,HVyR)
+     CALL CONSTRUCT_HO_Y(Mloc,Nloc,Nloc1,Ibeg,Iend,Jbeg,Jend,MASK,HU,HUyL,HUyR)
+# if defined (UseEtaScreen)
+     CALL CONSTRUCT_HO_Y(Mloc,Nloc,Nloc1,Ibeg,Iend,Jbeg,Jend,MASK,EtaScreen,EtaRyL,EtaRyR)
+# else
+     CALL CONSTRUCT_HO_Y(Mloc,Nloc,Nloc1,Ibeg,Iend,Jbeg,Jend,MASK,Eta,EtaRyL,EtaRyR)
+# endif
 
 ! dispersion
      HyL=EtaRyL+Depthy
      HyR=EtaRyR+Depthy
 # if defined (CARTESIAN)
      IF(DISPERSION)THEN
-       CALL CONSTRUCT_HO_Y(Mloc,Nloc,Nloc1,Ibeg,Iend,Jbeg,Jend,DY,MASK,V4,V4yL,V4yR)
+       CALL CONSTRUCT_HO_Y(Mloc,Nloc,Nloc1,Ibeg,Iend,Jbeg,Jend,MASK,V4,V4yL,V4yR)
 
 	 !ykchoi :: Following U4yL, U4yR terms should be computed.
-	 CALL CONSTRUCT_HO_Y(Mloc,Nloc,Nloc1,Ibeg,Iend,Jbeg,Jend,DY,MASK,U4,U4yL,U4yR)
+	 CALL CONSTRUCT_HO_Y(Mloc,Nloc,Nloc1,Ibeg,Iend,Jbeg,Jend,MASK,U4,U4yL,U4yR)
      ENDIF
 
      QL(1:Mloc,1:Nloc1)=HVyL(1:Mloc,1:Nloc1)   &
@@ -909,10 +944,10 @@ SUBROUTINE CONSTRUCTION_HO
 
 # if defined (ZALPHA)
      IF(DISPERSION)THEN
-       CALL CONSTRUCT_HO_Y(Mloc,Nloc,Nloc1,Ibeg,Iend,Jbeg,Jend,DY,MASK,V4,V4yL,V4yR)
+       CALL CONSTRUCT_HO_Y(Mloc,Nloc,Nloc1,Ibeg,Iend,Jbeg,Jend,MASK,V4,V4yL,V4yR)
 
 	 !ykchoi :: Following U4yL, U4yR terms should be computed.
-	 CALL CONSTRUCT_HO_Y(Mloc,Nloc,Nloc1,Ibeg,Iend,Jbeg,Jend,DY,MASK,U4,U4yL,U4yR)
+	 CALL CONSTRUCT_HO_Y(Mloc,Nloc,Nloc1,Ibeg,Iend,Jbeg,Jend,MASK,U4,U4yL,U4yR)
      ENDIF
 
      QL(1:Mloc,1:Nloc1)=HVyL(1:Mloc,1:Nloc1)   &
@@ -965,7 +1000,7 @@ SUBROUTINE CONSTRUCTION_HO
 
 	deallocate( MASK9u, MASK9v )   !ykchoi
 
-END SUBROUTINE CONSTRUCTION_HO
+END SUBROUTINE CONSTRUCTION_HO_minmod
 
 !-------------------------------------------------------------------------------------
 !
@@ -974,9 +1009,12 @@ END SUBROUTINE CONSTRUCTION_HO
 !    HISTORY:
 !    06/20/2010 Fengyan Shi, University of Delaware
 !    02/14/2011 Jeff Harris, replaced limiter function, saving 1/3 time
+!      08/31/2016 Choi noticed 4th-order + minmod is not stable
+!                 I changed construction_ho to _minmod to keep
+!                 this subroutine for further tests
 !
 !-------------------------------------------------------------------------------------
-SUBROUTINE CONSTRUCT_HO_X(M,N,M1,Ibeg,Iend,Jbeg,Jend,DX,MASK,Vin,OutL,OutR)
+SUBROUTINE CONSTRUCT_HO_X_minmod(M,N,M1,Ibeg,Iend,Jbeg,Jend,DX,MASK,Vin,OutL,OutR)
      USE PARAM
      IMPLICIT NONE
      INTEGER, INTENT(IN)::M,N,M1,Ibeg,Iend,Jbeg,Jend
@@ -1079,7 +1117,7 @@ SUBROUTINE CONSTRUCT_HO_X(M,N,M1,Ibeg,Iend,Jbeg,Jend,DX,MASK,Vin,OutL,OutR)
      ENDDO
      ENDDO
 
-END SUBROUTINE CONSTRUCT_HO_X
+END SUBROUTINE CONSTRUCT_HO_X_minmod
 
 
 !-------------------------------------------------------------------------------------
@@ -1089,9 +1127,12 @@ END SUBROUTINE CONSTRUCT_HO_X
 !    HISTORY:
 !      06/20/2010 Fengyan Shi
 !      02/14/2011 Jeff Harris, replaced limiter function, saving 1/3 time
+!      08/31/2016 Choi noticed 4th-order + minmod is not stable
+!                 I changed construction_ho to _minmod to keep
+!                 this subroutine for further tests
 !
 !-------------------------------------------------------------------------------------
-SUBROUTINE CONSTRUCT_HO_Y(M,N,N1,Ibeg,Iend,Jbeg,Jend,DY,MASK,Vin,OutL,OutR)
+SUBROUTINE CONSTRUCT_HO_Y_minmod(M,N,N1,Ibeg,Iend,Jbeg,Jend,DY,MASK,Vin,OutL,OutR)
      USE PARAM
      IMPLICIT NONE
      INTEGER, INTENT(IN)::M,N,N1,Ibeg,Iend,Jbeg,Jend
@@ -1195,7 +1236,7 @@ SUBROUTINE CONSTRUCT_HO_Y(M,N,N1,Ibeg,Iend,Jbeg,Jend,DY,MASK,Vin,OutL,OutR)
      ENDDO
      ENDDO
 
-END SUBROUTINE CONSTRUCT_HO_Y
+END SUBROUTINE CONSTRUCT_HO_Y_minmod
 
 
 !-------------------------------------------------------------------------------------
@@ -1239,3 +1280,447 @@ FUNCTION MINMOD_LIMITER(A,B,C)
 
     RETURN
 END FUNCTION MINMOD_LIMITER
+
+
+! --------------- ykchoi (08/28/2016)
+! This is subroutine for the fourth order MUSCL-TVD scheme.
+! Van-Leer limiter is used for the third-order part,
+! and the minmod limiter is used for the fourth order part in the fourth order scheme.
+!
+! Reference
+! Hybrid finite-volume finite-difference scheme for the solution of Boussinesq equations
+! Erduran et al. (2005)
+!   08/31/21016  fyshi changed the subroutine name HO_vanleer to HO
+!                to make a consistency
+! ---------------------------------------------------------------------------------------
+SUBROUTINE CONSTRUCTION_HO
+     USE GLOBAL
+     IMPLICIT NONE
+
+     REAL(SP),ALLOCATABLE :: MASK9u(:,:), MASK9v(:,:)
+     ALLOCATE( MASK9u(1:Mloc1,1:Nloc), MASK9v(1:Mloc,1:Nloc1) )
+
+     MASK9u(1:Mloc,1:Nloc)=MASK9(1:Mloc,1:Nloc)
+     MASK9v(1:Mloc,1:Nloc)=MASK9(1:Mloc,1:Nloc)
+
+     MASK9u(Mloc1,1:Nloc)=MASK9(Mloc,1:Nloc)
+     MASK9v(1:Mloc,Nloc1)=MASK9(1:Mloc,Nloc)
+
+! construct in x-direction
+     CALL CONSTRUCT_HO_X(Mloc,Nloc,Mloc1,Ibeg,Iend,Jbeg,Jend,MASK,U,UxL,UxR)
+     CALL CONSTRUCT_HO_X(Mloc,Nloc,Mloc1,Ibeg,Iend,Jbeg,Jend,MASK,V,VxL,VxR)
+     CALL CONSTRUCT_HO_X(Mloc,Nloc,Mloc1,Ibeg,Iend,Jbeg,Jend,MASK,HU,HUxL,HUxR)
+     CALL CONSTRUCT_HO_X(Mloc,Nloc,Mloc1,Ibeg,Iend,Jbeg,Jend,MASK,HV,HVxL,HVxR)
+# if defined (UseEtaScreen)
+     CALL CONSTRUCT_HO_X(Mloc,Nloc,Mloc1,Ibeg,Iend,Jbeg,Jend,MASK,EtaScreen,EtaRxL,EtaRxR)
+# else
+     CALL CONSTRUCT_HO_X(Mloc,Nloc,Mloc1,Ibeg,Iend,Jbeg,Jend,MASK,Eta,EtaRxL,EtaRxR)
+# endif
+
+     HxL=EtaRxL+Depthx
+     HxR=EtaRxR+Depthx
+
+# if defined (CARTESIAN)
+     IF(DISPERSION)THEN
+
+      CALL CONSTRUCT_HO_X(Mloc,Nloc,Mloc1,Ibeg,Iend,Jbeg,Jend,MASK,U4,U4xL,U4xR)
+	CALL CONSTRUCT_HO_X(Mloc,Nloc,Mloc1,Ibeg,Iend,Jbeg,Jend,MASK,V4,V4xL,V4xR)
+
+     ENDIF
+
+     PL(1:Mloc1,1:Nloc)=HUxL(1:Mloc1,1:Nloc) &
+     + Gamma1*MASK9u(1:Mloc1,1:Nloc)*HxL(1:Mloc1,1:Nloc)*U4xL(1:Mloc1,1:Nloc)
+
+     PR(1:Mloc1,1:Nloc)=HUxR(1:Mloc1,1:Nloc) &
+     + Gamma1*MASK9u(1:Mloc1,1:Nloc)*HxR(1:Mloc1,1:Nloc)*U4xR(1:Mloc1,1:Nloc)
+
+     FxL(1:Mloc1,1:Nloc)=Gamma3*PL(1:Mloc1,1:Nloc)*(UxL(1:Mloc1,1:Nloc)  &
+        +Gamma1*MASK9u(1:Mloc1,1:Nloc)*U4xL(1:Mloc1,1:Nloc)) &
+        +0.5*GRAV*((EtaRxL(1:Mloc1,1:Nloc))*(EtaRxL(1:Mloc1,1:Nloc))*Gamma3  &
+        +2.0_SP*(EtaRxL(1:Mloc1,1:Nloc))*(Depthx(1:Mloc1,1:Nloc)))
+
+     FxR(1:Mloc1,1:Nloc)=Gamma3*PR(1:Mloc1,1:Nloc)*(UxR(1:Mloc1,1:Nloc)  &
+        +Gamma1*MASK9u(1:Mloc1,1:Nloc)*U4xR(1:Mloc1,1:Nloc)) &
+        +0.5*GRAV*((EtaRxR(1:Mloc1,1:Nloc))*(EtaRxR(1:Mloc1,1:Nloc))*Gamma3  &
+        +2.0_SP*(EtaRxR(1:Mloc1,1:Nloc))*(Depthx(1:Mloc1,1:Nloc)))
+
+# else
+# if defined(ZALPHA)
+     IF(DISPERSION)THEN
+
+      CALL CONSTRUCT_HO_X(Mloc,Nloc,Mloc1,Ibeg,Iend,Jbeg,Jend,MASK,U4,U4xL,U4xR)
+	CALL CONSTRUCT_HO_X(Mloc,Nloc,Mloc1,Ibeg,Iend,Jbeg,Jend,MASK,V4,V4xL,V4xR)
+
+     ENDIF
+
+     PL(1:Mloc1,1:Nloc)=HUxL(1:Mloc1,1:Nloc) &
+     + Gamma1*MASK9u(1:Mloc1,1:Nloc)*HxL(1:Mloc1,1:Nloc)*U4xL(1:Mloc1,1:Nloc)
+
+     PR(1:Mloc1,1:Nloc)=HUxR(1:Mloc1,1:Nloc) &
+     + Gamma1*MASK9u(1:Mloc1,1:Nloc)*HxR(1:Mloc1,1:Nloc)*U4xR(1:Mloc1,1:Nloc)
+
+     FxL(1:Mloc1,1:Nloc)=Gamma3*PL(1:Mloc1,1:Nloc)*(UxL(1:Mloc1,1:Nloc)  &
+        +Gamma1*MASK9u(1:Mloc1,1:Nloc)*U4xL(1:Mloc1,1:Nloc)) &
+        +0.5*GRAV*((EtaRxL(1:Mloc1,1:Nloc))*(EtaRxL(1:Mloc1,1:Nloc))*Gamma3  &
+        +2.0_SP*(EtaRxL(1:Mloc1,1:Nloc))*(Depthx(1:Mloc1,1:Nloc)))
+
+     FxR(1:Mloc1,1:Nloc)=Gamma3*PR(1:Mloc1,1:Nloc)*(UxR(1:Mloc1,1:Nloc)  &
+        +Gamma1*MASK9u(1:Mloc1,1:Nloc)*U4xR(1:Mloc1,1:Nloc)) &
+        +0.5*GRAV*((EtaRxR(1:Mloc1,1:Nloc))*(EtaRxR(1:Mloc1,1:Nloc))*Gamma3  &
+        +2.0_SP*(EtaRxR(1:Mloc1,1:Nloc))*(Depthx(1:Mloc1,1:Nloc)))
+
+# else
+     PL=HUxL
+     PR=HUxR
+     FxL=Gamma3*PL*UxL &
+        +0.5*GRAV*((EtaRxL)*(EtaRxL)*Gamma3+2.0_SP*(EtaRxL)*(Depthx))
+     FxR=Gamma3*PR*UxR &
+        +0.5*GRAV*((EtaRxR)*(EtaRxR)*Gamma3+2.0_SP*(EtaRxR)*(Depthx))
+# endif
+# endif
+
+# if defined (CARTESIAN)
+
+	GxL(1:Mloc1,1:Nloc)=HxL(1:Mloc1,1:Nloc)*    &
+	  ( UxL(1:Mloc1,1:Nloc) + Gamma1*MASK9u(1:Mloc1,1:Nloc)*U4xL(1:Mloc1,1:Nloc) )*   &
+	  ( VxL(1:Mloc1,1:Nloc) + Gamma1*MASK9u(1:Mloc1,1:Nloc)*V4xL(1:Mloc1,1:Nloc) )*   &
+	  Gamma3
+
+	GxR(1:Mloc1,1:Nloc)=HxR(1:Mloc1,1:Nloc)*    &
+	  ( UxR(1:Mloc1,1:Nloc) + Gamma1*MASK9u(1:Mloc1,1:Nloc)*U4xR(1:Mloc1,1:Nloc) )*   &
+	  ( VxR(1:Mloc1,1:Nloc) + Gamma1*MASK9u(1:Mloc1,1:Nloc)*V4xR(1:Mloc1,1:Nloc) )*   &
+	  Gamma3
+
+# else
+
+     GxL=Gamma3*HxL*UxL*VxL
+     GxR=Gamma3*HxR*UxR*VxR
+
+# endif
+
+! construct in y-direction
+     CALL CONSTRUCT_HO_Y(Mloc,Nloc,Nloc1,Ibeg,Iend,Jbeg,Jend,MASK,U,UyL,UyR)
+     CALL CONSTRUCT_HO_Y(Mloc,Nloc,Nloc1,Ibeg,Iend,Jbeg,Jend,MASK,V,VyL,VyR)
+     CALL CONSTRUCT_HO_Y(Mloc,Nloc,Nloc1,Ibeg,Iend,Jbeg,Jend,MASK,HV,HVyL,HVyR)
+     CALL CONSTRUCT_HO_Y(Mloc,Nloc,Nloc1,Ibeg,Iend,Jbeg,Jend,MASK,HU,HUyL,HUyR)
+# if defined (UseEtaScreen)
+     CALL CONSTRUCT_HO_Y(Mloc,Nloc,Nloc1,Ibeg,Iend,Jbeg,Jend,MASK,EtaScreen,EtaRyL,EtaRyR)
+# else
+     CALL CONSTRUCT_HO_Y(Mloc,Nloc,Nloc1,Ibeg,Iend,Jbeg,Jend,MASK,Eta,EtaRyL,EtaRyR)
+# endif
+
+     HyL=EtaRyL+Depthy
+     HyR=EtaRyR+Depthy
+
+# if defined (CARTESIAN)
+     IF(DISPERSION)THEN
+
+       CALL CONSTRUCT_HO_Y(Mloc,Nloc,Nloc1,Ibeg,Iend,Jbeg,Jend,MASK,V4,V4yL,V4yR)
+	 CALL CONSTRUCT_HO_Y(Mloc,Nloc,Nloc1,Ibeg,Iend,Jbeg,Jend,MASK,U4,U4yL,U4yR)
+
+     ENDIF
+
+     QL(1:Mloc,1:Nloc1)=HVyL(1:Mloc,1:Nloc1)   &
+       + Gamma1*MASK9v(1:Mloc,1:Nloc1)*HyL(1:Mloc,1:Nloc1)*V4yL(1:Mloc,1:Nloc1)
+
+     QR(1:Mloc,1:Nloc1)=HVyR(1:Mloc,1:Nloc1)    &
+       + Gamma1*MASK9v(1:Mloc,1:Nloc1)*HyR(1:Mloc,1:Nloc1)*V4yR(1:Mloc,1:Nloc1)
+
+     GyL(1:Mloc,1:Nloc1)=Gamma3*QL(1:Mloc,1:Nloc1)*(VyL(1:Mloc,1:Nloc1)   &
+        +Gamma1*MASK9v(1:Mloc,1:Nloc1)*V4yL(1:Mloc,1:Nloc1)) &
+        +0.5*GRAV*((EtaRyL(1:Mloc,1:Nloc1))*(EtaRyL(1:Mloc,1:Nloc1))*Gamma3   &
+        +2.0_SP*(EtaRyL(1:Mloc,1:Nloc1))*(Depthy(1:Mloc,1:Nloc1)))
+
+     GyR(1:Mloc,1:Nloc1)=Gamma3*QR(1:Mloc,1:Nloc1)*(VyR(1:Mloc,1:Nloc1)    &
+        +Gamma1*MASK9v(1:Mloc,1:Nloc1)*V4yR(1:Mloc,1:Nloc1)) &
+        +0.5*GRAV*((EtaRyR(1:Mloc,1:Nloc1))*(EtaRyR(1:Mloc,1:Nloc1))*Gamma3    &
+        +2.0_SP*(EtaRyR(1:Mloc,1:Nloc1))*(Depthy(1:Mloc,1:Nloc1)))
+
+# else
+
+# if defined (ZALPHA)
+     IF(DISPERSION)THEN
+
+       CALL CONSTRUCT_HO_Y(Mloc,Nloc,Nloc1,Ibeg,Iend,Jbeg,Jend,MASK,V4,V4yL,V4yR)
+	 CALL CONSTRUCT_HO_Y(Mloc,Nloc,Nloc1,Ibeg,Iend,Jbeg,Jend,MASK,U4,U4yL,U4yR)
+
+     ENDIF
+
+     QL(1:Mloc,1:Nloc1)=HVyL(1:Mloc,1:Nloc1)   &
+       + Gamma1*MASK9v(1:Mloc,1:Nloc1)*HyL(1:Mloc,1:Nloc1)*V4yL(1:Mloc,1:Nloc1)
+
+     QR(1:Mloc,1:Nloc1)=HVyR(1:Mloc,1:Nloc1)    &
+       + Gamma1*MASK9v(1:Mloc,1:Nloc1)*HyR(1:Mloc,1:Nloc1)*V4yR(1:Mloc,1:Nloc1)
+
+     GyL(1:Mloc,1:Nloc1)=Gamma3*QL(1:Mloc,1:Nloc1)*(VyL(1:Mloc,1:Nloc1)   &
+        +Gamma1*MASK9v(1:Mloc,1:Nloc1)*V4yL(1:Mloc,1:Nloc1)) &
+        +0.5*GRAV*((EtaRyL(1:Mloc,1:Nloc1))*(EtaRyL(1:Mloc,1:Nloc1))*Gamma3   &
+        +2.0_SP*(EtaRyL(1:Mloc,1:Nloc1))*(Depthy(1:Mloc,1:Nloc1)))
+
+     GyR(1:Mloc,1:Nloc1)=Gamma3*QR(1:Mloc,1:Nloc1)*(VyR(1:Mloc,1:Nloc1)    &
+        +Gamma1*MASK9v(1:Mloc,1:Nloc1)*V4yR(1:Mloc,1:Nloc1)) &
+        +0.5*GRAV*((EtaRyR(1:Mloc,1:Nloc1))*(EtaRyR(1:Mloc,1:Nloc1))*Gamma3    &
+        +2.0_SP*(EtaRyR(1:Mloc,1:Nloc1))*(Depthy(1:Mloc,1:Nloc1)))
+
+# else
+     QL=HVyL
+     QR=HVyR
+     GyL=Gamma3*QL*VyL &
+        +0.5*GRAV*((EtaRyL)*(EtaRyL)*Gamma3+2.0_SP*(EtaRyL)*(Depthy))
+     GyR=Gamma3*QR*VyR &
+        +0.5*GRAV*((EtaRyR)*(EtaRyR)*Gamma3+2.0_SP*(EtaRyR)*(Depthy))
+# endif
+# endif
+
+# if defined(CARTESIAN)
+
+	FyL(1:Mloc,1:Nloc1)=HyL(1:Mloc,1:Nloc1)*   &
+	 ( UyL(1:Mloc,1:Nloc1) + Gamma1*MASK9v(1:Mloc,1:Nloc1)*U4yL(1:Mloc,1:Nloc1) )*   &
+	 ( VyL(1:Mloc,1:Nloc1) + Gamma1*MASK9v(1:Mloc,1:Nloc1)*V4yL(1:Mloc,1:Nloc1) )*   &
+	 Gamma3
+
+	FyR(1:Mloc,1:Nloc1)=HyR(1:Mloc,1:Nloc1)*   &
+	 ( UyR(1:Mloc,1:Nloc1) + Gamma1*MASK9v(1:Mloc,1:Nloc1)*U4yR(1:Mloc,1:Nloc1) )*   &
+	 ( VyR(1:Mloc,1:Nloc1) + Gamma1*MASK9v(1:Mloc,1:Nloc1)*V4yR(1:Mloc,1:Nloc1) )*   &
+	 Gamma3
+
+# else
+
+     FyL=Gamma3*HyL*UyL*VyL
+     FyR=Gamma3*HyR*UyR*VyR
+
+# endif
+
+	deallocate( MASK9u, MASK9v )
+
+ENDSUBROUTINE CONSTRUCTION_HO
+
+! --------------- ykchoi (08/28/2016)
+! Reference
+! Hybrid finite-volume finite-difference scheme for the solution of Boussinesq equations
+! Erduran et al. (2005)
+! ---------------------------------------------------------------------------------------
+SUBROUTINE CONSTRUCT_HO_X(M,N,M1,Ibeg,Iend,Jbeg,Jend,MASK,Vin,OutL,OutR)
+     USE PARAM
+     IMPLICIT NONE
+     INTEGER,INTENT(IN) :: M,N,M1,Ibeg,Iend,Jbeg,Jend
+
+     REAL(SP),INTENT(IN),DIMENSION(M,N) :: Vin
+     INTEGER,INTENT(IN),DIMENSION(M,N) :: MASK
+     REAL(SP),INTENT(OUT),DIMENSION(M1,N) :: OutL,OutR
+
+     REAL(SP),DIMENSION(M,N) :: Din
+     REAL(SP) :: TXP1,TXP2,TXP3,DVP1,DVP2,DVP3
+
+     REAL(SP) :: VAN1, VAN2, RAT
+
+     Din=0.0_SP
+     DO J=Jbeg,Jend
+
+	  ! Fourth order MUSCL TVD with van Leer and minmod limiter
+	  ! The minmod limiter is used for the fourth order part in the fourth order scheme
+	  DO I=Ibeg-1,Iend+2
+           TXP1=Vin(I-1,J)-Vin(I-2,J)
+           TXP2=Vin(I,J)-Vin(I-1,J)
+           TXP3=Vin(I+1,J)-Vin(I,J)
+
+           if (TXP1.ge.0.0_SP) then
+              DVP1=MAX(0.0_SP,MIN(TXP1,2.0*TXP2,2.0*TXP3))
+           else
+              DVP1=MIN(0.0_SP,MAX(TXP1,2.0*TXP2,2.0*TXP3))
+           endif
+           if (TXP2.ge.0.0_SP) then
+              DVP2=MAX(0.0_SP,MIN(TXP2,2.0*TXP3,2.0*TXP1))
+           else
+              DVP2=MIN(0.0_SP,MAX(TXP2,2.0*TXP3,2.0*TXP1))
+           endif
+           if (TXP3.ge.0.0_SP) then
+              DVP3=MAX(0.0_SP,MIN(TXP3,2.0*TXP1,2.0*TXP2))
+           else
+              DVP3=MIN(0.0_SP,MAX(TXP3,2.0*TXP1,2.0*TXP2))
+           endif
+
+           ! dry D-2 I-1 I D+1, lower-order
+           IF(MASK(I-2,J)==0.OR.MASK(I+1,J)==0)THEN
+             TXP2=Vin(I,J)-Vin(I-1,J)
+             TXP1=TXP2
+             TXP3=TXP2
+             if (TXP1.ge.0.0_SP) then
+                DVP1=MAX(0.0_SP,MIN(TXP1,2.0*TXP2,2.0*TXP3))
+             else
+                DVP1=MIN(0.0_SP,MAX(TXP1,2.0*TXP2,2.0*TXP3))
+             endif
+             if (TXP2.ge.0.0_SP) then
+                DVP2=MAX(0.0_SP,MIN(TXP2,2.0*TXP3,2.0*TXP1))
+             else
+                DVP2=MIN(0.0_SP,MAX(TXP2,2.0*TXP3,2.0*TXP1))
+             endif
+             if (TXP3.ge.0.0_SP) then
+                DVP3=MAX(0.0_SP,MIN(TXP3,2.0*TXP1,2.0*TXP2))
+             else
+                DVP3=MIN(0.0_SP,MAX(TXP3,2.0*TXP1,2.0*TXP2))
+             endif
+           ! here actually DVP1=DVP2=DVP3=TXP2
+           ENDIF
+           ! dry I-2 D-1 D I+1, zero gradient
+           IF(MASK(I-1,J)==0.OR.MASK(I,J)==0)THEN
+             DVP1=ZERO
+             DVP2=ZERO
+             DVP3=ZERO
+           ENDIF
+
+           Din(I,J)=TXP2-1.0_SP/6.0_SP*(DVP3-2.0_SP*DVP2+DVP1)
+        ENDDO
+
+	  ! Fourth order MUSCL TVD with van Leer and minmod limiter
+	  ! The van-Leer limiter is used for the third order part in the fourth order scheme
+        DO I=Ibeg,Iend+1
+           TMP1 = Din(I-1,J);   TMP2 = Din(I,J);
+
+           IF( ABS(TMP1).le.SMALL ) TMP1 = SMALL*SIGN( 1.0_SP, TMP1 )
+           IF( ABS(TMP2).le.SMALL ) TMP2 = SMALL*SIGN( 1.0_SP, TMP2 )
+           RAT = TMP2/TMP1
+           VAN1 = 0.0_SP;
+           IF( abs(1.0 + RAT) > SMALL ) VAN1 = ( RAT + ABS(RAT) )/( 1.0_SP + RAT)
+
+           RAT = TMP1/TMP2
+           VAN2 = 0.0_SP;
+           IF( abs(1.0 + RAT) > SMALL ) VAN2 = ( RAT + ABS(RAT) )/( 1.0_SP + RAT)
+
+           OutL(I,J) = Vin(I-1,J) + ( 1.0_SP/6.0_SP )*( VAN1*TMP1 + 2.0_SP*VAN2*TMP2 )
+
+	     !!!!!!!!!!!!!!!
+
+           TMP1 = Din(I,J);   TMP2 = Din(I+1,J);
+
+           IF( ABS(TMP1).le.SMALL ) TMP1 = SMALL*SIGN( 1.0_SP, TMP1 )
+           IF( ABS(TMP2).le.SMALL ) TMP2 = SMALL*SIGN( 1.0_SP, TMP2 )
+           RAT = TMP2/TMP1
+           VAN1 = 0.0_SP;
+           IF( abs(1.0 + RAT) > SMALL ) VAN1 = ( RAT + ABS(RAT) )/( 1.0_SP + RAT)
+
+           RAT = TMP1/TMP2
+           VAN2 = 0.0_SP;
+           IF( abs(1.0 + RAT) > SMALL ) VAN2 = ( RAT + ABS(RAT) )/( 1.0_SP + RAT)
+
+           OutR(I,J) = Vin(I,J) - ( 1.0_SP/6.0_SP )*( 2.0_SP*VAN1*TMP1 + VAN2*TMP2 )
+        ENDDO
+
+     ENDDO
+
+END SUBROUTINE CONSTRUCT_HO_X
+
+! --------------- ykchoi (08/28/2016)
+! Reference
+! Hybrid finite-volume finite-difference scheme for the solution of Boussinesq equations
+! Erduran et al. (2005)
+! ---------------------------------------------------------------------------------------
+SUBROUTINE CONSTRUCT_HO_Y(M,N,N1,Ibeg,Iend,Jbeg,Jend,MASK,Vin,OutL,OutR)
+     USE PARAM
+     IMPLICIT NONE
+     INTEGER,INTENT(IN) :: M,N,N1,Ibeg,Iend,Jbeg,Jend
+
+     REAL(SP),INTENT(IN),DIMENSION(M,N) :: Vin
+     INTEGER,INTENT(IN),DIMENSION(M,N) :: MASK
+     REAL(SP),INTENT(OUT),DIMENSION(M,N1) :: OutL,OutR
+
+     REAL(SP),DIMENSION(M,N) :: Din
+     REAL(SP) :: TYP1,TYP2,TYP3,DVP1,DVP2,DVP3
+
+     REAL(SP) :: VAN1, VAN2, RAT
+
+     Din=0.0_SP
+     DO I=Ibeg,Iend
+
+	  ! Fourth order MUSCL TVD with van Leer and minmod limiter
+	  ! The minmod limiter is used for the fourth order part in the fourth order scheme
+     	  DO J=Jbeg-1,Jend+2
+           TYP1=Vin(I,J-1)-Vin(I,J-2)
+           TYP2=Vin(I,J)-Vin(I,J-1)
+           TYP3=Vin(I,J+1)-Vin(I,J)
+
+           if (TYP1.ge.0.0_SP) then
+              DVP1=MAX(0.0_SP,MIN(TYP1,2.0*TYP2,2.0*TYP3))
+           else
+              DVP1=MIN(0.0_SP,MAX(TYP1,2.0*TYP2,2.0*TYP3))
+           endif
+           if (TYP2.ge.0.0_SP) then
+              DVP2=MAX(0.0_SP,MIN(TYP2,2.0*TYP3,2.0*TYP1))
+           else
+              DVP2=MIN(0.0_SP,MAX(TYP2,2.0*TYP3,2.0*TYP1))
+           endif
+           if (TYP3.ge.0.0_SP) then
+              DVP3=MAX(0.0_SP,MIN(TYP3,2.0*TYP1,2.0*TYP2))
+           else
+              DVP3=MIN(0.0_SP,MAX(TYP3,2.0*TYP1,2.0*TYP2))
+           endif
+
+           ! dry D-2 J-1 J D+1, lower-order
+           IF(MASK(I,J-2)==0.OR.MASK(I,J+1)==0)THEN
+             TYP2=Vin(I,J)-Vin(I,J-1)
+             TYP1=TYP2
+             TYP3=TYP2
+             if (TYP1.ge.0.0_SP) then
+                DVP1=MAX(0.0_SP,MIN(TYP1,2.0*TYP2,2.0*TYP3))
+             else
+                DVP1=MIN(0.0_SP,MAX(TYP1,2.0*TYP2,2.0*TYP3))
+             endif
+             if (TYP2.ge.0.0_SP) then
+                DVP2=MAX(0.0_SP,MIN(TYP2,2.0*TYP3,2.0*TYP1))
+             else
+                DVP2=MIN(0.0_SP,MAX(TYP2,2.0*TYP3,2.0*TYP1))
+             endif
+             if (TYP3.ge.0.0_SP) then
+                DVP3=MAX(0.0_SP,MIN(TYP3,2.0*TYP1,2.0*TYP2))
+             else
+                DVP3=MIN(0.0_SP,MAX(TYP3,2.0*TYP1,2.0*TYP2))
+             endif
+           ! here actually DVP1=DVP2=DVP3=TYP2
+           ENDIF
+           ! dry J-2 D-1 D J+1, zero gradient
+           IF(MASK(I,J-1)==0.OR.MASK(I,J)==0)THEN
+             DVP1=ZERO
+             DVP2=ZERO
+             DVP3=ZERO
+           ENDIF
+
+           Din(I,J)=TYP2-1.0_SP/6.0_SP*(DVP3-2.0_SP*DVP2+DVP1)
+     	  ENDDO
+
+	  ! Fourth order MUSCL TVD with van Leer and minmod limiter
+	  ! The van-Leer limiter is used for the third order part in the fourth order scheme
+	  DO J=Jbeg,Jend+1
+           TMP1 = Din(I,J-1);   TMP2 = Din(I,J);
+
+           IF( ABS(TMP1).le.SMALL ) TMP1 = SMALL*SIGN( 1.0_SP, TMP1 )
+           IF( ABS(TMP2).le.SMALL ) TMP2 = SMALL*SIGN( 1.0_SP, TMP2 )
+           RAT = TMP2/TMP1
+           VAN1 = 0.0_SP;
+           IF( abs(1.0 + RAT) > SMALL ) VAN1 = ( RAT + ABS(RAT) )/( 1.0_SP + RAT)
+
+           RAT = TMP1/TMP2
+           VAN2 = 0.0_SP;
+           IF( abs(1.0 + RAT) > SMALL ) VAN2 = ( RAT + ABS(RAT) )/( 1.0_SP + RAT)
+
+           OutL(I,J) = Vin(I,J-1) + ( 1.0_SP/6.0_SP )*( VAN1*TMP1 + 2.0_SP*VAN2*TMP2 )
+
+	   !!!!!!!!!!!!!!!
+
+           TMP1 = Din(I,J);   TMP2 = Din(I,J+1);
+
+           IF( ABS(TMP1).le.SMALL ) TMP1 = SMALL*SIGN( 1.0_SP, TMP1 )
+           IF( ABS(TMP2).le.SMALL ) TMP2 = SMALL*SIGN( 1.0_SP, TMP2 )
+           RAT = TMP2/TMP1
+           VAN1 = 0.0_SP;
+           IF( abs(1.0 + RAT) > SMALL ) VAN1 = ( RAT + ABS(RAT) )/( 1.0_SP + RAT)
+
+           RAT = TMP1/TMP2
+           VAN2 = 0.0_SP;
+           IF( abs(1.0 + RAT) > SMALL ) VAN2 = ( RAT + ABS(RAT) )/( 1.0_SP + RAT)
+
+           OutR(I,J) = Vin(I,J) - ( 1.0_SP/6.0_SP )*( 2.0_SP*VAN1*TMP1 + VAN2*TMP2 )
+        ENDDO
+
+     ENDDO
+
+END SUBROUTINE CONSTRUCT_HO_Y

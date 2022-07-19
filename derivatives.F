@@ -342,7 +342,6 @@ SUBROUTINE DERIVATIVE_XX(M,N,Ibeg,Iend,Jbeg,Jend,MASK,DX,Uin,Uout)
     DO I=Ibeg,Iend
       Uout(I,J)= (Uin(I+1,J)-2.0_SP*Uin(I,J) &
       +Uin(I-1,J))/DX(I,J)/DX(I,J)*MASK(I,J)
-
     ENDDO
   ENDDO
 # endif

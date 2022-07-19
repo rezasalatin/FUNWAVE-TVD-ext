@@ -102,11 +102,25 @@ SUBROUTINE ALLOCATE_VARIABLES
   ! others
   Umean(Mloc,Nloc),Vmean(Mloc,Nloc),ETAmean(Mloc,Nloc),&
   Usum(Mloc,Nloc),Vsum(Mloc,Nloc),ETAsum(Mloc,Nloc), &
+  UUsum(Mloc,Nloc),UUmean(Mloc,Nloc),&
+  UVsum(Mloc,Nloc),UVmean(Mloc,Nloc),&
+  VVsum(Mloc,Nloc),VVmean(Mloc,Nloc), &
+  WWsum(Mloc,Nloc),WWmean(Mloc,Nloc),&
+  FRCXsum(Mloc,Nloc),FRCXmean(Mloc,Nloc),&
+  FRCYsum(Mloc,Nloc),FRCYmean(Mloc,Nloc),&
+  Wsurf(Mloc,Nloc), &
+  DxSxx(Mloc,Nloc),DySxy(Mloc,Nloc), &
+  DySyy(Mloc,Nloc),DxSxy(Mloc,Nloc), &
+  PgrdX(Mloc,Nloc),PgrdY(Mloc,Nloc), &
+  DxUUH(Mloc,Nloc),DyUVH(Mloc,Nloc), &
+  DyVVH(Mloc,Nloc),DxUVH(Mloc,Nloc), &
+  P_center(Mloc,Nloc),Q_center(Mloc,Nloc), &
+  U_davg(Mloc,Nloc),V_davg(Mloc,Nloc), &
+  U_davg_sum(Mloc,Nloc),V_davg_sum(Mloc,Nloc), &
+  U_davg_mean(Mloc,Nloc),V_davg_mean(Mloc,Nloc), &
+  P_sum(Mloc,Nloc),Q_sum(Mloc,Nloc), &
+  P_mean(Mloc,Nloc),Q_mean(Mloc,Nloc),&
   nu_smg(Mloc,Nloc), &
-  vis_smg_x(Mloc,Nloc), &
-  vis_smg_y(Mloc,Nloc), &
-  nu_ver_x(Mloc,Nloc), &
-  nu_ver_y(Mloc,Nloc), &
   Num_Zero_Up(Mloc,Nloc), &
   WaveHeightRMS(Mloc,Nloc),  &
   WaveHeightAve(Mloc,Nloc),  &
@@ -114,8 +128,12 @@ SUBROUTINE ALLOCATE_VARIABLES
   Emin(Mloc,Nloc), &
   HrmsSum(Mloc,Nloc), &
   HavgSum(Mloc,Nloc), &
-  ETA2sum(Mloc,Nloc),SigWaveHeight(Mloc,Nloc), &
+  ETA2sum(Mloc,Nloc),ETA2mean(Mloc,Nloc),SigWaveHeight(Mloc,Nloc), &
   ETA2(Mloc,Nloc),ETAvariance(Mloc,Nloc), &
+  vis_smg_x(Mloc,Nloc), &
+  vis_smg_y(Mloc,Nloc), &
+  nu_ver_x(Mloc,Nloc), &
+  nu_ver_y(Mloc,Nloc), &
 # if defined (CARTESIAN)
   U4xL(Mloc1,Nloc),U4xR(Mloc1,Nloc),&
   V4yL(Mloc,Nloc1),V4yR(Mloc,Nloc1), &
@@ -146,6 +164,11 @@ SUBROUTINE ALLOCATE_VARIABLES
   Ubar0(Mloc,Nloc),Vbar0(Mloc,Nloc),&
   Ubar(Mloc,Nloc),Vbar(Mloc,Nloc))
   ! dispersion updating variables
+# if defined(UseEtaScreen)
+  ! wetting and drying
+  ALLOCATE(EtaScreen(Mloc,Nloc))
+# endif
+! dispersion updating variables
 # if defined (CARTESIAN)
   ALLOCATE(U4(Mloc,Nloc),V4(Mloc,Nloc),U1p(Mloc,Nloc),&
   V1p(Mloc,Nloc),U1pp(Mloc,Nloc),V1pp(Mloc,Nloc),&
@@ -180,16 +203,16 @@ SUBROUTINE ALLOCATE_VARIABLES
     nu_break=nu_bkg
   ENDIF
 
-  ! to determine the surfzone range
-  ALLOCATE(nu_break_mean(Mloc,Nloc))
-  ALLOCATE(nu_break_sum(Mloc,Nloc))
-
   ALLOCATE(ROLLER_FLUX(Mloc,Nloc),UNDERTOW_U(Mloc,Nloc),UNDERTOW_V(Mloc,Nloc))
 
   IF(WAVEMAKER_VIS)THEN
     ALLOCATE(nu_break(Mloc,Nloc))
     nu_break=ZERO
   ENDIF
+
+  ! Chen, Salatin, to determine the surfzone range
+  ALLOCATE(nu_break_mean(Mloc,Nloc))
+  ALLOCATE(nu_break_sum(Mloc,Nloc))
 
   IF(DIFFUSION_SPONGE)THEN
     ALLOCATE(nu_sponge(Mloc,Nloc))
@@ -211,6 +234,10 @@ SUBROUTINE ALLOCATE_VARIABLES
   IF(OUT_MFmax)THEN
     ALLOCATE(MomentumFluxMax(Mloc,Nloc))
     MomentumFluxMax=ZERO
+  ENDIF
+  IF(OUT_Time)THEN
+    ALLOCATE(ARRTIME(Mloc,Nloc))
+    ARRTIME=ZERO
   ENDIF
 
   ! Chen, Salatin
@@ -313,10 +340,10 @@ SUBROUTINE INITIALIZATION
   REAL(SP) :: myvar_tmp
 # endif
 
-  !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-  ! Chen, Salatin
-  REAL(SP) :: Dxg,Dyg
-  !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!START!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+!    REAL(SP) :: DXg,DYg                                   ! Salatin et al. 2021
+!     I moved to global since they will be used in multiple places
+!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!END!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
 # if !defined (CARTESIAN)
   REAL(SP)::Dphi_r,Dtheta_r
@@ -415,11 +442,42 @@ SUBROUTINE INITIALIZATION
   Umean = ZERO
   Vmean = ZERO
   ETAmean = ZERO
+  UUsum = ZERO
+  UUmean = ZERO
+  UVsum = ZERO
+  UVmean = ZERO
+  VVsum = ZERO
+  VVmean = ZERO
+  WWsum = ZERO
+  WWmean = ZERO
+  FRCXsum = ZERO
+  FRCXmean = ZERO
+  FRCYsum = ZERO
+  FRCYmean = ZERO
+  Wsurf = ZERO
+  DxSxx = ZERO
+  DySxy = ZERO
+  DySyy = ZERO
+  DxSxy = ZERO
+  PgrdX = ZERO
+  PgrdY = ZERO
+  DxUUH = ZERO
+  DyUVH = ZERO
+  DyVVH = ZERO
+  DxUVH = ZERO
+  P_center = ZERO
+  Q_center = ZERO
+  P_mean = ZERO
+  Q_mean = ZERO
+  P_sum = ZERO
+  Q_sum = ZERO
+  U_davg = ZERO
+  V_davg = ZERO
+  U_davg_mean = ZERO
+  V_davg_mean = ZERO
+  U_davg_sum = ZERO
+  V_davg_sum = ZERO
   nu_smg = ZERO
-  vis_smg_x = ZERO
-  vis_smg_y = ZERO
-  nu_ver_x = ZERO
-  nu_ver_y = ZERO
   Num_Zero_Up = 0
   WaveHeightRMS = ZERO
   WaveHeightAve =ZERO
@@ -427,6 +485,11 @@ SUBROUTINE INITIALIZATION
   Emin = ZERO
   HrmsSum = ZERO
   HavgSum = ZERO
+  ! Chen, Salatin
+  vis_smg_x = ZERO
+  vis_smg_y = ZERO
+  nu_ver_x = ZERO
+  nu_ver_y = ZERO
   DelxU=0.0_SP
   DelxHU=0.0_SP
   DelxV=0.0_SP
@@ -776,8 +839,11 @@ SUBROUTINE INITIALIZATION
   ! the reason for using mirror is eta bc is mirror at open bc
   ! it is important for complex bathy/topo at bc
 
-  VTYPE=1
+# if defined (CARTESIAN)
+  CALL PHI_COLL(Mloc,Nloc,Ibeg,Iend,Jbeg,Jend,Nghost,Depth,VTYPE,PERIODIC)
+# else
   CALL PHI_COLL(Mloc,Nloc,Ibeg,Iend,Jbeg,Jend,Nghost,Depth,VTYPE)
+# endif
 
   ! correction bathymetry
   IF (BATHY_CORRECTION)THEN
@@ -913,6 +979,13 @@ SUBROUTINE INITIALIZATION
   ! initial eta u and v for deforming
   IF(INI_UVZ) THEN
     CALL INITIAL_UVZ
+    IF(BED_DEFORMATION)THEN
+      DO J=1,Nloc
+        DO I=1,Mloc
+          Depth(I,J)=Depth(I,J)-ETA(I,J)
+        ENDDO
+      ENDDO
+    ENDIF
   ENDIF
 
   ! initial solitary wave
@@ -1008,6 +1081,23 @@ SUBROUTINE INITIALIZATION
   ENDIF
 
   ! get Eta and H
+  IF(NO_MASK_FILE)THEN
+    DO J=1,Nloc
+      DO I=1,Mloc
+        IF(Eta(I,J)<-DEPTH(I,J))THEN
+          MASK(I,J)=0
+          Eta(I,J)=MinDepth-Depth(I,J)
+# if defined(UseEtaScreen)
+          EtaScreen(I,J)=Eta(I,J)
+# endif
+        ELSE
+          MASK(I,J)=1
+        ENDIF
+      ENDDO
+    ENDDO
+  ENDIF
+
+
   H=MAX(Eta*Gamma3+Depth,MinDepthFrc)
   HU=H*U
   HV=H*V
@@ -1019,18 +1109,7 @@ SUBROUTINE INITIALIZATION
   Ubar=HU+gamma1*U1p*H
   Vbar=HV+gamma1*V1p*H
 
-  IF(NO_MASK_FILE)THEN
-    DO J=1,Nloc
-      DO I=1,Mloc
-        IF(Eta(I,J)<-DEPTH(I,J))THEN
-          MASK(I,J)=0
-          Eta(I,J)=MinDepth-Depth(I,J)
-        ELSE
-          MASK(I,J)=1
-        ENDIF
-      ENDDO
-    ENDDO
-  ENDIF
+
 
   ! read obstacle structures
   IF(OBSTACLE)THEN
@@ -1232,8 +1311,15 @@ SUBROUTINE INITIALIZATION
 
 
   !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-  ! Chen, Salatin
-  ! This is used inside source.F to speed up the calculations
+  !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!START!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
+  !Oct, 2021
+  !Salatin, R., Chen, Q., Bak, A. S., Shi, F., & Brandt, S. R. (2021). Effects of
+  !wave coherence on longshore variability of nearshore wave processes. Journal
+  !of Geophysical Research: Oceans,126, e2021JC017641.
+  !https://doi.org/10.1029/2021JC017641
+
+      ! This is used inside source.F to speed up the calculations
 
 # if defined (CARTESIAN)
   DXg=DX
@@ -1274,9 +1360,8 @@ SUBROUTINE INITIALIZATION
     ENDIF
   ENDDO
 
-  !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-
-
+!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!END!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 END SUBROUTINE INITIALIZATION
 
 
