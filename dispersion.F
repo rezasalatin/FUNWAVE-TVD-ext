@@ -470,7 +470,7 @@ SUBROUTINE CAL_DISPERSION
             ENDIF
 
             ! Chen, Salatin, Instant Vorticity
-            Vor_Instant(I,J)=omega_0(I,J)
+            Vor_Instant(I,J)=omega_0
 
 
             ken1=((Beta_1-1.0_SP/2.0_SP)*(reta+rh)*Beta_2)
