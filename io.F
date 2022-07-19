@@ -4448,6 +4448,11 @@ SUBROUTINE PREVIEW
     !         call PutFile(TMP_NAME,etat)
   ENDIF
 
+  IF(OUT_Time)THEN
+    TMP_NAME = TRIM(FDIR)//'time_'//TRIM(FILE_NAME)
+    call PutFile(TMP_NAME,ARRTIME)
+  ENDIF
+
 # if defined (METEO)
   IF(OUT_METEO)THEN
 

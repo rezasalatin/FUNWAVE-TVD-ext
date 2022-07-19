@@ -404,6 +404,7 @@ LOGICAL :: OUT_U=.FALSE., OUT_V=.FALSE.,OUT_ETA=.FALSE., &
       OUT_Umax=.FALSE.
 LOGICAL :: OUT_MFmax=.FALSE., &
       OUT_VORmax=.FALSE., &
+      OUT_Time=.FALSE., &
       OUT_ROLLER = .FALSE., &
       OUT_UNDERTOW = .FALSE.
 
