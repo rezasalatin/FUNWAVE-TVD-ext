@@ -102,7 +102,7 @@ END SUBROUTINE MIXING_STUFF
 !
 !-------------------------------------------------------------------------------------
 SUBROUTINE CALCULATE_MEAN(T_INTV_mean,T_sum,T_INTV_UVmean,T_sumUVmean,&
-  DT,DXg,DYg,Mloc,Nloc,U,V,Wsurf,ETA,ETA0,&
+  DT,DXg,DYg,M,N,U,V,Wsurf,ETA,ETA0,&
   Umean,Vmean,ETAmean,Usum,Vsum,ETAsum,WaveHeightRMS, &
   WaveHeightAve,Emax,Emin,Num_Zero_Up,Ibeg,Iend,Jbeg,Jend, &
   HrmsSum,HavgSum, &
