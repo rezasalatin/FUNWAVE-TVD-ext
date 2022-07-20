@@ -3227,6 +3227,14 @@ SUBROUTINE WK_WAVEMAKER_REGULAR_WAVE &
   ENDIF
   wave_length=C_phase*Tperiod
 
+# if defined (PARALLEL)
+  if(myid.eq.0)then
+    WRITE(*,*) 'wave length for this regular wave:', tmp3
+  endif
+# else
+  WRITE(*,*) 'wave length for this regular wave:', tmp3
+# endif
+
   rlamda=wkn*sin(theta)
   width=delta*wave_length/2.0_SP
   beta_gen=80.0_SP/delta**2/wave_length**2
