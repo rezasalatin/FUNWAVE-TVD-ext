@@ -183,6 +183,8 @@ SUBROUTINE WAVEMAKER_INITIALIZATION
         WRITE(*,*) 'wave angle in calculation to make periodic boundary:', tmp3
 # endif
 
+        WRITE(*,*) 'Nglob:', Nglob
+
 
         Theta_WK = tmp3
       ENDIF
