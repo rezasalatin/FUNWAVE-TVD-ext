@@ -183,15 +183,12 @@ SUBROUTINE WAVEMAKER_INITIALIZATION
         WRITE(*,*) 'wave angle in calculation to make periodic boundary:', tmp3
 # endif
 
-        WRITE(*,*) 'Nglob:', Nglob
-
-
         Theta_WK = tmp3
       ENDIF
     ENDIF ! end theta .ne.zero
 
     CALL WK_WAVEMAKER_REGULAR_WAVE &
-    (Tperiod,AMP_WK,Theta_WK,DEP_WK,Delta_WK,D_gen,rlamda,beta_gen,Width_WK)
+    (Tperiod,AMP_WK,Theta_WK,DEP_WK,Delta_WK,D_gen,rlamda,beta_gen,Width_WK,myid)
 
   ENDIF
 
@@ -3204,7 +3201,7 @@ END SUBROUTINE WK_NEW_EQUAL_DFREQ_IRREGULAR_WAVE
 !
 !-------------------------------------------------------------------------------------
 SUBROUTINE WK_WAVEMAKER_REGULAR_WAVE &
-  (Tperiod,AMP_WK,Theta_WK,H_gen,delta,D_gen,rlamda,beta_gen,width)
+  (Tperiod,AMP_WK,Theta_WK,H_gen,delta,D_gen,rlamda,beta_gen,width,myid)
   USE PARAM
   IMPLICIT NONE
   REAL(SP) :: alpha,alpha1,omgn,tb,tc,wkn,C_phase,wave_length,&
@@ -3228,7 +3225,14 @@ SUBROUTINE WK_WAVEMAKER_REGULAR_WAVE &
     C_phase=1./wkn/Tperiod*2.*pi
   ENDIF
   wave_length=C_phase*Tperiod
-  WRITE(*,*) 'wave length for this regular wave:', wave_length
+
+# if defined (PARALLEL)
+        if(myid.eq.0)then
+          WRITE(*,*) 'wave length for this regular wave:', wave_length
+        endif
+# else
+        WRITE(*,*) 'wave length for this regular wave:', wave_length
+# endif
 
   rlamda=wkn*sin(theta)
   width=delta*wave_length/2.0_SP
