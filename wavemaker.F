@@ -3208,6 +3208,7 @@ SUBROUTINE WK_WAVEMAKER_REGULAR_WAVE &
   rl_gen,rI,theta
   REAL(SP),INTENT(OUT) :: Beta_gen,rlamda,D_gen,width
   REAL(SP),INTENT(IN) :: Tperiod,AMP_WK,Theta_WK,H_gen,delta
+  INTEGER,INTENT(IN) :: myid
 
   theta=Theta_WK*pi/180.
   alpha=-0.39
