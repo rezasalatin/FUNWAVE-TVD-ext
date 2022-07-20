@@ -3226,7 +3226,7 @@ SUBROUTINE WK_WAVEMAKER_REGULAR_WAVE &
     C_phase=1./wkn/Tperiod*2.*pi
   ENDIF
   wave_length=C_phase*Tperiod
-  WRITE(*,*) 'wave length for this regular wave:', tmp3
+  WRITE(*,*) 'wave length for this regular wave:', wave_length
 
   rlamda=wkn*sin(theta)
   width=delta*wave_length/2.0_SP
