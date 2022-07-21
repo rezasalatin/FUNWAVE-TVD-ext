@@ -383,6 +383,8 @@ SUBROUTINE CAL_DISPERSION
 
 # if defined (CARTESIAN)
       IF(gamma2>ZERO)THEN
+        CALL DERIVATIVE_X(Mloc,Nloc,Ibeg,Iend,Jbeg,Jend,MASK9,DX,V,Vx)
+        CALL DERIVATIVE_Y(Mloc,Nloc,Ibeg,Iend,Jbeg,Jend,MASK9,DY,U,Uy)
         DO J=Jbeg,Jend
           DO I=Ibeg,Iend
             !
