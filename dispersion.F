@@ -383,8 +383,8 @@ SUBROUTINE CAL_DISPERSION
 
 # if defined (CARTESIAN)
       IF(gamma2>ZERO)THEN
-        DO J=Jbeg,Jend
-          DO I=Ibeg,Iend
+        DO J=Jbeg-3,Jend+3
+          DO I=Ibeg-3,Iend+3
             !
             UxxVxy=Uxx(I,J)+Vxy(I,J)
             UxyVyy=Uxy(I,J)+Vyy(I,J)
@@ -471,7 +471,6 @@ SUBROUTINE CAL_DISPERSION
 
             ! Chen, Salatin, Instant Vorticity
             Vor_Instant(I,J)=omega_0
-
 
             ken1=((Beta_1-1.0_SP/2.0_SP)*(reta+rh)*Beta_2)
             ken2=(1.0_SP/3.0_SP-Beta_1+0.5_SP*Beta_1*Beta_1)*rh*rh*Beta_2*Beta_2  &
