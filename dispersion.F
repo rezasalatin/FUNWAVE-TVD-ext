@@ -383,8 +383,8 @@ SUBROUTINE CAL_DISPERSION
 
 # if defined (CARTESIAN)
       IF(gamma2>ZERO)THEN
-        DO J=Jbeg-3,Jend+3
-          DO I=Ibeg-3,Iend+3
+        DO J=Jbeg,Jend
+          DO I=Ibeg,Iend
             !
             UxxVxy=Uxx(I,J)+Vxy(I,J)
             UxyVyy=Uxy(I,J)+Vyy(I,J)

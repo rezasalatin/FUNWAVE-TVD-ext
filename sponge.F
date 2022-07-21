@@ -150,8 +150,8 @@ SUBROUTINE CALCULATE_SPONGE_MAKER(M,N,Nghost,DX,DY,&
   USE PARAM
 # if defined (PARALLEL)
   USE GLOBAL, ONLY : n_west, n_east, n_suth, n_nrth,&
-  px,py,npx,npy,Mglob,Nglob, &
-  iista   !ykchoi Jan/23/2018
+      px,py,npx,npy,Mglob,Nglob, &
+      iista   !ykchoi Jan/23/2018
 # endif
   IMPLICIT NONE
   INTEGER, INTENT(IN)::M,N,Nghost
@@ -222,9 +222,9 @@ SUBROUTINE CALCULATE_FRICTION_SPONGE(M,N,Nghost,DX,DY,&
   REAL(SP),DIMENSION(M,N),INTENT(IN)::DX,DY
 # endif
   REAL(SP),INTENT(IN) :: &
-  Sponge_west_width,Sponge_east_width,&
-  Sponge_south_width,Sponge_north_width, &
-  R_sponge,A_sponge
+      Sponge_west_width,Sponge_east_width,&
+      Sponge_south_width,Sponge_north_width, &
+      R_sponge,A_sponge
   REAL(SP),DIMENSION(M,N),INTENT(OUT)::SPONGE
   REAL(SP)::ri,lim
   INTEGER::Iwidth
@@ -404,9 +404,9 @@ SUBROUTINE CALCULATE_DIFFUSION_SPONGE(M,N,Nghost,DX,DY,&
   REAL(SP),DIMENSION(M,N),INTENT(IN)::DX,DY
 # endif
   REAL(SP),INTENT(IN) :: &
-  Sponge_west_width,Sponge_east_width,&
-  Sponge_south_width,Sponge_north_width, &
-  R_sponge,A_sponge
+      Sponge_west_width,Sponge_east_width,&
+      Sponge_south_width,Sponge_north_width, &
+      R_sponge,A_sponge
   REAL(SP),DIMENSION(M,N),INTENT(INOUT)::SPONGE
   REAL(SP)::ri,lim
   INTEGER::Iwidth
@@ -590,9 +590,9 @@ SUBROUTINE CALCULATE_SPONGE(M,N,Nghost,DX,DY,&
   REAL(SP),DIMENSION(M,N),INTENT(IN)::DX,DY
 # endif
   REAL(SP),INTENT(IN) :: &
-  Sponge_west_width,Sponge_east_width,&
-  Sponge_south_width,Sponge_north_width, &
-  R_sponge,A_sponge
+      Sponge_west_width,Sponge_east_width,&
+      Sponge_south_width,Sponge_north_width, &
+      R_sponge,A_sponge
 
   REAL(SP),DIMENSION(M,N),INTENT(INOUT)::SPONGE
   REAL(SP)::ri,lim
@@ -632,7 +632,7 @@ SUBROUTINE CALCULATE_SPONGE(M,N,Nghost,DX,DY,&
         ri = R_Sponge**(50*(i+(iista-1)-1)/(Iwidth-1))
         !---ykchoi Jan/23/2018]
 # else
-        ri=R_sponge**(50*(I-1)/(Iwidth-1))
+        ri = R_sponge**(50*(I-1)/(Iwidth-1))
 # endif
         tmp_2d_1(i,j)=MAX(A_Sponge**ri,lim)
       ENDDO
