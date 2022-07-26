@@ -343,7 +343,7 @@ REAL(SP)::T_INTV_UVmean = 20.0,T_sumUVmean=0.0
 REAL(SP)::T_MA_STEP=1.0,T_MA_Sum=0.0
 INTEGER :: MA_Window=1
 ! Chen, Salatin ! Vorticity and Vor Intensity
-REAL(SP),DIMENSION(:,:),ALLOCATABLE :: Vor_Instant,Vor_Mean,&
+REAL(SP),DIMENSION(:,:),ALLOCATABLE :: vorticity,Vor_Mean,&
       Vor_Intensity,Vor2,&
       Vor2sum,Vorsum,Vorsum2
 

@@ -3978,7 +3978,7 @@ do i=1,NumberStations
       eta_sta=eta(ista(i),jsta(i))
       u_sta=u(ista(i),jsta(i))
       v_sta=v(ista(i),jsta(i))
-      vor_sta=Vor_Instant(ista(i),jsta(i))
+      vor_sta=vorticity(ista(i),jsta(i))
     ENDIF
     IF(BufferCount(i)<StationOutputBuffer.AND.TIME<TOTAL_TIME)THEN
       BufferCount(i) = BufferCount(i) +1
@@ -4108,7 +4108,7 @@ do i=1,NumberStations
       eta_sta=eta(ista(i),jsta(i))
       u_sta=u(ista(i),jsta(i))
       v_sta=v(ista(i),jsta(i))
-      vor_sta=Vor_Instant(ista(i),jsta(i))
+      vor_sta=vorticity(ista(i),jsta(i))
     ENDIF
 
     IF(BufferCount(i)<StationOutputBuffer.AND.TIME<TOTAL_TIME)THEN
@@ -4241,7 +4241,7 @@ do i=1,NumberStations
       eta_sta=eta(ista(i),jsta(i))
       u_sta=u(ista(i),jsta(i))
       v_sta=v(ista(i),jsta(i))
-      vor_sta=Vor_Instant(ista(i),jsta(i))
+      vor_sta=vorticity(ista(i),jsta(i))
     ENDIF
 
     IF(BufferCount(i)<StationOutputBuffer.AND.TIME<TOTAL_TIME)THEN
@@ -4524,8 +4524,8 @@ SUBROUTINE PREVIEW
 
   ! Chen, Salatin
   IF(OUT_VOR)THEN
-    TMP_NAME = TRIM(FDIR)//'VorInstant_'//TRIM(FILE_NAME)
-    call PutFile(TMP_NAME,Vor_Instant)
+    TMP_NAME = TRIM(FDIR)//'vorticity_'//TRIM(FILE_NAME)
+    call PutFile(TMP_NAME,vorticity)
   ENDIF
 
   ! Chen, Salatin, output cross-shore gradient of radiation shear stress
@@ -4638,7 +4638,7 @@ END SUBROUTINE PREVIEW_MEAN
 SUBROUTINE PREVIEW_MEAN_UV
   USE GLOBAL
   IMPLICIT NONE
-  REAL(SP),DIMENSION(Mloc,Nloc) :: tmpout 
+  REAL(SP),DIMENSION(Mloc,Nloc) :: tmpout
 
   CHARACTER(LEN=80)::FILE_NAME=' '
   CHARACTER(LEN=80)::FDIR=' '

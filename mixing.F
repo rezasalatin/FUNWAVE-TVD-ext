@@ -73,7 +73,7 @@ SUBROUTINE MIXING_STUFF
     P_mean,Q_mean,MinDepthFrc,&
     ! Salatin
     ETA2,ETAvariance,&
-    Vor_Instant, Vor_Mean, Vor_Intensity, NumDT1, NumDT2,Vor2,&
+    vorticity, Vor_Mean, Vor_Intensity, NumDT1, NumDT2,Vor2,&
     Vor2sum,Vorsum,nu_break,nu_break_mean,nu_break_sum,nu_smg_mean,nu_smg_sum,nu_smg)
   ENDIF    !ykchoi
 
@@ -116,7 +116,7 @@ SUBROUTINE CALCULATE_MEAN(T_INTV_mean,T_sum,T_INTV_UVmean,T_sumUVmean,&
   P_mean,Q_mean,MinDepthFrc,&
   ! Salatin
   ETA2,ETAvariance,&
-  Vor_Instant, Vor_Mean, Vor_Intensity, NumDT1, NumDT2,Vor2,&
+  vorticity, Vor_Mean, Vor_Intensity, NumDT1, NumDT2,Vor2,&
   Vor2sum,Vorsum,nu_break,nu_break_mean,nu_break_sum,nu_smg_mean,nu_smg_sum,nu_smg)
   ! calculate mean for smagorinsky mixing and wave height
   USE PARAM
@@ -150,7 +150,7 @@ SUBROUTINE CALCULATE_MEAN(T_INTV_mean,T_sum,T_INTV_UVmean,T_sumUVmean,&
   REAL(SP),INTENT(IN) :: T_INTV_UVmean
   REAL(SP),INTENT(OUT) :: T_sumUVmean
   INTEGER,INTENT(INOUT) :: NumDT1, NumDT2
-  REAL(SP),DIMENSION(M,N),INTENT(INOUT) :: Vor_Instant,Vor_Mean,Vor_Intensity
+  REAL(SP),DIMENSION(M,N),INTENT(INOUT) :: vorticity,Vor_Mean,Vor_Intensity
   REAL(SP),DIMENSION(M,N),INTENT(INOUT) :: Vor2,Vor2sum,Vorsum
   REAL(SP),DIMENSION(M,N) :: Vor_Variance
   REAL(SP),DIMENSION(M,N),INTENT(INOUT) :: ETA2
@@ -341,8 +341,8 @@ SUBROUTINE CALCULATE_MEAN(T_INTV_mean,T_sum,T_INTV_UVmean,T_sumUVmean,&
     Umean=Usum/T_sumUVmean
     Vmean=Vsum/T_sumUVmean
 
-    !Vorsum =Vor_Instant+Vorsum
-    Vorsum =Vor_Instant*DT+Vorsum
+    !Vorsum =vorticity+Vorsum
+    Vorsum =vorticity*DT+Vorsum
     !Vor_Mean=Vorsum/NumDT2
     Vor_Mean=Vorsum/T_sumUVmean
     DO J=1,N
@@ -366,11 +366,11 @@ SUBROUTINE CALCULATE_MEAN(T_INTV_mean,T_sum,T_INTV_UVmean,T_sumUVmean,&
     Vsum=V*DT+Vsum
     !Vorticity Intensity
     NumDT2 = NumDT2+1
-    !Vorsum =Vor_Instant+Vorsum
-    Vorsum =Vor_Instant*DT+Vorsum
+    !Vorsum =vorticity+Vorsum
+    Vorsum =vorticity*DT+Vorsum
     DO J=1,N
       DO I=1,M
-        Vor2(I,J) = Vor_Instant(I,J)*Vor_Instant(I,J)
+        Vor2(I,J) = vorticity(I,J)*vorticity(I,J)
       ENDDO
     ENDDO
     Vor2sum=Vor2+Vor2sum

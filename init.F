@@ -241,10 +241,10 @@ SUBROUTINE ALLOCATE_VARIABLES
   ENDIF
 
   ! Chen, Salatin
-  ALLOCATE(Vor_Instant(Mloc,Nloc),Vor_Mean(Mloc,Nloc),&
+  ALLOCATE(vorticity(Mloc,Nloc),Vor_Mean(Mloc,Nloc),&
   Vor_Intensity(Mloc,Nloc),Vor2(Mloc,Nloc),Vor2sum(Mloc,Nloc),&
   Vorsum(Mloc,Nloc),Vorsum2(Mloc,Nloc))
-  Vor_Instant=ZERO
+  vorticity=ZERO
   Vor_Mean=ZERO
   Vor_Intensity=ZERO
   Vor2=ZERO
