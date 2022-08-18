@@ -111,9 +111,9 @@ SUBROUTINE WAVEMAKER_INITIALIZATION
             I=I+1
             !         tmp2=I*2.0_SP*pi/DY/(Jend-Jbeg)     ! rlamda
 # if defined (CARTESIAN)
-            tmp2=I*2.0_SP*pi/DY/(Nglob-1.0_SP)
+            tmp2=I*2.0_SP*pi/DY/(Nglob)
 # else
-            tmp2=I*2.0_SP*pi/DY(1,1)/(Nglob-1.0_SP)
+            tmp2=I*2.0_SP*pi/DY(1,1)/(Nglob)
 # endif
             IF(tmp2.GE.tmp1)THEN
               tmp3=90.0
@@ -145,9 +145,9 @@ SUBROUTINE WAVEMAKER_INITIALIZATION
             I=I+1
             !         tmp2=I*2.0_SP*pi/DY/(Jend-Jbeg)     ! rlamda
 # if defined (CARTESIAN)
-            tmp2=I*2.0_SP*pi/DY/(Nglob-1.0_SP)     ! rlamda
+            tmp2=I*2.0_SP*pi/DY/(Nglob)     ! rlamda
 # else
-            tmp2=I*2.0_SP*pi/DY(1,1)/(Nglob-1.0_SP)     ! rlamda
+            tmp2=I*2.0_SP*pi/DY(1,1)/(Nglob)     ! rlamda
 # endif
             IF(tmp2.GE.tmp1)THEN
               tmp3=-90.0
