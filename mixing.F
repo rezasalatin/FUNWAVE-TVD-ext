@@ -452,13 +452,6 @@ SUBROUTINE CALCULATE_MovingAverage(DT,M,N,U,V,ETA,MASK,DX,DY,Depth,&
       CALL DERIVATIVE_Y(M,N,Ibeg,Iend,Jbeg,Jend,MASK,DY,vMA,vMAy)
       CALL DERIVATIVE_X(M,N,Ibeg,Iend,Jbeg,Jend,MASK,DX,uMA,uMAx)
       CALL DERIVATIVE_Y(M,N,Ibeg,Iend,Jbeg,Jend,MASK,DY,uMA,uMAy)
-      VTYPE=1
-      CALL PHI_COLL(M,N,Ibeg,Iend,Jbeg,Jend,Nghost,uMAx,VTYPE,PERIODIC)
-      CALL PHI_COLL(M,N,Ibeg,Iend,Jbeg,Jend,Nghost,vMAy,VTYPE,PERIODIC)
-      VTYPE=3
-      CALL PHI_COLL(M,N,Ibeg,Iend,Jbeg,Jend,Nghost,uMAy,VTYPE,PERIODIC)
-      Vtype=2
-      CALL PHI_COLL(M,N,Ibeg,Iend,Jbeg,Jend,Nghost,vMAx,VTYPE,PERIODIC)
 
       ! subtracting average velocity from the instant velocity
       U_temp1 = U - uMA
