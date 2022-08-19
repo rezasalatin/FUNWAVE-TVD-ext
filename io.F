@@ -3879,7 +3879,7 @@ do i=1,NumberStations
       eta_sta=eta(ista(i),jsta(i))
       u_sta=u(ista(i),jsta(i))
       v_sta=v(ista(i),jsta(i))
-      vor_sta=Vor_Instant(ista(i),jsta(i))
+      vor_sta=vorticity(ista(i),jsta(i))
       Syx_x_sta=Syx_x(ista(i),jsta(i))
     ENDIF
     write (iunit,'(6E16.5E4)') &
@@ -3988,7 +3988,7 @@ do i=1,NumberStations
       eta_sta=eta(ista(i),jsta(i))
       u_sta=u(ista(i),jsta(i))
       v_sta=v(ista(i),jsta(i))
-      vor_sta=Vor_Instant(ista(i),jsta(i))
+      vor_sta=vorticity(ista(i),jsta(i))
       Syx_x_sta=Syx_x(ista(i),jsta(i))
     ENDIF
     write (iunit,'(6E16.5E4)') time, eta_sta,&
@@ -4097,7 +4097,7 @@ do i=1,NumberStations
       eta_sta=eta(ista(i),jsta(i))
       u_sta=u(ista(i),jsta(i))
       v_sta=v(ista(i),jsta(i))
-      vor_sta=Vor_Instant(ista(i),jsta(i))
+      vor_sta=vorticity(ista(i),jsta(i))
       Syx_x_sta=Syx_x(ista(i),jsta(i))
     ENDIF
 
@@ -4363,7 +4363,7 @@ SUBROUTINE PREVIEW
   ! Chen, Salatin
   IF(OUT_VOR)THEN
     TMP_NAME = TRIM(FDIR)//'VorInstant_'//TRIM(FILE_NAME)
-    call PutFile(TMP_NAME,Vor_Instant)
+    call PutFile(TMP_NAME,vorticity)
   ENDIF
 
   ! Chen, Salatin, output cross-shore gradient of radiation shear stress
@@ -4403,19 +4403,6 @@ SUBROUTINE PREVIEW
   call PutFile(TMP_NAME,temp_output3)
   TMP_NAME = TRIM(FDIR)//'nuVis_MA_'//TRIM(FILE_NAME)
   call PutFile(TMP_NAME,temp_output4)
-
-  IF(H_MIXING)THEN
-    TMP_NAME = TRIM(FDIR)//'vis_smg_x_'//TRIM(FILE_NAME)
-    call PutFile(TMP_NAME,vis_smg_x)
-    TMP_NAME = TRIM(FDIR)//'vis_smg_y_'//TRIM(FILE_NAME)
-    call PutFile(TMP_NAME,vis_smg_y)
-    TMP_NAME = TRIM(FDIR)//'vis_smg_xMA_'//TRIM(FILE_NAME)
-    call PutFile(TMP_NAME,vis_smg_xMA)
-    TMP_NAME = TRIM(FDIR)//'vis_smg_yMA_'//TRIM(FILE_NAME)
-    call PutFile(TMP_NAME,vis_smg_yMA)
-    TMP_NAME = TRIM(FDIR)//'nu_smg_MA_'//TRIM(FILE_NAME)
-    call PutFile(TMP_NAME,nu_smg_MA)
-  ENDIF
 
   IF(V_MIXING)THEN
     TMP_NAME = TRIM(FDIR)//'nu_verx_'//TRIM(FILE_NAME)

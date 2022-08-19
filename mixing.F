@@ -63,7 +63,7 @@ SUBROUTINE MIXING_STUFF
     Umean,Vmean,ETAmean,Usum,Vsum,ETAsum,WaveHeightRMS, &
     WaveHeightAve,Emax,Emin,Num_Zero_Up,Ibeg,Iend,Jbeg,Jend, &
     HrmsSum,HavgSum,ETA2,ETA2sum,SigWaveHeight,ETAvariance, &
-    Vor_Instant, Vor_Mean, Vor_Intensity, NumDT1, NumDT2,Vor2,&
+    vorticity, Vor_Mean, Vor_Intensity, NumDT1, NumDT2,Vor2,&
     Vor2sum,Vorsum,nu_break,nu_break_mean,nu_break_sum,nu_smg_mean,nu_smg_sum,nu_smg)
   ENDIF    !ykchoi
 
@@ -74,8 +74,7 @@ SUBROUTINE MIXING_STUFF
   MA_Window,T_MA_Sum,T_MA_STEP,&
   Syx_temp,Syx_x,U_Window,V_Window,uMA,vMA,eta_MA_temp,eta_MA,Vor_MA,&
   ! Smagorinsky subgrid scale turbulence calculated here
-  PERIODIC,Nghost,uMAx,uMAy,vMAx,vMAy,vis_smg_xMA_temp,vis_smg_yMA_temp,&
-  vis_smg_xMA,vis_smg_yMA,vis_smg_x,vis_smg_y,nu_smg,nu_smg_MA,nu_smg_MA_temp)
+  PERIODIC,Nghost,uMAx,uMAy,vMAx,vMAy,nu_smg)
 
 END SUBROUTINE MIXING_STUFF
 
@@ -97,7 +96,7 @@ SUBROUTINE CALCULATE_MEAN(T_INTV_mean,T_INTV_UVmean,T_sum,T_sumUVmean,&
   WaveHeightRMS, &
   WaveHeightAve,Emax,Emin,Num_Zero_Up,Ibeg,Iend,Jbeg,Jend, &
   HrmsSum,HavgSum,ETA2,ETA2sum,SigWaveHeight,ETAvariance, &
-  Vor_Instant, Vor_Mean, Vor_Intensity, NumDT1, NumDT2,Vor2, &
+  vorticity, Vor_Mean, Vor_Intensity, NumDT1, NumDT2,Vor2, &
   Vor2sum,Vorsum,nu_break,nu_break_mean,nu_break_sum,nu_smg_mean,nu_smg_sum,nu_smg)
 
   ! calculate mean for smagorinsky mixing and wave height
@@ -116,7 +115,7 @@ SUBROUTINE CALCULATE_MEAN(T_INTV_mean,T_INTV_UVmean,T_sum,T_sumUVmean,&
   INTEGER,DIMENSION(M,N),INTENT(INOUT) :: Num_Zero_Up
   !!! Chen, Salatin
   INTEGER,INTENT(INOUT) :: NumDT1, NumDT2
-  REAL(SP),DIMENSION(M,N),INTENT(INOUT) :: Vor_Instant,Vor_Mean,Vor_Intensity
+  REAL(SP),DIMENSION(M,N),INTENT(INOUT) :: vorticity,Vor_Mean,Vor_Intensity
   REAL(SP),DIMENSION(M,N),INTENT(INOUT) :: Vor2,Vor2sum,Vorsum
   REAL(SP),DIMENSION(M,N) :: Vor_Variance
   REAL(SP),DIMENSION(M,N),INTENT(INOUT) :: ETAmean,ETAsum,ETA2,ETA2sum
@@ -223,8 +222,8 @@ SUBROUTINE CALCULATE_MEAN(T_INTV_mean,T_INTV_UVmean,T_sum,T_sumUVmean,&
     Umean=Usum/T_sumUVmean
     Vmean=Vsum/T_sumUVmean
 
-    !Vorsum =Vor_Instant+Vorsum
-    Vorsum =Vor_Instant*DT+Vorsum
+    !Vorsum =vorticity+Vorsum
+    Vorsum =vorticity*DT+Vorsum
     !Vor_Mean=Vorsum/NumDT2
     Vor_Mean=Vorsum/T_sumUVmean
     DO J=1,N
@@ -248,11 +247,11 @@ SUBROUTINE CALCULATE_MEAN(T_INTV_mean,T_INTV_UVmean,T_sum,T_sumUVmean,&
     Vsum=V*DT+Vsum
     !Vorticity Intensity
     NumDT2 = NumDT2+1
-    !Vorsum =Vor_Instant+Vorsum
-    Vorsum =Vor_Instant*DT+Vorsum
+    !Vorsum =vorticity+Vorsum
+    Vorsum =vorticity*DT+Vorsum
     DO J=1,N
       DO I=1,M
-        Vor2(I,J) = Vor_Instant(I,J)*Vor_Instant(I,J)
+        Vor2(I,J) = vorticity(I,J)*vorticity(I,J)
       ENDDO
     ENDDO
     Vor2sum=Vor2+Vor2sum
@@ -275,8 +274,7 @@ SUBROUTINE CALCULATE_MovingAverage(DT,M,N,U,V,ETA,MASK,DX,DY,Depth,&
   OUT_uvMA,OUT_VorMA,OUT_RadStr,OUT_etaMA,&
   MA_Window,T_MA_Sum,T_MA_STEP,&
   Syx_temp,Syx_x,U_Window,V_Window,uMA,vMA,eta_MA_temp,eta_MA,Vor_MA,&
-  PERIODIC,Nghost,uMAx,uMAy,vMAx,vMAy,vis_smg_xMA_temp,vis_smg_yMA_temp,&
-  vis_smg_xMA,vis_smg_yMA,vis_smg_x,vis_smg_y,nu_smg,nu_smg_MA,nu_smg_MA_temp)
+  PERIODIC,Nghost,uMAx,uMAy,vMAx,vMAy,nu_smg)
 
   USE PARAM
   IMPLICIT NONE
@@ -306,10 +304,7 @@ SUBROUTINE CALCULATE_MovingAverage(DT,M,N,U,V,ETA,MASK,DX,DY,Depth,&
   ! moving average of vorticity
   REAL(SP),DIMENSION(M,N),INTENT(OUT) :: Vor_MA
   ! eddy viscosity
-  REAL(SP),DIMENSION(M,N,MA_Window),INTENT(INOUT) :: vis_smg_xMA_temp,vis_smg_yMA_temp,nu_smg_MA_temp
-  REAL(SP),DIMENSION(M,N),INTENT(IN) :: vis_smg_x,vis_smg_y,nu_smg
-  REAL(SP),DIMENSION(M,N),INTENT(OUT) :: vis_smg_xMA,vis_smg_yMA,nu_smg_MA
-  REAL(SP),DIMENSION(M,N) :: vis_smg_xMA_SUM,vis_smg_yMA_SUM,nu_smg_MA_SUM
+  REAL(SP),DIMENSION(M,N),INTENT(IN) :: nu_smg
 
   INTEGER :: VTYPE,Nghost
   LOGICAL :: PERIODIC
@@ -365,24 +360,6 @@ SUBROUTINE CALCULATE_MovingAverage(DT,M,N,U,V,ETA,MASK,DX,DY,Depth,&
       eta_MA_Sum = SUM(eta_MA_temp,3)
       eta_MA = eta_MA_Sum/MA_Window
     ENDIF
-
-    ! moving average of the horizontal viscosity
-    vis_smg_xMA_temp = CSHIFT(vis_smg_xMA_temp,-1,3)
-    vis_smg_yMA_temp = CSHIFT(vis_smg_yMA_temp,-1,3)
-    nu_smg_MA_temp = CSHIFT(nu_smg_MA_temp,-1,3)
-
-    vis_smg_xMA_temp(:,:,1) = vis_smg_x
-    vis_smg_yMA_temp(:,:,1) = vis_smg_y
-    nu_smg_MA_temp(:,:,1) = nu_smg
-
-    vis_smg_xMA_SUM = SUM(vis_smg_xMA_temp,3)
-    vis_smg_yMA_SUM = SUM(vis_smg_yMA_temp,3)
-    nu_smg_MA_SUM = SUM(nu_smg_MA_temp,3)
-
-    vis_smg_xMA = vis_smg_xMA_SUM/MA_Window
-    vis_smg_yMA = vis_smg_yMA_SUM/MA_Window
-    nu_smg_MA = nu_smg_MA_SUM/MA_Window
-
     ! go to next time step
     T_MA_Sum=T_MA_Sum-T_MA_STEP
 

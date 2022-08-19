@@ -449,26 +449,24 @@ SUBROUTINE SourceTerms
   IF(H_MIXING)THEN
     IF(MIX_MODEL.EQ.0)THEN
       ! default
-      nu_smg = C_smg**2*DX*DY*SQRT(2.0*uMAx**2+2.0*vMAy**2+(uMAy+vMAx)**2)
+      nu_smg = (C_smg**2)*(DX*DY)*SQRT(2.0*uMAx**2+2.0*vMAy**2+(uMAy+vMAx)**2)
     ELSEIF(MIX_MODEL.EQ.1)THEN
       VTYPE=1
-      CALL PHI_COLL(Mloc,Nloc,Ibeg,Iend,Jbeg,Jend,Nghost,Vor_Instant,VTYPE,PERIODIC)
-      CALL DERIVATIVE_X(Mloc,Nloc,Ibeg,Iend,Jbeg,Jend,MASK9,DX,Vor_Instant,VorX)
-      CALL DERIVATIVE_Y(Mloc,Nloc,Ibeg,Iend,Jbeg,Jend,MASK9,DY,Vor_Instant,VorY)
+      CALL PHI_COLL(Mloc,Nloc,Ibeg,Iend,Jbeg,Jend,Nghost,vorticity,VTYPE,PERIODIC)
+      CALL DERIVATIVE_X(Mloc,Nloc,Ibeg,Iend,Jbeg,Jend,MASK9,DX,vorticity,VorX)
+      CALL DERIVATIVE_Y(Mloc,Nloc,Ibeg,Iend,Jbeg,Jend,MASK9,DY,vorticity,VorY)
       nu_smg=C_smg*DX*DY*(DEPTH+ETA)*SQRT(VorX*VorX+VorY*VorY)
     ELSEIF(MIX_MODEL.EQ.2)THEN
-      nu_smg=C_smg*(DX*DY*(DEPTH+ETA))**(2.0_SP/3.0_SP)*SQRT(Vor_Instant*Vor_Instant/2)
+      nu_smg=C_smg*(DX*DY*(DEPTH+ETA))**(2.0_SP/3.0_SP)*SQRT(vorticity*vorticity/2)
     ELSEIF(MIX_MODEL.EQ.3)THEN
       nu_smg = C_smg**2*DX*DY*DEPTH/SQRT(DX**2+DY**2)*SQRT(2.0*uMAx**2+2.0*vMAy**2+(uMAy+vMAx)**2)
     ELSEIF(MIX_MODEL.EQ.4)THEN
-
       VTYPE=1
-      CALL PHI_COLL(Mloc,Nloc,Ibeg,Iend,Jbeg,Jend,Nghost,Vor_Instant,VTYPE,PERIODIC)
-      CALL DERIVATIVE_X(Mloc,Nloc,Ibeg,Iend,Jbeg,Jend,MASK9,DX,Vor_Instant,VorX)
-      CALL DERIVATIVE_Y(Mloc,Nloc,Ibeg,Iend,Jbeg,Jend,MASK9,DY,Vor_Instant,VorY)
-
+      CALL PHI_COLL(Mloc,Nloc,Ibeg,Iend,Jbeg,Jend,Nghost,vorticity,VTYPE,PERIODIC)
+      CALL DERIVATIVE_X(Mloc,Nloc,Ibeg,Iend,Jbeg,Jend,MASK9,DX,vorticity,VorX)
+      CALL DERIVATIVE_Y(Mloc,Nloc,Ibeg,Iend,Jbeg,Jend,MASK9,DY,vorticity,VorY)
       nu_smg=0.5*(C_smg*DX*DY*(DEPTH+ETA)*SQRT(VorX*VorX+VorY*VorY)) &
-      +0.5*(C_smg*(DX*DY*(DEPTH+ETA))**(2.0_SP/3.0_SP)*SQRT(Vor_Instant*Vor_Instant/2))
+      +0.5*(C_smg*(DX*DY*(DEPTH+ETA))**(2.0_SP/3.0_SP)*SQRT(vorticity*vorticity/2))
     ELSEIF(MIX_MODEL.EQ.5)THEN
       nu_smg = C_smg**2*DX*DY*SQRT(2.0*Ux**2+2.0*Vy**2+(Uy+Vx)**2)
     ENDIF
@@ -521,9 +519,6 @@ SUBROUTINE SourceTerms
         0.5_SP/DY*(P(I-1,J+1)-P(I-1,J-1))) ) )
       ENDDO
     ENDDO
-    ! Save the value to print it
-    vis_smg_x = SmgX
-    vis_smg_y = SmgY
     ! add to the source term
     SourceX = SourceX + SmgX
     SourceY = SourceY + SmgY

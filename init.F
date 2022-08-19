@@ -103,8 +103,6 @@ SUBROUTINE ALLOCATE_VARIABLES
   Umean(Mloc,Nloc),Vmean(Mloc,Nloc),ETAmean(Mloc,Nloc),&
   Usum(Mloc,Nloc),Vsum(Mloc,Nloc),ETAsum(Mloc,Nloc), &
   nu_smg(Mloc,Nloc), &
-  vis_smg_x(Mloc,Nloc), &
-  vis_smg_y(Mloc,Nloc), &
   nu_ver_x(Mloc,Nloc), &
   nu_ver_y(Mloc,Nloc), &
   Num_Zero_Up(Mloc,Nloc), &
@@ -214,10 +212,10 @@ SUBROUTINE ALLOCATE_VARIABLES
   ENDIF
 
   ! Chen, Salatin
-  ALLOCATE(Vor_Instant(Mloc,Nloc),Vor_Mean(Mloc,Nloc),&
+  ALLOCATE(vorticity(Mloc,Nloc),Vor_Mean(Mloc,Nloc),&
   Vor_Intensity(Mloc,Nloc),Vor2(Mloc,Nloc),Vor2sum(Mloc,Nloc),&
   Vorsum(Mloc,Nloc),Vorsum2(Mloc,Nloc))
-  Vor_Instant=ZERO
+  vorticity=ZERO
   Vor_Mean=ZERO
   Vor_Intensity=ZERO
   Vor2=ZERO
@@ -256,18 +254,6 @@ SUBROUTINE ALLOCATE_VARIABLES
 
   ! Reza Salatin, May 2022, horizontal eddy viscosity (with moving ave)
   ALLOCATE(C_smg(Mloc,Nloc))
-  ALLOCATE(vis_smg_xMA_temp(Mloc,Nloc,MA_Window))
-  vis_smg_xMA_temp=ZERO
-  ALLOCATE(vis_smg_yMA_temp(Mloc,Nloc,MA_Window))
-  vis_smg_yMA_temp=ZERO
-  ALLOCATE(vis_smg_xMA(Mloc,Nloc),vis_smg_yMA(Mloc,Nloc))
-  vis_smg_xMA=ZERO
-  vis_smg_yMA=ZERO
-  ALLOCATE(nu_smg_MA_temp(Mloc,Nloc,MA_Window))
-  nu_smg_MA_temp=ZERO
-  ALLOCATE(nu_smg_MA(Mloc,Nloc))
-  nu_smg_MA=ZERO
-
   ALLOCATE(nu_smg_mean(Mloc,Nloc))
   ALLOCATE(nu_smg_sum(Mloc,Nloc))
   nu_smg_mean = ZERO
@@ -416,8 +402,6 @@ SUBROUTINE INITIALIZATION
   Vmean = ZERO
   ETAmean = ZERO
   nu_smg = ZERO
-  vis_smg_x = ZERO
-  vis_smg_y = ZERO
   nu_ver_x = ZERO
   nu_ver_y = ZERO
   Num_Zero_Up = 0

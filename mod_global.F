@@ -288,7 +288,7 @@ R_sponge,A_sponge
 
 
 ! Vorticity and Vor Intensity ! Chen, Salatin
-REAL(SP),DIMENSION(:,:),ALLOCATABLE :: Vor_Instant,Vor_Mean,&
+REAL(SP),DIMENSION(:,:),ALLOCATABLE :: vorticity,Vor_Mean,&
 Vor_Intensity,Vor2,&
 Vor2sum,Vorsum,Vorsum2
 
@@ -310,9 +310,7 @@ REAL(SP):: Csmg_fixed
 CHARACTER(LEN=80) Csmg_file
 REAL(SP),DIMENSION(:,:),ALLOCATABLE :: C_smg
 
-REAL(SP),DIMENSION(:,:),ALLOCATABLE :: nu_smg,vis_smg_x,vis_smg_y
-REAL(SP),DIMENSION(:,:),ALLOCATABLE :: vis_smg_xMA,vis_smg_yMA,nu_smg_MA
-REAL(SP),DIMENSION(:,:,:),ALLOCATABLE :: vis_smg_xMA_temp, vis_smg_yMA_temp,nu_smg_MA_temp
+REAL(SP),DIMENSION(:,:),ALLOCATABLE :: nu_smg
 REAL(SP),DIMENSION(:,:),ALLOCATABLE :: nu_smg_mean,nu_smg_sum
 
 ! vertical eddy viscosity

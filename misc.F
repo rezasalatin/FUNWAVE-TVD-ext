@@ -372,7 +372,7 @@ SUBROUTINE MAX_MIN_PROPERTY
 # else
     CALL DERIVATIVE_X(Mloc,Nloc,Ibeg,Iend,Jbeg,Jend,MASK9,DX,V,Vx)
     CALL DERIVATIVE_Y(Mloc,Nloc,Ibeg,Iend,Jbeg,Jend,MASK9,DY,U,Uy)
-    Vor_Instant=Vx-Uy
+    vorticity=Vx-Uy
 # endif
 
 # if defined (PARALLEL)
