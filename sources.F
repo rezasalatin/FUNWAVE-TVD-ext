@@ -443,8 +443,7 @@ SUBROUTINE SourceTerms
 
     !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
-    temp_output2 = VertX
-    temp_output3 = Vis_BrkX
+    !temp_output1 = VertX
 
     !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
