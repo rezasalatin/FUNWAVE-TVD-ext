@@ -472,7 +472,7 @@ SUBROUTINE SourceTerms
     ENDIF
 
     ! when there is breaking, deactivate the horizontal mixing
-    nu_smg = nu_smg*(1-CEILING(nu_visMA))
+    ! nu_smg = nu_smg*(1-CEILING(nu_visMA))
 
     ! excep a specific range, make nu_smg zero elsewhere
     !DO J=Jbeg,Jend
