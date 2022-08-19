@@ -75,7 +75,7 @@ SUBROUTINE SourceTerms
   REAL(SP), DIMENSION(NumFreq) :: BB2,CC2 ! for WK_DATA (optimized)
   INTEGER :: kf_index ! Chen, Salatin
   ! variables eddy viscosity terms (horizontal, vertical, breaking)
-  REAL(SP),DIMENSION(Mloc,Nloc) :: SmgX,SmgY,Vis_BrkX,Vis_BrkY,VertX,VertY,nu_visMA_SUM
+  REAL(SP),DIMENSION(Mloc,Nloc) :: Vis_BrkX,Vis_BrkY,VertX,VertY,nu_visMA_SUM
   REAL(SP),DIMENSION(Mloc,Nloc) :: VorX,VorY,DEPTHDerX
   INTEGER :: VTYPE
 
@@ -227,7 +227,7 @@ SUBROUTINE SourceTerms
   ! should include ghost cells 02/28/2017 fyshi
 
   IF(VISCOSITY_BREAKING.OR.WAVEMAKER_VIS)THEN
-    nu_vis = nu_break
+    nu_vis = nu_vis + nu_break
   ENDIF
 
   IF(DIFFUSION_SPONGE)THEN
@@ -365,86 +365,6 @@ SUBROUTINE SourceTerms
   ENDIF
 # endif
 
-  !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-    !!! EDDY VISCOSITY BREAKING
-
-  IF(VISCOSITY_BREAKING.OR.DIFFUSION_SPONGE.OR.WAVEMAKER_VIS)THEN
-    ! Viscosity Breaking
-    ! depth gradient term
-    DO J=Jbeg,Jend
-      DO I=Ibeg,Iend
-        IF(1.EQ.0)THEN
-        Vis_BrkX(I,J) = 1.0_SP * (1.0_SP/DX*( &
-        0.5_SP*(nu_vis(I,J)+nu_vis(I+1,J)) &
-        *1.0_SP/DX*(P(I+1,J)-P(I,J))  &
-        -0.5_SP*(nu_vis(I-1,J)+nu_vis(I,J)) &
-        *1.0_SP/DX*(P(I,J)-P(I-1,J))) ) &
-        +0.5_SP * ( 1.0_SP/DY*( &
-        0.5_SP*(nu_vis(I,J)+nu_vis(I,J+1)) &
-        *1.0_SP/DY*(P(I,J+1)-P(I,J)) &
-        -0.5_SP*(nu_vis(I,J-1)+nu_vis(I,J)) &
-        *1.0_SP/DY*(P(I,J)-P(I,J-1))) &
-        + 0.5_SP/DY*( &
-        nu_vis(I,J+1) &
-        *0.5_SP/DX*(Q(I+1,J+1)-Q(I-1,J+1)) &
-        -nu_vis(I,J-1) &
-        *0.5_SP/DX*(Q(I+1,J-1)-Q(I-1,J-1))) )
-
-        Vis_BrkY(I,J) = 1.0_SP * (1.0_SP/DY*( &
-        0.5_SP*(nu_vis(I,J)+nu_vis(I,J+1)) &
-        *1.0_SP/DY*(Q(I,J+1)-Q(I,J))  &
-        - 0.5_SP*(nu_vis(I,J-1)+nu_vis(I,J)) &
-        *1.0_SP/DY*(Q(I,J)-Q(I,J-1))) ) &
-        + 0.5_SP * ( 1.0_SP/DX*( &
-        0.5_SP*(nu_vis(I,J)+nu_vis(I+1,J)) &
-        *1.0_SP/DX*(Q(I+1,J)-Q(I,J)) &
-        -0.5_SP*(nu_vis(I-1,J)+nu_vis(I,J)) &
-        *1.0_SP/DX*(Q(I,J)-Q(I-1,J))) &
-        + 0.5_SP/DX*( &
-        nu_vis(I+1,J) &
-        *0.5_SP/DY*(P(I+1,J+1)-P(I+1,J-1)) &
-        -nu_vis(I-1,J)* &
-        0.5_SP/DY*(P(I-1,J+1)-P(I-1,J-1))) )
-        ELSE
-        Vis_BrkX(I,J) = 0.5_SP/DX*( &
-        (nu_vis(I+1,J)+nu_vis(I,J)) &
-        *1.0_SP/DX*(HU(I+1,J)-HU(I,J)) &
-        -(nu_vis(I-1,J)+nu_vis(I,J)) &
-        *1.0_SP/DX*(HU(I,J)-HU(I-1,J)) ) &
-        + 0.5_SP/DY*( &
-        (nu_vis(I,J+1)+nu_vis(I,J)) &
-        *1.0_SP/DY*(HU(I,J+1)-HU(I,J)) &
-        -(nu_vis(I,J-1)+nu_vis(I,J)) &
-        *1.0_SP/DY*(HU(I,J)-HU(I,J-1)) )
-
-        Vis_BrkY(I,J) = 0.5_SP/DX*( &
-        (nu_vis(I+1,J)+nu_vis(I,J)) &
-        *1.0_SP/DX*(HV(I+1,J)-HV(I,J)) &
-        -(nu_vis(I-1,J)+nu_vis(I,J)) &
-        *1.0_SP/DX*(HV(I,J)-HV(I-1,J)) ) &
-        + 0.5_SP/DY*( &
-        (nu_vis(I,J+1)+nu_vis(I,J)) &
-        *1.0_SP/DY*(HV(I,J+1)-HV(I,J)) &
-        -(nu_vis(I,J-1)+nu_vis(I,J)) &
-        *1.0_SP/DY*(HV(I,J)-HV(I,J-1)) )
-        ENDIF
-      ENDDO
-    ENDDO
-    ! add to the source term
-    SourceX = SourceX + Vis_BrkX
-    SourceY = SourceY + Vis_BrkY
-  ENDIF
-
-  ! moving average of the breaking terms
-  nu_visMA_temp = CSHIFT(nu_visMA_temp,-1,3)
-  nu_visMA_temp(:,:,1) = nu_vis
-  nu_visMA_SUM = SUM(nu_visMA_temp,3)
-  nu_visMA = nu_visMA_SUM/MA_Window
-  temp_output4 = nu_visMA
-
-  !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-  !!! MIXING MODULE
-
   ! Horizontal Mixing
   IF(H_MIXING)THEN
     IF(MIX_MODEL.EQ.0)THEN
@@ -471,112 +391,58 @@ SUBROUTINE SourceTerms
       nu_smg = C_smg**2*DX*DY*SQRT(2.0*Ux**2+2.0*Vy**2+(Uy+Vx)**2)
     ENDIF
 
+    nu_vis = nu_vis + nu_smg
+  ENDIF
+
     ! when there is breaking, deactivate the horizontal mixing
     ! nu_smg = nu_smg*(1-CEILING(nu_visMA))
 
-    ! excep a specific range, make nu_smg zero elsewhere
-    !DO J=Jbeg,Jend
-    !  DO I=Ibeg,Iend
-    !    !IF(DEPTH(I,J).LE.0.4_SP.OR.DEPTH(I,J).GE.0.6_SP)THEN
-    !    IF(DEPTH(I,J).GE.0.55_SP)THEN
-    !      nu_smg(I,J)=0.0_SP
-    !    ENDIF
-    !  ENDDO
-    !ENDDO
-
-    DO J=Jbeg,Jend
-      DO I=Ibeg,Iend
-        SmgX(I,J) = 2.0_SP * (1.0_SP * (1.0_SP/DX*( &
-        0.5_SP*(nu_smg(I,J)+nu_smg(I+1,J)) &
-        *1.0_SP/DX*(P(I+1,J)-P(I,J))  &
-        -0.5_SP*(nu_smg(I-1,J)+nu_smg(I,J)) &
-        *1.0_SP/DX*(P(I,J)-P(I-1,J))) ) &
-        + 0.5_SP * ( 1.0_SP/DY*( &
-        0.5_SP*(nu_smg(I,J)+nu_smg(I,J+1)) &
-        *1.0_SP/DY*(P(I,J+1)-P(I,J)) &
-        -0.5_SP*(nu_smg(I,J-1)+nu_smg(I,J)) &
-        *1.0_SP/DY*(P(I,J)-P(I,J-1))) &
-        + 0.5_SP/DY*( &
-        nu_smg(I,J+1) &
-        *0.5_SP/DX*(Q(I+1,J+1)-Q(I-1,J+1)) &
-        -nu_smg(I,J-1) &
-        *0.5_SP/DX*(Q(I+1,J-1)-Q(I-1,J-1))) ) )
-
-        SmgY(I,J) = 2.0_SP * (1.0_SP * (1.0_SP/DY*( &
-        0.5_SP*(nu_smg(I,J)+nu_smg(I,J+1)) &
-        *1.0_SP/DY*(Q(I,J+1)-Q(I,J))  &
-        - 0.5_SP*(nu_smg(I,J-1)+nu_smg(I,J)) &
-        *1.0_SP/DY*(Q(I,J)-Q(I,J-1))) ) &
-        + 0.5_SP * ( 1.0_SP/DX*( &
-        0.5_SP*(nu_smg(I,J)+nu_smg(I+1,J)) &
-        *1.0_SP/DX*(Q(I+1,J)-Q(I,J)) &
-        -0.5_SP*(nu_smg(I-1,J)+nu_smg(I,J)) &
-        *1.0_SP/DX*(Q(I,J)-Q(I-1,J))) &
-        + 0.5_SP/DX*( &
-        nu_smg(I+1,J) &
-        *0.5_SP/DY*(P(I+1,J+1)-P(I+1,J-1)) &
-        -nu_smg(I-1,J)* &
-        0.5_SP/DY*(P(I-1,J+1)-P(I-1,J-1))) ) )
-      ENDDO
-    ENDDO
-    ! add to the source term
-    SourceX = SourceX + SmgX
-    SourceY = SourceY + SmgY
-  ENDIF
-
   !!!!!!!!!!!!!!!!!!!!!!!!!!!!
   IF(V_MIXING)THEN
-
     nu_ver_x = 0.4/6.0*Depth*SQRT(Cd*abs(uMA)*SQRT(uMA*uMA+vMA*vMA))
     nu_ver_y = 0.4/6.0*Depth*SQRT(Cd*abs(vMA)*SQRT(uMA*uMA+vMA*vMA))
-
     !nu_ver_x = 0.4/6.0*(Depth+Eta)*SQRT(Cd*abs(U)*SQRT(U*U+V*V))
     !nu_ver_y = 0.4/6.0*(Depth+Eta)*SQRT(Cd*abs(V)*SQRT(U*U+V*V))
-
-    DO J=Jbeg,Jend
-      DO I=Ibeg,Iend
-        VertX(I,J) = 2.0_SP * (1.0_SP * (1.0_SP/DX*( &
-        0.5_SP*(nu_ver_x(I,J)+nu_ver_x(I+1,J)) &
-        *1.0_SP/DX*(P(I+1,J)-P(I,J))  &
-        -0.5_SP*(nu_ver_x(I-1,J)+nu_ver_x(I,J)) &
-        *1.0_SP/DX*(P(I,J)-P(I-1,J))) ) &
-        +0.5_SP * ( 1.0_SP/DY*( &
-        0.5_SP*(nu_ver_x(I,J)+nu_ver_x(I,J+1)) &
-        *1.0_SP/DY*(P(I,J+1)-P(I,J)) &
-        -0.5_SP*(nu_ver_x(I,J-1)+nu_ver_x(I,J)) &
-        *1.0_SP/DY*(P(I,J)-P(I,J-1))) &
-        + 0.5_SP/DY*( &
-        nu_ver_x(I,J+1) &
-        *0.5_SP/DX*(Q(I+1,J+1)-Q(I-1,J+1)) &
-        -nu_ver_x(I,J-1) &
-        *0.5_SP/DX*(Q(I+1,J-1)-Q(I-1,J-1))) ) )
-
-        VertY(I,J) = 2.0_SP * (1.0_SP * (1.0_SP/DY*( &
-        0.5_SP*(nu_ver_y(I,J)+nu_ver_y(I,J+1)) &
-        *1.0_SP/DY*(Q(I,J+1)-Q(I,J))  &
-        - 0.5_SP*(nu_ver_y(I,J-1)+nu_ver_y(I,J)) &
-        *1.0_SP/DY*(Q(I,J)-Q(I,J-1))) ) &
-        + 0.5_SP * ( 1.0_SP/DX*( &
-        0.5_SP*(nu_ver_y(I,J)+nu_ver_y(I+1,J)) &
-        *1.0_SP/DX*(Q(I+1,J)-Q(I,J)) &
-        -0.5_SP*(nu_ver_y(I-1,J)+nu_ver_y(I,J)) &
-        *1.0_SP/DX*(Q(I,J)-Q(I-1,J))) &
-        + 0.5_SP/DX*( &
-        nu_ver_y(I+1,J) &
-        *0.5_SP/DY*(P(I+1,J+1)-P(I+1,J-1)) &
-        -nu_ver_y(I-1,J)* &
-        0.5_SP/DY*(P(I-1,J+1)-P(I-1,J-1))) ) )
-      ENDDO
-    ENDDO
-
-    ! add Vertical Mixing to the source term
-    SourceX = SourceX + C_VMixing*VertX
-    SourceY = SourceY + C_VMixing*VertY
   ENDIF
+
+  DO J=Jbeg,Jend
+    DO I=Ibeg,Iend
+      SourceX(I,J) = SourceX(I,J) + 2.0_SP * (1.0_SP * (1.0_SP/DX*( &
+      0.5_SP*(nu_vis(I,J)+nu_vis(I+1,J)) &
+      *1.0_SP/DX*(P(I+1,J)-P(I,J))  &
+      -0.5_SP*(nu_vis(I-1,J)+nu_vis(I,J)) &
+      *1.0_SP/DX*(P(I,J)-P(I-1,J))) ) &
+      + 0.5_SP * ( 1.0_SP/DY*( &
+      0.5_SP*(nu_vis(I,J)+nu_vis(I,J+1)) &
+      *1.0_SP/DY*(P(I,J+1)-P(I,J)) &
+      -0.5_SP*(nu_vis(I,J-1)+nu_vis(I,J)) &
+      *1.0_SP/DY*(P(I,J)-P(I,J-1))) &
+      + 0.5_SP/DY*( &
+      nu_vis(I,J+1) &
+      *0.5_SP/DX*(Q(I+1,J+1)-Q(I-1,J+1)) &
+      -nu_vis(I,J-1) &
+      *0.5_SP/DX*(Q(I+1,J-1)-Q(I-1,J-1))) ) )
+
+      SourceY(I,J) = SourceY(I,J) + 2.0_SP * (1.0_SP * (1.0_SP/DY*( &
+      0.5_SP*(nu_vis(I,J)+nu_vis(I,J+1)) &
+      *1.0_SP/DY*(Q(I,J+1)-Q(I,J))  &
+      - 0.5_SP*(nu_vis(I,J-1)+nu_vis(I,J)) &
+      *1.0_SP/DY*(Q(I,J)-Q(I,J-1))) ) &
+      + 0.5_SP * ( 1.0_SP/DX*( &
+      0.5_SP*(nu_vis(I,J)+nu_vis(I+1,J)) &
+      *1.0_SP/DX*(Q(I+1,J)-Q(I,J)) &
+      -0.5_SP*(nu_vis(I-1,J)+nu_vis(I,J)) &
+      *1.0_SP/DX*(Q(I,J)-Q(I-1,J))) &
+      + 0.5_SP/DX*( &
+      nu_vis(I+1,J) &
+      *0.5_SP/DY*(P(I+1,J+1)-P(I+1,J-1)) &
+      -nu_vis(I-1,J)* &
+      0.5_SP/DY*(P(I-1,J+1)-P(I-1,J-1))) ) )
+    ENDDO
+  ENDDO
 
     !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
-    temp_output1 = SmgX
     temp_output2 = VertX
     temp_output3 = Vis_BrkX
 

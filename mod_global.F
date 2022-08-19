@@ -446,7 +446,7 @@ REAL(SP) :: Cbrk1=0.65,Cbrk2=0.35,T_brk
 ! use T_brk to judge breakers
 LOGICAL :: INI_UVZ=.FALSE.
 
-REAL(SP),DIMENSION(:,:),ALLOCATABLE :: nu_break,nu_sponge,nu_break_mean,nu_break_sum
+REAL(SP),DIMENSION(:,:),ALLOCATABLE :: nu_break,nu_sponge
 REAL(SP) :: nu_bkg
 LOGICAL :: DIFFUSION_SPONGE = .FALSE.
 LOGICAL :: DIRECT_SPONGE = .FALSE.

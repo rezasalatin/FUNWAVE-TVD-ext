@@ -102,7 +102,6 @@ SUBROUTINE ALLOCATE_VARIABLES
   ! others
   Umean(Mloc,Nloc),Vmean(Mloc,Nloc),ETAmean(Mloc,Nloc),&
   Usum(Mloc,Nloc),Vsum(Mloc,Nloc),ETAsum(Mloc,Nloc), &
-  nu_smg(Mloc,Nloc), &
   nu_ver_x(Mloc,Nloc), &
   nu_ver_y(Mloc,Nloc), &
   Num_Zero_Up(Mloc,Nloc), &
@@ -178,10 +177,6 @@ SUBROUTINE ALLOCATE_VARIABLES
     nu_break=nu_bkg
   ENDIF
 
-  ! to determine the surfzone range
-  ALLOCATE(nu_break_mean(Mloc,Nloc))
-  ALLOCATE(nu_break_sum(Mloc,Nloc))
-
   ALLOCATE(ROLLER_FLUX(Mloc,Nloc),UNDERTOW_U(Mloc,Nloc),UNDERTOW_V(Mloc,Nloc))
 
   IF(WAVEMAKER_VIS)THEN
@@ -254,16 +249,6 @@ SUBROUTINE ALLOCATE_VARIABLES
 
   ! Reza Salatin, May 2022, horizontal eddy viscosity (with moving ave)
   ALLOCATE(C_smg(Mloc,Nloc))
-  ALLOCATE(nu_smg_mean(Mloc,Nloc))
-  ALLOCATE(nu_smg_sum(Mloc,Nloc))
-  nu_smg_mean = ZERO
-  nu_smg_sum = ZERO
-
-  ALLOCATE(nu_visMA_temp(Mloc,Nloc,MA_Window))
-  nu_visMA_temp=ZERO
-  ALLOCATE(nu_visMA(Mloc,Nloc))
-  nu_visMA=ZERO
-
   ! two variables to print some variables
   ALLOCATE(temp_output1(Mloc,Nloc),temp_output2(Mloc,Nloc), &
       temp_output3(Mloc,Nloc),temp_output4(Mloc,Nloc))
@@ -401,7 +386,6 @@ SUBROUTINE INITIALIZATION
   Umean = ZERO
   Vmean = ZERO
   ETAmean = ZERO
-  nu_smg = ZERO
   nu_ver_x = ZERO
   nu_ver_y = ZERO
   Num_Zero_Up = 0

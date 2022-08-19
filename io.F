@@ -4388,23 +4388,19 @@ SUBROUTINE PREVIEW
     TMP_NAME = TRIM(FDIR)//'VorMA_'//TRIM(FILE_NAME)
     call PutFile(TMP_NAME,Vor_MA)
   ENDIF
-  ! Chen, Salatin, output Smagorinsky and vertical eddy viscosity
-  IF(OUT_uvMA)THEN
-    TMP_NAME = TRIM(FDIR)//'nu_smg_'//TRIM(FILE_NAME)
-    call PutFile(TMP_NAME,nu_smg)
-  ENDIF
-
-  ! variables to get output
-  TMP_NAME = TRIM(FDIR)//'SmgX_'//TRIM(FILE_NAME)
-  call PutFile(TMP_NAME,temp_output1)
-  TMP_NAME = TRIM(FDIR)//'VertX_'//TRIM(FILE_NAME)
-  call PutFile(TMP_NAME,temp_output2)
-  TMP_NAME = TRIM(FDIR)//'VisBrkX_'//TRIM(FILE_NAME)
-  call PutFile(TMP_NAME,temp_output3)
-  TMP_NAME = TRIM(FDIR)//'nuVis_MA_'//TRIM(FILE_NAME)
-  call PutFile(TMP_NAME,temp_output4)
 
   IF(V_MIXING)THEN
+    ! variables to get output
+    TMP_NAME = TRIM(FDIR)//'SmgX_'//TRIM(FILE_NAME)
+    call PutFile(TMP_NAME,temp_output1)
+    TMP_NAME = TRIM(FDIR)//'VertX_'//TRIM(FILE_NAME)
+    call PutFile(TMP_NAME,temp_output2)
+    TMP_NAME = TRIM(FDIR)//'VisBrkX_'//TRIM(FILE_NAME)
+    call PutFile(TMP_NAME,temp_output3)
+    TMP_NAME = TRIM(FDIR)//'nuVis_MA_'//TRIM(FILE_NAME)
+    call PutFile(TMP_NAME,temp_output4)
+
+
     TMP_NAME = TRIM(FDIR)//'nu_verx_'//TRIM(FILE_NAME)
     call PutFile(TMP_NAME,nu_ver_x)
     TMP_NAME = TRIM(FDIR)//'nu_very_'//TRIM(FILE_NAME)
@@ -4468,16 +4464,6 @@ SUBROUTINE PREVIEW_MEAN
     call PutFile(TMP_NAME,WaveHeightAve)
     TMP_NAME = TRIM(FDIR)//'Hsig_'//TRIM(FILE_NAME)
     call PutFile(TMP_NAME,SigWaveHeight)
-  ENDIF
-
-  IF(OUT_NU)THEN
-    TMP_NAME = TRIM(FDIR)//'nubrkmean_'//TRIM(FILE_NAME)
-    call PutFile(TMP_NAME,nu_break_mean)
-  ENDIF
-
-  IF(H_MIXING)THEN
-    TMP_NAME = TRIM(FDIR)//'nu_smg_mean_'//TRIM(FILE_NAME)
-    call PutFile(TMP_NAME,nu_smg_mean)
   ENDIF
 
 END SUBROUTINE PREVIEW_MEAN
