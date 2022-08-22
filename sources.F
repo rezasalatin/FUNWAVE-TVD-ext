@@ -405,12 +405,6 @@ SUBROUTINE SourceTerms
     !nu_ver_y = 0.4/6.0*(Depth+Eta)*SQRT(Cd*abs(V)*SQRT(U*U+V*V))
   ENDIF
 
-# if defined (FILTERING)
-# if defined (CARTESIAN)
-    CALL SHAPIRO_3(Mloc,Nloc,Nghost,MASK,nu_vis)
-# endif
-# endif
-
   DO J=Jbeg,Jend
     DO I=Ibeg,Iend
       IF(1.EQ.0)THEN
