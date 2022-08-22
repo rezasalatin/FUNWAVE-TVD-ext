@@ -391,11 +391,10 @@ SUBROUTINE SourceTerms
       nu_smg = C_smg**2*DX*DY*SQRT(2.0*Ux**2+2.0*Vy**2+(Uy+Vx)**2)
     ENDIF
 
+    ! when there is breaking, deactivate the horizontal mixing
+    nu_smg = nu_smg*(1-CEILING(nu_vis))
     nu_vis = nu_vis + nu_smg
   ENDIF
-
-    ! when there is breaking, deactivate the horizontal mixing
-    ! nu_smg = nu_smg*(1-CEILING(nu_visMA))
 
   !!!!!!!!!!!!!!!!!!!!!!!!!!!!
   IF(V_MIXING)THEN
@@ -405,7 +404,7 @@ SUBROUTINE SourceTerms
     !nu_ver_y = 0.4/6.0*(Depth+Eta)*SQRT(Cd*abs(V)*SQRT(U*U+V*V))
   ENDIF
 
-  CALL fltr(nu_smg)
+  ! CALL fltr(nu_smg)
 
   DO J=Jbeg,Jend
     DO I=Ibeg,Iend
@@ -581,7 +580,7 @@ SUBROUTINE SourceTerms
 
 END SUBROUTINE SourceTerms
 
-
+! filtering based on FUNWAVE 1.0 code to smooth out nu_vis
 SUBROUTINE fltr(var_fltr)
   USE GLOBAL
 
