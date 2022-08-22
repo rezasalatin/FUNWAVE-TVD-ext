@@ -392,7 +392,7 @@ SUBROUTINE SourceTerms
     ENDIF
 
     ! when there is breaking, deactivate the horizontal mixing
-    nu_smg = nu_smg*(1-CEILING(nu_vis))
+    ! nu_smg = nu_smg*(1-CEILING(nu_vis))
     nu_vis = nu_vis + nu_smg
   ENDIF
 
@@ -404,7 +404,7 @@ SUBROUTINE SourceTerms
     !nu_ver_y = 0.4/6.0*(Depth+Eta)*SQRT(Cd*abs(V)*SQRT(U*U+V*V))
   ENDIF
 
-  ! CALL fltr(nu_smg)
+  CALL fltr(nu_vis)
 
   DO J=Jbeg,Jend
     DO I=Ibeg,Iend
@@ -450,12 +450,12 @@ SUBROUTINE SourceTerms
         0.5_SP*(nu_vis(I,J)+nu_vis(I,J+1)) &
         *1.0_SP/DY*(HU(I,J+1)-HU(I,J)) &
         -0.5_SP*(nu_vis(I,J-1)+nu_vis(I,J)) &
-        *1.0_SP/DY*(HU(I,J)-HU(I,J-1))) ) ) !&
-        !+ 0.5_SP/DY*( &
-        !nu_vis(I,J+1) &
-        !*0.5_SP/DX*(HV(I+1,J+1)-HV(I-1,J+1)) &
-        !-nu_vis(I,J-1) &
-        !*0.5_SP/DX*(HV(I+1,J-1)-HV(I-1,J-1))) ) )
+        *1.0_SP/DY*(HU(I,J)-HU(I,J-1))) &
+        + 0.5_SP/DY*( &
+        nu_vis(I,J+1) &
+        *0.5_SP/DX*(HV(I+1,J+1)-HV(I-1,J+1)) &
+        -nu_vis(I,J-1) &
+        *0.5_SP/DX*(HV(I+1,J-1)-HV(I-1,J-1))) ) )
 
         SourceY(I,J) = SourceY(I,J) + 2.0_SP * (1.0_SP * (1.0_SP/DY*( &
         0.5_SP*(nu_vis(I,J)+nu_vis(I,J+1)) &
@@ -466,12 +466,12 @@ SUBROUTINE SourceTerms
         0.5_SP*(nu_vis(I,J)+nu_vis(I+1,J)) &
         *1.0_SP/DX*(HV(I+1,J)-HV(I,J)) &
         -0.5_SP*(nu_vis(I-1,J)+nu_vis(I,J)) &
-        *1.0_SP/DX*(HV(I,J)-HV(I-1,J))) ) ) !&
-        !+ 0.5_SP/DX*( &
-        !nu_vis(I+1,J) &
-        !*0.5_SP/DY*(HU(I+1,J+1)-HU(I+1,J-1)) &
-        !-nu_vis(I-1,J)* &
-        !0.5_SP/DY*(HU(I-1,J+1)-HU(I-1,J-1))) ) )
+        *1.0_SP/DX*(HV(I,J)-HV(I-1,J))) &
+        + 0.5_SP/DX*( &
+        nu_vis(I+1,J) &
+        *0.5_SP/DY*(HU(I+1,J+1)-HU(I+1,J-1)) &
+        -nu_vis(I-1,J)* &
+        0.5_SP/DY*(HU(I-1,J+1)-HU(I-1,J-1))) ) )
       ENDIF
     ENDDO
   ENDDO
