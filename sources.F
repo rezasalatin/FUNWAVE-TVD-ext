@@ -439,7 +439,7 @@ SUBROUTINE SourceTerms
         *0.5_SP/DY*(P(I+1,J+1)-P(I+1,J-1)) &
         -nu_vis(I-1,J)* &
         0.5_SP/DY*(P(I-1,J+1)-P(I-1,J-1))) ) )
-      ELSEIF
+      ELSE
         SourceX(I,J) = SourceX(I,J) + 2.0_SP * (1.0_SP * (1.0_SP/DX*( &
         0.5_SP*(nu_vis(I,J)+nu_vis(I+1,J)) &
         *1.0_SP/DX*(HU(I+1,J)-HU(I,J))  &
