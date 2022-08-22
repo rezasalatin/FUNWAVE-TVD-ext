@@ -405,6 +405,8 @@ SUBROUTINE SourceTerms
     !nu_ver_y = 0.4/6.0*(Depth+Eta)*SQRT(Cd*abs(V)*SQRT(U*U+V*V))
   ENDIF
 
+  CALL fltr(nu_smg)
+
   DO J=Jbeg,Jend
     DO I=Ibeg,Iend
       IF(1.EQ.0)THEN
@@ -578,3 +580,44 @@ SUBROUTINE SourceTerms
 # endif
 
 END SUBROUTINE SourceTerms
+
+
+SUBROUTINE fltr(var_fltr)
+  USE GLOBAL
+
+  IMPLICIT NONE
+  REAL,DIMENSION(Mloc,Nloc),INTENT(INOUT) :: var_fltr
+  REAL,DIMENSION(Mloc,Nloc) :: var_fltr_tmp
+  REAL :: c1, c2, c3, c4, c5
+
+  c1 = 186./256.
+  c2 =  56./256.
+  c3 = -28./256.
+  c4 =   8./256.
+  c5 =  -1./256.
+
+  ! x direction
+
+  DO J=Jbeg,Jend
+    DO I=Ibeg,Iend
+      var_fltr_tmp(i,j)=c1*var_fltr(i,j) &
+      +c2*(var_fltr(i+1,j)+var_fltr(i-1,j)) &
+      +c3*(var_fltr(i+2,j)+var_fltr(i-2,j)) &
+      +c4*(var_fltr(i+3,j)+var_fltr(i-3,j)) &
+      +c5*(var_fltr(i+4,j)+var_fltr(i-4,j))
+    ENDDO
+  ENDDO
+
+  DO J=Jbeg,Jend
+    DO I=Ibeg,Iend
+      var_fltr_tmp(i,j)=c1*var_fltr_tmp(i,j) &
+      +c2*(var_fltr_tmp(i,j+1)+var_fltr_tmp(i,j-1)) &
+      +c3*(var_fltr_tmp(i,j+2)+var_fltr_tmp(i,j-2)) &
+      +c4*(var_fltr_tmp(i,j+3)+var_fltr_tmp(i,j-3)) &
+      +c5*(var_fltr_tmp(i,j+4)+var_fltr_tmp(i,j-4))
+    ENDDO
+  ENDDO
+
+  var_fltr = var_fltr_tmp
+
+END SUBROUTINE fltr
