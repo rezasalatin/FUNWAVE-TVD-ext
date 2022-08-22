@@ -404,7 +404,7 @@ SUBROUTINE SourceTerms
     !nu_ver_y = 0.4/6.0*(Depth+Eta)*SQRT(Cd*abs(V)*SQRT(U*U+V*V))
   ENDIF
 
-  CALL fltr(nu_vis)
+  ! CALL fltr(nu_vis)
 
   DO J=Jbeg,Jend
     DO I=Ibeg,Iend
