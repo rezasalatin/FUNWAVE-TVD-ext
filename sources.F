@@ -455,7 +455,7 @@ SUBROUTINE SourceTerms
         *1.0_SP/DX*(HU(I+1,J)-HU(I,J))  &
         -0.5_SP*(nu_vis(I-1,J)+nu_vis(I,J)) &
         *1.0_SP/DX*(HU(I,J)-HU(I-1,J))) ) &
-        + 1.0_SP * ( 1.0_SP/DY*( &
+        + 0.5_SP * ( 1.0_SP/DY*( &
         0.5_SP*(nu_vis(I,J)+nu_vis(I,J+1)) &
         *1.0_SP/DY*(HU(I,J+1)-HU(I,J)) &
         -0.5_SP*(nu_vis(I,J-1)+nu_vis(I,J)) &
@@ -468,12 +468,12 @@ SUBROUTINE SourceTerms
 
         SourceY(I,J) = SourceY(I,J) + &
         1.0_SP * (&
-        1.0_SP * ( 1.0_SP/DY*( &
+        1.0_SP * (1.0_SP/DY*( &
         0.5_SP*(nu_vis(I,J)+nu_vis(I,J+1)) &
         *1.0_SP/DY*(HV(I,J+1)-HV(I,J))  &
         - 0.5_SP*(nu_vis(I,J-1)+nu_vis(I,J)) &
         *1.0_SP/DY*(HV(I,J)-HV(I,J-1))) ) &
-        + 1.0_SP * ( 1.0_SP/DX*( &
+        + 0.5_SP * ( 1.0_SP/DX*( &
         0.5_SP*(nu_vis(I,J)+nu_vis(I+1,J)) &
         *1.0_SP/DX*(HV(I+1,J)-HV(I,J)) &
         -0.5_SP*(nu_vis(I-1,J)+nu_vis(I,J)) &
