@@ -410,7 +410,7 @@ SUBROUTINE SourceTerms
 
     DO J=Jbeg,Jend
       DO I=Ibeg,Iend
-        SourceX(I,J) = SourceX(I,J) + 2.0_SP * (1.0_SP * (1.0_SP/DX*( &
+        SourceX(I,J) = SourceX(I,J) + 1.0_SP * (1.0_SP/DX*( &
         0.5_SP*(nu_vis(I,J)+nu_vis(I+1,J)) &
         *1.0_SP/DX*(P(I+1,J)-P(I,J))  &
         -0.5_SP*(nu_vis(I-1,J)+nu_vis(I,J)) &
@@ -424,9 +424,9 @@ SUBROUTINE SourceTerms
         nu_vis(I,J+1) &
         *0.5_SP/DX*(Q(I+1,J+1)-Q(I-1,J+1)) &
         -nu_vis(I,J-1) &
-        *0.5_SP/DX*(Q(I+1,J-1)-Q(I-1,J-1))) ) )
+        *0.5_SP/DX*(Q(I+1,J-1)-Q(I-1,J-1))) )
 
-        SourceY(I,J) = SourceY(I,J) + 2.0_SP * (1.0_SP * (1.0_SP/DY*( &
+        SourceY(I,J) = SourceY(I,J) + 1.0_SP * (1.0_SP/DY*( &
         0.5_SP*(nu_vis(I,J)+nu_vis(I,J+1)) &
         *1.0_SP/DY*(Q(I,J+1)-Q(I,J))  &
         - 0.5_SP*(nu_vis(I,J-1)+nu_vis(I,J)) &
@@ -440,7 +440,7 @@ SUBROUTINE SourceTerms
         nu_vis(I+1,J) &
         *0.5_SP/DY*(P(I+1,J+1)-P(I+1,J-1)) &
         -nu_vis(I-1,J)* &
-        0.5_SP/DY*(P(I-1,J+1)-P(I-1,J-1))) ) )
+        0.5_SP/DY*(P(I-1,J+1)-P(I-1,J-1))) )
       ENDDO
     ENDDO
 
@@ -449,7 +449,6 @@ SUBROUTINE SourceTerms
     DO J=Jbeg,Jend
       DO I=Ibeg,Iend
         SourceX(I,J) = SourceX(I,J) + &
-        2.0_SP * (&
         1.0_SP * ( 1.0_SP/DX*( &
         0.5_SP*(nu_vis(I,J)+nu_vis(I+1,J)) &
         *1.0_SP/DX*(HU(I+1,J)-HU(I,J))  &
@@ -464,10 +463,9 @@ SUBROUTINE SourceTerms
         nu_vis(I,J+1) &
         *0.5_SP/DX*(HV(I+1,J+1)-HV(I-1,J+1)) &
         -nu_vis(I,J-1) &
-        *0.5_SP/DX*(HV(I+1,J-1)-HV(I-1,J-1))) ) )
+        *0.5_SP/DX*(HV(I+1,J-1)-HV(I-1,J-1))) )
 
         SourceY(I,J) = SourceY(I,J) + &
-        2.0_SP * (&
         1.0_SP * (1.0_SP/DY*( &
         0.5_SP*(nu_vis(I,J)+nu_vis(I,J+1)) &
         *1.0_SP/DY*(HV(I,J+1)-HV(I,J))  &
@@ -482,7 +480,7 @@ SUBROUTINE SourceTerms
         nu_vis(I+1,J) &
         *0.5_SP/DY*(HU(I+1,J+1)-HU(I+1,J-1)) &
         -nu_vis(I-1,J)* &
-        0.5_SP/DY*(HU(I-1,J+1)-HU(I-1,J-1))) ) )
+        0.5_SP/DY*(HU(I-1,J+1)-HU(I-1,J-1))) )
       ENDDO
     ENDDO
 
