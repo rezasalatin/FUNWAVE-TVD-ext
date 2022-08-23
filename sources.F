@@ -460,11 +460,11 @@ SUBROUTINE SourceTerms
         *1.0_SP/DY*(HU(I,J+1)-HU(I,J)) &
         -0.5_SP*(nu_vis(I,J-1)+nu_vis(I,J)) &
         *1.0_SP/DY*(HU(I,J)-HU(I,J-1))) )) !&
-        !+ 0.5_SP/DY*( &
-        !nu_vis(I,J+1) &
-        !*0.5_SP/DX*(HV(I+1,J+1)-HV(I-1,J+1)) &
-        !-nu_vis(I,J-1) &
-        !*0.5_SP/DX*(HV(I+1,J-1)-HV(I-1,J-1))) ) )
+        + 0.5_SP/DY*( &
+        nu_vis(I,J+1) &
+        *0.5_SP/DX*(HV(I+1,J+1)-HV(I-1,J+1)) &
+        -nu_vis(I,J-1) &
+        *0.5_SP/DX*(HV(I+1,J-1)-HV(I-1,J-1))) ) )
 
         SourceY(I,J) = SourceY(I,J) + &
         1.0_SP * (&
@@ -478,11 +478,11 @@ SUBROUTINE SourceTerms
         *1.0_SP/DX*(HV(I+1,J)-HV(I,J)) &
         -0.5_SP*(nu_vis(I-1,J)+nu_vis(I,J)) &
         *1.0_SP/DX*(HV(I,J)-HV(I-1,J))) )) !&
-        !+ 0.5_SP/DX*( &
-        !nu_vis(I+1,J) &
-        !*0.5_SP/DY*(HU(I+1,J+1)-HU(I+1,J-1)) &
-        !-nu_vis(I-1,J)* &
-        !0.5_SP/DY*(HU(I-1,J+1)-HU(I-1,J-1))) ) )
+        + 0.5_SP/DX*( &
+        nu_vis(I+1,J) &
+        *0.5_SP/DY*(HU(I+1,J+1)-HU(I+1,J-1)) &
+        -nu_vis(I-1,J)* &
+        0.5_SP/DY*(HU(I-1,J+1)-HU(I-1,J-1))) ) )
       ENDDO
     ENDDO
 
