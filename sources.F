@@ -406,9 +406,10 @@ SUBROUTINE SourceTerms
 
   ! CALL fltr(nu_vis)
 
-  DO J=Jbeg,Jend
-    DO I=Ibeg,Iend
-      IF(1.EQ.0)THEN
+  IF(1.EQ.0)THEN
+    
+    DO J=Jbeg,Jend
+      DO I=Ibeg,Iend
         SourceX(I,J) = SourceX(I,J) + 2.0_SP * (1.0_SP * (1.0_SP/DX*( &
         0.5_SP*(nu_vis(I,J)+nu_vis(I+1,J)) &
         *1.0_SP/DX*(P(I+1,J)-P(I,J))  &
@@ -440,7 +441,13 @@ SUBROUTINE SourceTerms
         *0.5_SP/DY*(P(I+1,J+1)-P(I+1,J-1)) &
         -nu_vis(I-1,J)* &
         0.5_SP/DY*(P(I-1,J+1)-P(I-1,J-1))) ) )
-      ELSE
+      ENDDO
+    ENDDO
+
+  ELSEIF(2.EQ.0)THEN
+
+    DO J=Jbeg,Jend
+      DO I=Ibeg,Iend
         SourceX(I,J) = SourceX(I,J) + 2.0_SP * (1.0_SP * (1.0_SP/DX*( &
         0.5_SP*(nu_vis(I,J)+nu_vis(I+1,J)) &
         *1.0_SP/DX*(HU(I+1,J)-HU(I,J))  &
@@ -472,9 +479,38 @@ SUBROUTINE SourceTerms
         *0.5_SP/DY*(HU(I+1,J+1)-HU(I+1,J-1)) &
         -nu_vis(I-1,J)* &
         0.5_SP/DY*(HU(I-1,J+1)-HU(I-1,J-1))) ) )
-      ENDIF
+      ENDDO
     ENDDO
-  ENDDO
+
+  ELSEIF(0.EQ.0)THEN
+
+    DO J=Jbeg,Jend
+      DO I=Ibeg,Iend
+        SourceX(I,J) = SourceX(I,J) + 0.5_SP/DX*( &
+                      (nu_vis(I+1,J)+nu_vis(I,J)) &
+                      *1.0_SP/DX*(HU(I+1,J)-HU(I,J)) &
+                     -(nu_vis(I-1,J)+nu_vis(I,J)) &
+                      *1.0_SP/DX*(HU(I,J)-HU(I-1,J)) ) &
+                                   + 0.5_SP/DY*( &
+                      (nu_vis(I,J+1)+nu_vis(I,J)) &
+                      *1.0_SP/DY*(HU(I,J+1)-HU(I,J)) &
+                     -(nu_vis(I,J-1)+nu_vis(I,J)) &
+                      *1.0_SP/DY*(HU(I,J)-HU(I,J-1)) )
+
+       SourceY(I,J) = SourceY(I,J) + 0.5_SP/DX*( &
+                      (nu_vis(I+1,J)+nu_vis(I,J)) &
+                      *1.0_SP/DX*(HV(I+1,J)-HV(I,J)) &
+                     -(nu_vis(I-1,J)+nu_vis(I,J)) &
+                      *1.0_SP/DX*(HV(I,J)-HV(I-1,J)) ) &
+                                   + 0.5_SP/DY*( &
+                      (nu_vis(I,J+1)+nu_vis(I,J)) &
+                      *1.0_SP/DY*(HV(I,J+1)-HV(I,J)) &
+                     -(nu_vis(I,J-1)+nu_vis(I,J)) &
+                      *1.0_SP/DY*(HV(I,J)-HV(I,J-1)) )
+      ENDDO
+    ENDDO
+
+  ENDIF
 
     !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
