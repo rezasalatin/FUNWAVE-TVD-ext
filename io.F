@@ -4389,18 +4389,17 @@ SUBROUTINE PREVIEW
     call PutFile(TMP_NAME,Vor_MA)
   ENDIF
 
+  ! variables to get output
+  TMP_NAME = TRIM(FDIR)//'var1_'//TRIM(FILE_NAME)
+  call PutFile(TMP_NAME,temp_output1)
+  TMP_NAME = TRIM(FDIR)//'var2_'//TRIM(FILE_NAME)
+  call PutFile(TMP_NAME,temp_output2)
+  TMP_NAME = TRIM(FDIR)//'var3_'//TRIM(FILE_NAME)
+  call PutFile(TMP_NAME,temp_output3)
+  TMP_NAME = TRIM(FDIR)//'var4_'//TRIM(FILE_NAME)
+  call PutFile(TMP_NAME,temp_output4)
+
   IF(V_MIXING)THEN
-    ! variables to get output
-    TMP_NAME = TRIM(FDIR)//'SmgX_'//TRIM(FILE_NAME)
-    call PutFile(TMP_NAME,temp_output1)
-    !TMP_NAME = TRIM(FDIR)//'VertX_'//TRIM(FILE_NAME)
-    !call PutFile(TMP_NAME,temp_output2)
-    !TMP_NAME = TRIM(FDIR)//'VisBrkX_'//TRIM(FILE_NAME)
-    !call PutFile(TMP_NAME,temp_output3)
-    !TMP_NAME = TRIM(FDIR)//'nuVis_MA_'//TRIM(FILE_NAME)
-    !call PutFile(TMP_NAME,temp_output4)
-
-
     TMP_NAME = TRIM(FDIR)//'nu_verx_'//TRIM(FILE_NAME)
     call PutFile(TMP_NAME,nu_ver_x)
     TMP_NAME = TRIM(FDIR)//'nu_very_'//TRIM(FILE_NAME)
