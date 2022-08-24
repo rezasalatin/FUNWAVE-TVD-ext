@@ -367,7 +367,7 @@ SUBROUTINE SourceTerms
 
   ! Horizontal Mixing
   IF(H_MIXING)THEN
-    IF(MIX_MODEL.EQ.0)THEN
+    IF(MIX_MODEL.EQ.10)THEN
       ! default
       nu_smg = (C_smg**2)*(DX*DY)*SQRT(2.0*uMAx**2+2.0*vMAy**2+(uMAy+vMAx)**2)
     ELSEIF(MIX_MODEL.EQ.1)THEN
@@ -393,9 +393,12 @@ SUBROUTINE SourceTerms
 
     ! when there is breaking, deactivate the horizontal mixing
     ! nu_smg = nu_smg*(1-CEILING(nu_vis))
-    nu_vis = nu_vis + nu_smg
+    ! nu_vis = nu_vis + nu_smg
   ENDIF
 
+  nu_smg = (C_smg**2)*(DX*DY)*SQRT(2.0*uMAx**2+2.0*vMAy**2+(uMAy+vMAx)**2)
+  nu_vis = nu_vis + nu_smg
+  
   !!!!!!!!!!!!!!!!!!!!!!!!!!!!
   IF(V_MIXING)THEN
     nu_ver_x = 0.4/6.0*Depth*SQRT(Cd*abs(uMA)*SQRT(uMA*uMA+vMA*vMA))
@@ -403,8 +406,6 @@ SUBROUTINE SourceTerms
     !nu_ver_x = 0.4/6.0*(Depth+Eta)*SQRT(Cd*abs(U)*SQRT(U*U+V*V))
     !nu_ver_y = 0.4/6.0*(Depth+Eta)*SQRT(Cd*abs(V)*SQRT(U*U+V*V))
   ENDIF
-
-  ! CALL fltr(nu_vis)
 
   IF(1.EQ.0)THEN
 
