@@ -396,8 +396,19 @@ SUBROUTINE SourceTerms
     ! nu_vis = nu_vis + nu_smg
   ENDIF
 
+  !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
+  temp_output1 = nu_vis
+
+! temp_output3 = vMAx
+! temp_output4 = vMAy
+
+!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
   nu_smg = (C_smg**2)*(DX*DY)*SQRT(2.0*uMAx**2+2.0*vMAy**2+(uMAy+vMAx)**2)
+  temp_output2 = nu_smg
   nu_vis = nu_vis + nu_smg
+  temp_output3 = nu_vis
   
   !!!!!!!!!!!!!!!!!!!!!!!!!!!!
   IF(V_MIXING)THEN
@@ -520,15 +531,6 @@ SUBROUTINE SourceTerms
     ENDDO
 
   ENDIF
-
-    !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-
-    ! temp_output1 = uMAx
-    ! temp_output2 = uMAy
-    ! temp_output3 = vMAx
-    ! temp_output4 = vMAy
-
-    !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
 ! else Cartesian
 # else
