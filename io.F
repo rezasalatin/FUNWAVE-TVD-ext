@@ -4362,7 +4362,7 @@ SUBROUTINE PREVIEW
 
   ! Chen, Salatin
   IF(OUT_VOR)THEN
-    TMP_NAME = TRIM(FDIR)//'VorInstant_'//TRIM(FILE_NAME)
+    TMP_NAME = TRIM(FDIR)//'vorticity_'//TRIM(FILE_NAME)
     call PutFile(TMP_NAME,vorticity)
   ENDIF
 
