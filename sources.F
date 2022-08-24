@@ -522,10 +522,10 @@ SUBROUTINE SourceTerms
 
     !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
-    temp_output1 = uMAx
-    temp_output2 = uMAy
-    temp_output3 = vMAx
-    temp_output4 = vMAy
+    ! temp_output1 = uMAx
+    ! temp_output2 = uMAy
+    ! temp_output3 = vMAx
+    ! temp_output4 = vMAy
 
     !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
