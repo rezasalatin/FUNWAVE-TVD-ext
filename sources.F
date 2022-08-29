@@ -78,6 +78,7 @@ SUBROUTINE SourceTerms
   REAL(SP),DIMENSION(Mloc,Nloc) :: Vis_BrkX,Vis_BrkY,VertX,VertY,nu_visMA_SUM
   REAL(SP),DIMENSION(Mloc,Nloc) :: VorX,VorY,DEPTHDerX
   INTEGER :: VTYPE
+  REAL(SP),DIMENSION(Mloc,Nloc) :: Mixing_eddy
 
   !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
   !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
@@ -369,7 +370,8 @@ SUBROUTINE SourceTerms
   IF(H_MIXING)THEN
     IF(MIX_MODEL.EQ.0)THEN
       ! default
-      nu_smg = C_smg**2*DX*DY*SQRT(2.0*uMAx**2+2.0*vMAy**2+(uMAy+vMAx)**2)
+      Mixing_eddy = SQRT(2.0*uMAx**2+2.0*vMAy**2+(uMAy+vMAx)**2)
+      nu_smg = C_smg**2*DX*DY*Mixing_eddy
     ELSEIF(MIX_MODEL.EQ.1)THEN
       VTYPE=1
       CALL PHI_COLL(Mloc,Nloc,Ibeg,Iend,Jbeg,Jend,Nghost,vorticity,VTYPE,PERIODIC)
@@ -388,18 +390,15 @@ SUBROUTINE SourceTerms
       nu_smg=0.5*(C_smg*DX*DY*(DEPTH+ETA)*SQRT(VorX*VorX+VorY*VorY)) &
       +0.5*(C_smg*(DX*DY*(DEPTH+ETA))**(2.0_SP/3.0_SP)*SQRT(vorticity*vorticity/2))
     ELSEIF(MIX_MODEL.EQ.5)THEN
-      nu_smg = C_smg**2*DX*DY*SQRT(2.0*Ux**2+2.0*Vy**2+(Uy+Vx)**2)
+      Mixing_eddy = SQRT(2.0*Ux**2+2.0*Vy**2+(Uy+Vx)**2)
+      nu_smg = C_smg**2*DX*DY*Mixing_eddy
     ENDIF
 
     ! when there is breaking, deactivate the horizontal mixing
     nu_smg = nu_smg*(1-CEILING(nu_vis))
       
-    temp_output1 = nu_vis
-    temp_output2 = nu_smg
-
+    temp_output1 = Mixing_eddy
     nu_vis = nu_vis + nu_smg
-
-    temp_output3 = nu_vis
   ENDIF
 
   !!!!!!!!!!!!!!!!!!!!!!!!!!!!  
