@@ -370,7 +370,6 @@ SUBROUTINE SourceTerms
     IF(MIX_MODEL.EQ.0)THEN
       ! default
       nu_smg = (C_smg**2)*(DX*DY)*SQRT(2.0*uMAx**2+2.0*vMAy**2+(uMAy+vMAx)**2)
-      print*, C_smg
     ELSEIF(MIX_MODEL.EQ.1)THEN
       VTYPE=1
       CALL PHI_COLL(Mloc,Nloc,Ibeg,Iend,Jbeg,Jend,Nghost,vorticity,VTYPE,PERIODIC)
