@@ -68,7 +68,7 @@ SUBROUTINE MIXING_STUFF
   ENDIF    !ykchoi
 
   ! Chen, Salatin, moving average of some properties (U,V,Eta,Vor,Syx)
-  CALL CALCULATE_MovingAverage(DT,Mloc,Nloc,U,V,ETA,MASK9,DX,DY,Depth,&
+  CALL CALCULATE_MovingAverage(DT,Mloc,Nloc,U,V,ETA,MASK,DX,DY,Depth,&
   Ibeg,Iend,Jbeg,Jend,&
   OUT_uvMA,OUT_VorMA,OUT_RadStr,OUT_etaMA,&
   MA_Window,T_MA_Sum,T_MA_STEP,&
