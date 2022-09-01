@@ -2986,9 +2986,9 @@ IF(ierr==1)THEN
 ENDIF
 
 # if defined (PARALLEL)
-if (myid.eq.0) WRITE(3,'(A13,F12.2)')'Cd_fixed         =', Cd_fixed
+if (myid.eq.0) WRITE(3,'(A13,F12.4)')'Cd_fixed         =', Cd_fixed
 # else
-WRITE(3,'(A13,F12.2)')'Cd_fixed         =', Cd_fixed
+WRITE(3,'(A13,F12.4)')'Cd_fixed         =', Cd_fixed
 # endif
 
 # if defined (PARALLEL)
