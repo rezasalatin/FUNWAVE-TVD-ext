@@ -411,7 +411,7 @@ SUBROUTINE SourceTerms
     !nu_ver_y = 0.4/6.0*(Depth+Eta)*SQRT(Cd*abs(V)*SQRT(U*U+V*V))
   ENDIF
 
-  IF(0.EQ.0)THEN
+  IF(10.EQ.0)THEN
 
     DO J=Jbeg,Jend
       DO I=Ibeg,Iend
@@ -449,7 +449,7 @@ SUBROUTINE SourceTerms
       ENDDO
     ENDDO
 
-  ELSEIF(2.EQ.0)THEN
+  ELSEIF(0.EQ.0)THEN
 
     DO J=Jbeg,Jend
       DO I=Ibeg,Iend
