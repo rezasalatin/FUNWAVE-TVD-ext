@@ -4399,6 +4399,13 @@ SUBROUTINE PREVIEW
   !TMP_NAME = TRIM(FDIR)//'var4_'//TRIM(FILE_NAME)
   !call PutFile(TMP_NAME,temp_output4)
 
+    ! variables to get output
+  TMP_NAME = TRIM(FDIR)//'nubrkMA_'//TRIM(FILE_NAME)
+  call PutFile(TMP_NAME,temp2_MA)
+    ! variables to get output
+  TMP_NAME = TRIM(FDIR)//'nusmgMA_'//TRIM(FILE_NAME)
+  call PutFile(TMP_NAME,temp1_MA)
+
   IF(V_MIXING)THEN
     TMP_NAME = TRIM(FDIR)//'nu_verx_'//TRIM(FILE_NAME)
     call PutFile(TMP_NAME,nu_ver_x)

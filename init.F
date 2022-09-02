@@ -257,6 +257,14 @@ SUBROUTINE ALLOCATE_VARIABLES
   temp_output3=ZERO
   temp_output4=ZERO
 
+  ! Chen, Salatin, two more MA
+  ALLOCATE(temp1_Window(Mloc,Nloc,MA_Window),temp2_Window(Mloc,Nloc,MA_Window))
+  temp1_Window=ZERO
+  temp2_Window=ZERO
+  ALLOCATE(temp1_MA(Mloc,Nloc),temp2_MA(Mloc,Nloc))
+  temp1_MA=ZERO
+  temp2_MA=ZERO
+
 END SUBROUTINE ALLOCATE_VARIABLES
 
 !-------------------------------------------------------------------------------------

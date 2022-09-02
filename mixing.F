@@ -74,7 +74,8 @@ SUBROUTINE MIXING_STUFF
   MA_Window,T_MA_Sum,T_MA_STEP,&
   Syx_temp,Syx_x,U_Window,V_Window,uMA,vMA,eta_MA_temp,eta_MA,Vor_MA,&
   ! Smagorinsky subgrid scale turbulence calculated here
-  PERIODIC,Nghost,uMAx,uMAy,vMAx,vMAy)
+  PERIODIC,Nghost,uMAx,uMAy,vMAx,vMAy,&
+  temp1_Window,temp2_Window,temp1_MA,temp2_MA,nu_smg,nu_break)
 
 END SUBROUTINE MIXING_STUFF
 
@@ -257,7 +258,8 @@ SUBROUTINE CALCULATE_MovingAverage(DT,M,N,U,V,ETA,MASK,DX,DY,Depth,&
   OUT_uvMA,OUT_VorMA,OUT_RadStr,OUT_etaMA,&
   MA_Window,T_MA_Sum,T_MA_STEP,&
   Syx_temp,Syx_x,U_Window,V_Window,uMA,vMA,eta_MA_temp,eta_MA,Vor_MA,&
-  PERIODIC,Nghost,uMAx,uMAy,vMAx,vMAy)
+  PERIODIC,Nghost,uMAx,uMAy,vMAx,vMAy,&
+  temp1_Window,temp2_Window,temp1_MA,temp2_MA,nu_smg,nu_break)
 
   USE PARAM
   IMPLICIT NONE
@@ -288,6 +290,12 @@ SUBROUTINE CALCULATE_MovingAverage(DT,M,N,U,V,ETA,MASK,DX,DY,Depth,&
   REAL(SP),DIMENSION(M,N),INTENT(OUT) :: Vor_MA
   INTEGER :: VTYPE,Nghost
   LOGICAL :: PERIODIC
+
+  REAL(SP),DIMENSION(M,N,MA_Window),INTENT(INOUT) :: temp1_Window,temp2_Window
+  REAL(SP),DIMENSION(M,N) :: temp1_Window_Sum,temp2_Window_Sum
+  REAL(SP),DIMENSION(M,N),INTENT(OUT) :: temp1_MA,temp2_MA
+  REAL(SP),DIMENSION(M,N),INTENT(IN) :: nu_smg,nu_break
+  
 
   T_MA_Sum=T_MA_Sum+DT
 
@@ -340,6 +348,23 @@ SUBROUTINE CALCULATE_MovingAverage(DT,M,N,U,V,ETA,MASK,DX,DY,Depth,&
       eta_MA_Sum = SUM(eta_MA_temp,3)
       eta_MA = eta_MA_Sum/MA_Window
     ENDIF
+
+    !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
+    ! Moving average of NU brk and smg
+    temp1_Window = CSHIFT(temp1_Window,-1,3)
+    temp2_Window = CSHIFT(temp2_Window,-1,3)
+    ! replace oldest variable by the newest
+    temp1_Window(:,:,1) = nu_smg
+    temp2_Window(:,:,1) = nu_break
+    ! only sum up the values within the window
+    temp1_Window_Sum = SUM(temp1_Window,3)
+    temp2_Window_Sum = SUM(temp2_Window,3)
+    ! do averaging
+    temp1_MA = temp1_Window_Sum/MA_Window
+    temp2_MA = temp2_Window_Sum/MA_Window
+
+
     ! go to next time step
     T_MA_Sum=T_MA_Sum-T_MA_STEP
 

@@ -401,9 +401,8 @@ SUBROUTINE SourceTerms
     nu_vis = nu_vis + nu_smg
   ENDIF
 
-  !!!!!!!!!!!!!!!!!!!!!!!!!!!!  
+  !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
   
-  !!!!!!!!!!!!!!!!!!!!!!!!!!!!
   IF(V_MIXING)THEN
     nu_ver_x = 0.4/6.0*Depth*SQRT(Cd*abs(uMA)*SQRT(uMA*uMA+vMA*vMA))
     nu_ver_y = 0.4/6.0*Depth*SQRT(Cd*abs(vMA)*SQRT(uMA*uMA+vMA*vMA))

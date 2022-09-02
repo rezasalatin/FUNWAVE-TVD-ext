@@ -303,6 +303,10 @@ REAL(SP),DIMENSION(:,:),ALLOCATABLE :: eta_MA
 REAL(SP),DIMENSION(:,:,:),ALLOCATABLE :: eta_MA_temp
 REAL(SP),DIMENSION(:,:),ALLOCATABLE :: Vor_MA
 
+! Chen, Salatin, two more MA
+REAL(SP),DIMENSION(:,:),ALLOCATABLE :: temp1_MA,temp2_MA
+REAL(SP),DIMENSION(:,:,:),ALLOCATABLE :: temp1_Window, temp2_Window
+
 ! horizontal eddy viscosity
 INTEGER :: MIX_MODEL
 LOGICAL :: IN_Csmg=.FALSE.
