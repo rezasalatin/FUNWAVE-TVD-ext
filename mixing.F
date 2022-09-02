@@ -129,7 +129,7 @@ SUBROUTINE CALCULATE_MEAN(T_INTV_mean,T_INTV_UVmean,T_sum,T_sumUVmean,&
     ! Significant Wave Height
     ! Chen, Salatin
     ! variance equation with initially unknown etamean
-    ETAsum =ETA*DT+ETAsum
+    ETAsum =ETA*MASK*DT+ETAsum
     ETAmean=ETAsum/T_sum
     ETAvariance = 1/real(NumDT1-1)*ETA2sum-real(NumDT1)/real(NumDT1-1)*ETAmean**2
     SigWaveHeight = 4.0*SQRT(ETAvariance)
@@ -157,8 +157,8 @@ SUBROUTINE CALCULATE_MEAN(T_INTV_mean,T_INTV_UVmean,T_sum,T_sumUVmean,&
 
     NumDT1 = NumDT1+1
 
-    ETAsum=ETA*DT+ETAsum
-    ETA2 = ETA*ETA
+    ETAsum=ETA*DT*MASK+ETAsum
+    ETA2 = ETA*ETA*MASK
     ETA2sum=ETA2+ETA2sum
 
     ! wave height
