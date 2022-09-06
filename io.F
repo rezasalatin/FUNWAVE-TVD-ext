@@ -4390,7 +4390,7 @@ SUBROUTINE PREVIEW
   ENDIF
 
   ! variables to get output
-  TMP_NAME = TRIM(FDIR)//'var1_'//TRIM(FILE_NAME)
+  TMP_NAME = TRIM(FDIR)//'nusmg_'//TRIM(FILE_NAME)
   call PutFile(TMP_NAME,temp_output1)
   !TMP_NAME = TRIM(FDIR)//'var2_'//TRIM(FILE_NAME)
   !call PutFile(TMP_NAME,temp_output2)
