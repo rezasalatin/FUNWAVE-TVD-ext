@@ -370,8 +370,11 @@ SUBROUTINE SourceTerms
   IF(H_MIXING)THEN
     IF(MIX_MODEL.EQ.0)THEN
       ! default
-      Mixing_eddy = SQRT(2.0*uMAx**2+2.0*vMAy**2+(uMAy+vMAx)**2)
-      nu_smg = C_smg**2*DX*DY*Mixing_eddy
+      ! Mixing_eddy = SQRT(2.0*uMAx**2+2.0*vMAy**2+(uMAy+vMAx)**2)
+      ! nu_smg = C_smg**2*DX*DY*Mixing_eddy
+
+      Mixing_eddy = SQRT(uMAx**2+vMAy**2+((uMAy+vMAx)**2)/2.0)
+      nu_smg = C_smg*DX*DY*Mixing_eddy
     ELSEIF(MIX_MODEL.EQ.1)THEN
       VTYPE=1
       CALL PHI_COLL(Mloc,Nloc,Ibeg,Iend,Jbeg,Jend,Nghost,vorticity,VTYPE,PERIODIC)
