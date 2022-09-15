@@ -263,6 +263,7 @@ SUBROUTINE SourceTerms
 
 107   format(500f12.6)
 
+print *, 'hello 0!'
 
 # if defined (CARTESIAN)
   DO J=Jbeg,Jend
