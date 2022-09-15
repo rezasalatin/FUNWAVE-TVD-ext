@@ -131,6 +131,7 @@ SUBROUTINE SourceTerms
     !  ENDIF
     !ENDDO
 
+    print *, 'hello, I am here'
     ! split into four parts
     DO J=Jbeg,Jend
      IF(ymk_wk(J).GT.(Yc_WK/3.0+2.0*DY).AND.ymk_wk(J).LT.(Yc_WK-2.0*DY)) THEN
@@ -155,6 +156,7 @@ SUBROUTINE SourceTerms
       ENDDO
      ENDIF
     ENDDO
+    print *, 'hello, I passed that point'
   ENDIF
 
   !!!!!!!!!!!!!!!!!!!!!!!!!!
