@@ -263,8 +263,6 @@ SUBROUTINE SourceTerms
 
 107   format(500f12.6)
 
-print *, 'hello 0!'
-
 # if defined (CARTESIAN)
   DO J=Jbeg,Jend
     DO I=Ibeg,Iend
@@ -392,8 +390,6 @@ print *, 'hello 0!'
   ENDIF
 # endif
 
-  print *, 'hello 1!'
-
   ! Horizontal Mixing
   IF(H_MIXING)THEN
     IF(MIX_MODEL.EQ.0)THEN
@@ -476,8 +472,6 @@ print *, 'hello 0!'
     !nu_ver_x = 0.4/6.0*(Depth+Eta)*SQRT(Cd*abs(U)*SQRT(U*U+V*V))
     !nu_ver_y = 0.4/6.0*(Depth+Eta)*SQRT(Cd*abs(V)*SQRT(U*U+V*V))
   !ENDIF
-
-  print *, 'hello 2!'
 
   IF(0.EQ.0)THEN    
     ! breaking
@@ -592,8 +586,6 @@ print *, 'hello 0!'
     ENDDO
 
   ENDIF
-
-  print *, 'hello 3!'
 
 ! else Cartesian
 # else
