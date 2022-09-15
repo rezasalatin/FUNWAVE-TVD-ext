@@ -106,15 +106,15 @@ SUBROUTINE SourceTerms
   IF(WAVEMAKER(1:6)=='WK_REG')THEN
     AA = TANH(PI/(Time_ramp*Tperiod)*TIME)*D_gen
 
-    IF(0.EQ.0)THEN
-    ! do not execute this part (original code)
-    DO J=jlo,jhi
-      DO I=ilo,ihi
-        WaveMaker_Mass(I,J)= AA*EXP(-Beta_gen*(xmk_wk(I)-Xc_WK)**2) &
-        *SIN(rlamda*(ymk_wk(J)-ZERO)-2.0_SP*PI/Tperiod*TIME)
+    IF(10.EQ.0)THEN
+      ! do not execute this part (original code)
+      DO J=jlo,jhi
+        DO I=ilo,ihi
+          WaveMaker_Mass(I,J)= AA*EXP(-Beta_gen*(xmk_wk(I)-Xc_WK)**2) &
+          *SIN(rlamda*(ymk_wk(J)-ZERO)-2.0_SP*PI/Tperiod*TIME)
+        ENDDO
       ENDDO
-    ENDDO
-    ELSEIF(1.EQ.0)THEN
+    ELSEIF(20.EQ.0)THEN
     ! SPLIT WAVEMAKER INTO TWO with 0.5 m gap in between according to
     ! Choi 2021 experimental design
     ! first part has phase of pi and second has zero deg phase
@@ -131,31 +131,31 @@ SUBROUTINE SourceTerms
     !    ENDDO
     !  ENDIF
     !ENDDO
-    ELSEIF(2.EQ.0)THEN
-    ! split into four parts
-    DO J=Jbeg,Jend
-     IF(ymk_wk(J).GT.(Yc_WK/3.0+2.0*DY).AND.ymk_wk(J).LT.(Yc_WK-2.0*DY)) THEN
-      DO I=ilo,ihi
-       WaveMaker_Mass(I,J)=AA*EXP(-Beta_gen*(xmk_wk(I)-Xc_WK)**2) &
-       *SIN(rlamda*(ymk_wk(J)-ZERO)-2.0*PI/Tperiod*TIME+PI)
+    ELSEIF(0.EQ.0)THEN
+      ! split into four parts
+      DO J=Jbeg,Jend
+        IF(ymk_wk(J).GT.(Yc_WK/3.0+2.0*DY).AND.ymk_wk(J).LT.(Yc_WK-2.0*DY)) THEN
+          DO I=ilo,ihi
+          WaveMaker_Mass(I,J)=AA*EXP(-Beta_gen*(xmk_wk(I)-Xc_WK)**2) &
+          *SIN(rlamda*(ymk_wk(J)-ZERO)-2.0*PI/Tperiod*TIME+PI)
+          ENDDO
+        ELSEIF(ymk_wk(J).GT.(Yc_WK+2.0*DY).AND.ymk_wk(J).LT.(Yc_WK*5.0/3.0-2.0*DY)) THEN
+          DO I=ilo,ihi
+            WaveMaker_Mass(I,J)=AA*EXP(-Beta_gen*(xmk_wk(I)-Xc_WK)**2) &
+            *SIN(rlamda*(ymk_wk(J)-ZERO)-2.0*PI/Tperiod*TIME)
+          ENDDO
+        ELSEIF(ymk_wk(J).LT.(Yc_WK/3.0-2.0*DY)) THEN
+          DO I=ilo,ihi
+            WaveMaker_Mass(I,J)=AA*EXP(-Beta_gen*(xmk_wk(I)-Xc_WK)**2) &
+            *SIN(rlamda*(ymk_wk(J)-ZERO)-2.0*PI/Tperiod*TIME)
+          ENDDO
+        ELSEIF(ymk_wk(J).GT.(Yc_WK*5.0/3.0+2.0*DY)) THEN
+          DO I=ilo,ihi
+            WaveMaker_Mass(I,J)=AA*EXP(-Beta_gen*(xmk_wk(I)-Xc_WK)**2) &
+            *SIN(rlamda*(ymk_wk(J)-ZERO)-2.0*PI/Tperiod*TIME+PI)
+          ENDDO
+        ENDIF
       ENDDO
-     ELSEIF(ymk_wk(J).GT.(Yc_WK+2.0*DY).AND.ymk_wk(J).LT.(Yc_WK*5.0/3.0-2.0*DY)) THEN
-      DO I=ilo,ihi
-        WaveMaker_Mass(I,J)=AA*EXP(-Beta_gen*(xmk_wk(I)-Xc_WK)**2) &
-        *SIN(rlamda*(ymk_wk(J)-ZERO)-2.0*PI/Tperiod*TIME)
-      ENDDO
-     ELSEIF(ymk_wk(J).LT.(Yc_WK/3.0-2.0*DY)) THEN
-      DO I=ilo,ihi
-        WaveMaker_Mass(I,J)=AA*EXP(-Beta_gen*(xmk_wk(I)-Xc_WK)**2) &
-        *SIN(rlamda*(ymk_wk(J)-ZERO)-2.0*PI/Tperiod*TIME)
-      ENDDO
-     ELSEIF(ymk_wk(J).GT.(Yc_WK*5.0/3.0+2.0*DY)) THEN
-      DO I=ilo,ihi
-        WaveMaker_Mass(I,J)=AA*EXP(-Beta_gen*(xmk_wk(I)-Xc_WK)**2) &
-        *SIN(rlamda*(ymk_wk(J)-ZERO)-2.0*PI/Tperiod*TIME+PI)
-      ENDDO
-     ENDIF
-    ENDDO
     ENDIF
   ENDIF
 
@@ -392,7 +392,7 @@ SUBROUTINE SourceTerms
   ENDIF
 # endif
 
-! breaking
+  ! breaking
   DO J=Jbeg,Jend
     DO I=Ibeg,Iend
       SourceX(I,J) = SourceX(I,J) + 1.0_SP * (1.0_SP/DX*( &
@@ -513,45 +513,6 @@ SUBROUTINE SourceTerms
   !ENDIF
 
   IF(10.EQ.0)THEN    
-    ! breaking
-    DO J=Jbeg,Jend
-      DO I=Ibeg,Iend
-        SourceX(I,J) = SourceX(I,J) + 1.0_SP * (1.0_SP/DX*( &
-        0.5_SP*(nu_vis(I,J)+nu_vis(I+1,J)) &
-        *1.0_SP/DX*(P(I+1,J)-P(I,J))  &
-        -0.5_SP*(nu_vis(I-1,J)+nu_vis(I,J)) &
-        *1.0_SP/DX*(P(I,J)-P(I-1,J))) ) &
-        + 0.5_SP * ( 1.0_SP/DY*( &
-        0.5_SP*(nu_vis(I,J)+nu_vis(I,J+1)) &
-        *1.0_SP/DY*(P(I,J+1)-P(I,J)) &
-        -0.5_SP*(nu_vis(I,J-1)+nu_vis(I,J)) &
-        *1.0_SP/DY*(P(I,J)-P(I,J-1))) &
-        + 0.5_SP/DY*( &
-        nu_vis(I,J+1) &
-        *0.5_SP/DX*(Q(I+1,J+1)-Q(I-1,J+1)) &
-        -nu_vis(I,J-1) &
-        *0.5_SP/DX*(Q(I+1,J-1)-Q(I-1,J-1))) )
-
-        SourceY(I,J) = SourceY(I,J) + 1.0_SP * (1.0_SP/DY*( &
-        0.5_SP*(nu_vis(I,J)+nu_vis(I,J+1)) &
-        *1.0_SP/DY*(Q(I,J+1)-Q(I,J))  &
-        - 0.5_SP*(nu_vis(I,J-1)+nu_vis(I,J)) &
-        *1.0_SP/DY*(Q(I,J)-Q(I,J-1))) ) &
-        + 0.5_SP * ( 1.0_SP/DX*( &
-        0.5_SP*(nu_vis(I,J)+nu_vis(I+1,J)) &
-        *1.0_SP/DX*(Q(I+1,J)-Q(I,J)) &
-        -0.5_SP*(nu_vis(I-1,J)+nu_vis(I,J)) &
-        *1.0_SP/DX*(Q(I,J)-Q(I-1,J))) &
-        + 0.5_SP/DX*( &
-        nu_vis(I+1,J) &
-        *0.5_SP/DY*(P(I+1,J+1)-P(I+1,J-1)) &
-        -nu_vis(I-1,J)* &
-        0.5_SP/DY*(P(I-1,J+1)-P(I-1,J-1))) )
-      ENDDO
-    ENDDO
-
-  ELSEIF(2.EQ.0)THEN
-
     DO J=Jbeg,Jend
       DO I=Ibeg,Iend
         SourceX(I,J) = SourceX(I,J) + &
@@ -589,19 +550,15 @@ SUBROUTINE SourceTerms
         0.5_SP/DY*(HU(I-1,J+1)-HU(I-1,J-1))) )
       ENDDO
     ENDDO
-
   ELSEIF(1.EQ.0)THEN
-
     DO J=Jbeg,Jend
       DO I=Ibeg,Iend
         SourceX(I,J) = SourceX(I,J) &
-
         + 0.5_SP/DX*( &
         (nu_vis(I+1,J)+nu_vis(I,J)) &
         *1.0_SP/DX*(HU(I+1,J)-HU(I,J)) &
         -(nu_vis(I-1,J)+nu_vis(I,J)) &
         *1.0_SP/DX*(HU(I,J)-HU(I-1,J)) ) &
-
         + 0.5_SP/DY*( &
         (nu_vis(I,J+1)+nu_vis(I,J)) &
         *1.0_SP/DY*(HU(I,J+1)-HU(I,J)) &
@@ -609,13 +566,11 @@ SUBROUTINE SourceTerms
         *1.0_SP/DY*(HU(I,J)-HU(I,J-1)) )
 
        SourceY(I,J) = SourceY(I,J) &
-
        + 0.5_SP/DX*( &
         (nu_vis(I+1,J)+nu_vis(I,J)) &
         *1.0_SP/DX*(HV(I+1,J)-HV(I,J)) &
         -(nu_vis(I-1,J)+nu_vis(I,J)) &
         *1.0_SP/DX*(HV(I,J)-HV(I-1,J)) ) &
-
         + 0.5_SP/DY*( &
         (nu_vis(I,J+1)+nu_vis(I,J)) &
         *1.0_SP/DY*(HV(I,J+1)-HV(I,J)) &
@@ -623,7 +578,6 @@ SUBROUTINE SourceTerms
         *1.0_SP/DY*(HV(I,J)-HV(I,J-1)) )
       ENDDO
     ENDDO
-
   ENDIF
 
 ! else Cartesian
