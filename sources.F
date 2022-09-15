@@ -427,20 +427,7 @@ SUBROUTINE SourceTerms
       
     temp_output1 = nu_smg
     ! nu_vis = nu_vis + nu_smg
-  ENDIF
 
-  !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-  
-  !IF(V_MIXING)THEN
-    !nu_ver_x = 0.4/6.0*Depth*SQRT(Cd*abs(uMA)*SQRT(uMA*uMA+vMA*vMA))
-    !nu_ver_y = 0.4/6.0*Depth*SQRT(Cd*abs(vMA)*SQRT(uMA*uMA+vMA*vMA))
-    !nu_ver_x = 0.4/6.0*(Depth+Eta)*SQRT(Cd*abs(U)*SQRT(U*U+V*V))
-    !nu_ver_y = 0.4/6.0*(Depth+Eta)*SQRT(Cd*abs(V)*SQRT(U*U+V*V))
-  !ENDIF
-
-  IF(0.EQ.0)THEN
-
-    ! smagorinsky
     DO J=Jbeg,Jend
       DO I=Ibeg,Iend
         SourceX(I,J) = SourceX(I,J) + 1.0_SP * (1.0_SP/DX*( &
@@ -477,6 +464,18 @@ SUBROUTINE SourceTerms
       ENDDO
     ENDDO
 
+  ENDIF
+
+  !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+  
+  !IF(V_MIXING)THEN
+    !nu_ver_x = 0.4/6.0*Depth*SQRT(Cd*abs(uMA)*SQRT(uMA*uMA+vMA*vMA))
+    !nu_ver_y = 0.4/6.0*Depth*SQRT(Cd*abs(vMA)*SQRT(uMA*uMA+vMA*vMA))
+    !nu_ver_x = 0.4/6.0*(Depth+Eta)*SQRT(Cd*abs(U)*SQRT(U*U+V*V))
+    !nu_ver_y = 0.4/6.0*(Depth+Eta)*SQRT(Cd*abs(V)*SQRT(U*U+V*V))
+  !ENDIF
+
+  IF(0.EQ.0)THEN    
     ! breaking
     DO J=Jbeg,Jend
       DO I=Ibeg,Iend
