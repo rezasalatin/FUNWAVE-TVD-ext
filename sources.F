@@ -462,7 +462,7 @@ SUBROUTINE SourceTerms
 
     ! when there is breaking, deactivate the horizontal mixing
     nu_smg = nu_smg*(1-CEILING(nu_vis))
-      
+
     temp_output1 = nu_smg
 
     DO J=Jbeg,Jend
@@ -501,8 +501,10 @@ SUBROUTINE SourceTerms
       ENDDO
     ENDDO
 
+  ELSE
+    nu_smg = ZERO
+    temp_output1 = nu_smg
   ENDIF
-
   !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
   
   !IF(V_MIXING)THEN
