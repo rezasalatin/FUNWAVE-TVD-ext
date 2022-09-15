@@ -107,12 +107,12 @@ SUBROUTINE SourceTerms
     AA = TANH(PI/(Time_ramp*Tperiod)*TIME)*D_gen
 
     ! do not execute this part (original code)
-    DO J=jlo,jhi
-      DO I=ilo,ihi
-        WaveMaker_Mass(I,J)= AA*EXP(-Beta_gen*(xmk_wk(I)-Xc_WK)**2) &
-        *SIN(rlamda*(ymk_wk(J)-ZERO)-2.0_SP*PI/Tperiod*TIME)
-      ENDDO
-    ENDDO
+    !DO J=jlo,jhi
+    !  DO I=ilo,ihi
+    !    WaveMaker_Mass(I,J)= AA*EXP(-Beta_gen*(xmk_wk(I)-Xc_WK)**2) &
+    !    *SIN(rlamda*(ymk_wk(J)-ZERO)-2.0_SP*PI/Tperiod*TIME)
+    !  ENDDO
+    !ENDDO
 
     ! SPLIT WAVEMAKER INTO TWO with 0.5 m gap in between according to
     ! Choi 2021 experimental design
@@ -130,6 +130,31 @@ SUBROUTINE SourceTerms
     !    ENDDO
     !  ENDIF
     !ENDDO
+
+    ! split into four parts
+    DO J=Jbeg,Jend
+     IF(ymk_wk(J).GT.(Yc_WK/3.0+2.0*DY).AND.ymk_wk(J).LT.(Yc_WK-2.0*DY)) THEN
+      DO I=ilo,ihi
+       WaveMaker_Mass(I,J)=AA*EXP(-Beta_gen*(xmk_wk(I)-Xc_WK)**2) &
+       *SIN(rlamda*(ymk_wk(J)-ZERO)-2.0*PI/Tperiod*TIME+PI)
+      ENDDO
+     ELSEIF(ymk_wk(J).GT.(Yc_WK+2.0*DY).AND.ymk_wk(J).LT.(Yc_WK*5.0/3.0-2.0*DY)) THEN
+      DO I=ilo,ihi
+        WaveMaker_Mass(I,J)=AA*EXP(-Beta_gen*(xmk_wk(I)-Xc_WK)**2) &
+        *SIN(rlamda*(ymk_wk(J)-ZERO)-2.0*PI/Tperiod*TIME)
+      ENDDO
+     ELSEIF(ymk_wk(J).LT.(Yc_WK/3.0-2.0*DY)) THEN
+      DO I=ilo,ihi
+        WaveMaker_Mass(I,J)=AA*EXP(-Beta_gen*(xmk_wk(I)-Xc_WK)**2) &
+        *SIN(rlamda*(ymk_wk(J)-ZERO)-2.0*PI/Tperiod*TIME)
+      ENDDO
+     ELSEIF(ymk_wk(J).GT.(Yc_WK*5.0/3.0+2.0*DY)) THEN
+      DO I=ilo,ihi
+        WaveMaker_Mass(I,J)=AA*EXP(-Beta_gen*(xmk_wk(I)-Xc_WK)**2) &
+        *SIN(rlamda*(ymk_wk(J)-ZERO)-2.0*PI/Tperiod*TIME+PI)
+      ENDDO
+     ENDIF
+    ENDDO
   ENDIF
 
   !!!!!!!!!!!!!!!!!!!!!!!!!!
@@ -401,20 +426,58 @@ SUBROUTINE SourceTerms
     nu_smg = nu_smg*(1-CEILING(nu_vis))
       
     temp_output1 = nu_smg
-    nu_vis = nu_vis + nu_smg
+    ! nu_vis = nu_vis + nu_smg
   ENDIF
 
   !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
   
-  IF(V_MIXING)THEN
-    nu_ver_x = 0.4/6.0*Depth*SQRT(Cd*abs(uMA)*SQRT(uMA*uMA+vMA*vMA))
-    nu_ver_y = 0.4/6.0*Depth*SQRT(Cd*abs(vMA)*SQRT(uMA*uMA+vMA*vMA))
+  !IF(V_MIXING)THEN
+    !nu_ver_x = 0.4/6.0*Depth*SQRT(Cd*abs(uMA)*SQRT(uMA*uMA+vMA*vMA))
+    !nu_ver_y = 0.4/6.0*Depth*SQRT(Cd*abs(vMA)*SQRT(uMA*uMA+vMA*vMA))
     !nu_ver_x = 0.4/6.0*(Depth+Eta)*SQRT(Cd*abs(U)*SQRT(U*U+V*V))
     !nu_ver_y = 0.4/6.0*(Depth+Eta)*SQRT(Cd*abs(V)*SQRT(U*U+V*V))
-  ENDIF
+  !ENDIF
 
-  IF(10.EQ.0)THEN
+  IF(0.EQ.0)THEN
 
+    ! smagorinsky
+    DO J=Jbeg,Jend
+      DO I=Ibeg,Iend
+        SourceX(I,J) = SourceX(I,J) + 1.0_SP * (1.0_SP/DX*( &
+        0.5_SP*(nu_smg(I,J)+nu_smg(I+1,J)) &
+        *1.0_SP/DX*(P(I+1,J)-P(I,J))  &
+        -0.5_SP*(nu_smg(I-1,J)+nu_smg(I,J)) &
+        *1.0_SP/DX*(P(I,J)-P(I-1,J))) ) &
+        + 0.5_SP * ( 1.0_SP/DY*( &
+        0.5_SP*(nu_smg(I,J)+nu_smg(I,J+1)) &
+        *1.0_SP/DY*(P(I,J+1)-P(I,J)) &
+        -0.5_SP*(nu_smg(I,J-1)+nu_smg(I,J)) &
+        *1.0_SP/DY*(P(I,J)-P(I,J-1))) &
+        + 0.5_SP/DY*( &
+        nu_smg(I,J+1) &
+        *0.5_SP/DX*(Q(I+1,J+1)-Q(I-1,J+1)) &
+        -nu_smg(I,J-1) &
+        *0.5_SP/DX*(Q(I+1,J-1)-Q(I-1,J-1))) )
+
+        SourceY(I,J) = SourceY(I,J) + 1.0_SP * (1.0_SP/DY*( &
+        0.5_SP*(nu_smg(I,J)+nu_smg(I,J+1)) &
+        *1.0_SP/DY*(Q(I,J+1)-Q(I,J))  &
+        - 0.5_SP*(nu_smg(I,J-1)+nu_smg(I,J)) &
+        *1.0_SP/DY*(Q(I,J)-Q(I,J-1))) ) &
+        + 0.5_SP * ( 1.0_SP/DX*( &
+        0.5_SP*(nu_smg(I,J)+nu_smg(I+1,J)) &
+        *1.0_SP/DX*(Q(I+1,J)-Q(I,J)) &
+        -0.5_SP*(nu_smg(I-1,J)+nu_smg(I,J)) &
+        *1.0_SP/DX*(Q(I,J)-Q(I-1,J))) &
+        + 0.5_SP/DX*( &
+        nu_smg(I+1,J) &
+        *0.5_SP/DY*(P(I+1,J+1)-P(I+1,J-1)) &
+        -nu_smg(I-1,J)* &
+        0.5_SP/DY*(P(I-1,J+1)-P(I-1,J-1))) )
+      ENDDO
+    ENDDO
+
+    ! breaking
     DO J=Jbeg,Jend
       DO I=Ibeg,Iend
         SourceX(I,J) = SourceX(I,J) + 1.0_SP * (1.0_SP/DX*( &
@@ -451,7 +514,7 @@ SUBROUTINE SourceTerms
       ENDDO
     ENDDO
 
-  ELSEIF(0.EQ.0)THEN
+  ELSEIF(2.EQ.0)THEN
 
     DO J=Jbeg,Jend
       DO I=Ibeg,Iend
