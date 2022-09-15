@@ -106,7 +106,7 @@ SUBROUTINE SourceTerms
   IF(WAVEMAKER(1:6)=='WK_REG')THEN
     AA = TANH(PI/(Time_ramp*Tperiod)*TIME)*D_gen
 
-    IF(0.EQ.0)THEN
+    IF(10.EQ.0)THEN
       ! do not execute this part (original code)
       DO J=jlo,jhi
         DO I=ilo,ihi
@@ -131,7 +131,7 @@ SUBROUTINE SourceTerms
     !    ENDDO
     !  ENDIF
     !ENDDO
-    ELSEIF(30.EQ.0)THEN
+    ELSEIF(0.EQ.0)THEN
       ! split into four parts
       DO J=Jbeg,Jend
         IF(ymk_wk(J).GT.(Yc_WK/3.0+2.0*DY).AND.ymk_wk(J).LT.(Yc_WK-2.0*DY)) THEN
