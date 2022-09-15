@@ -391,6 +391,8 @@ SUBROUTINE SourceTerms
   ENDIF
 # endif
 
+  print *, 'hello 1!'
+
   ! Horizontal Mixing
   IF(H_MIXING)THEN
     IF(MIX_MODEL.EQ.0)THEN
@@ -426,7 +428,6 @@ SUBROUTINE SourceTerms
     nu_smg = nu_smg*(1-CEILING(nu_vis))
       
     temp_output1 = nu_smg
-    ! nu_vis = nu_vis + nu_smg
 
     DO J=Jbeg,Jend
       DO I=Ibeg,Iend
@@ -474,6 +475,8 @@ SUBROUTINE SourceTerms
     !nu_ver_x = 0.4/6.0*(Depth+Eta)*SQRT(Cd*abs(U)*SQRT(U*U+V*V))
     !nu_ver_y = 0.4/6.0*(Depth+Eta)*SQRT(Cd*abs(V)*SQRT(U*U+V*V))
   !ENDIF
+
+  print *, 'hello 2!'
 
   IF(0.EQ.0)THEN    
     ! breaking
@@ -588,6 +591,8 @@ SUBROUTINE SourceTerms
     ENDDO
 
   ENDIF
+
+  print *, 'hello 3!'
 
 ! else Cartesian
 # else
