@@ -111,7 +111,7 @@ SUBROUTINE SourceTerms
       DO J=jlo,jhi
         DO I=ilo,ihi
           WaveMaker_Mass(I,J)= AA*EXP(-Beta_gen*(xmk_wk(I)-Xc_WK)**2) &
-          *SIN(rlamda*(ymk_wk(J)-ZERO)-2.0_SP*PI/Tperiod*TIME)
+          *SIN(rlamda*(ymk_wk(J)-ZERO)-2.0*PI/Tperiod*TIME)
         ENDDO
       ENDDO
     ELSEIF(0.EQ.0)THEN
@@ -119,37 +119,37 @@ SUBROUTINE SourceTerms
     ! Choi 2021 experimental design
     ! first part has phase of pi and second has zero deg phase
       DO J=Jbeg,Jend
-        IF(ymk_wk(J).LT.(Yc_WK-2.0_SP*DY)) THEN
+        IF(ymk_wk(J).LT.(Yc_WK-1.0*DY)) THEN
           DO I=ilo,ihi
             WaveMaker_Mass(I,J)=AA*EXP(-Beta_gen*(xmk_wk(I)-Xc_WK)**2) &
-            *SIN(rlamda*(ymk_wk(J)-ZERO)-2.0_SP*PI/Tperiod*TIME+PI)
+            *SIN(rlamda*(ymk_wk(J)-ZERO)-2.0*PI/Tperiod*TIME+PI)
           ENDDO
-        ELSEIF(ymk_wk(J).GT.(Yc_WK+2.0_SP*DY)) THEN
+        ELSEIF(ymk_wk(J).GT.(Yc_WK+1.0*DY)) THEN
           DO I=ilo,ihi
             WaveMaker_Mass(I,J)=AA*EXP(-Beta_gen*(xmk_wk(I)-Xc_WK)**2) &
-            *SIN(rlamda*(ymk_wk(J)-ZERO)-2.0_SP*PI/Tperiod*TIME)
+            *SIN(rlamda*(ymk_wk(J)-ZERO)-2.0*PI/Tperiod*TIME)
           ENDDO
         ENDIF
       ENDDO
     ELSEIF(30.EQ.0)THEN
       ! split into four parts
       DO J=Jbeg,Jend
-        IF(ymk_wk(J).GT.(Yc_WK/3.0+2.0*DY).AND.ymk_wk(J).LT.(Yc_WK-2.0*DY)) THEN
+        IF(ymk_wk(J).GT.(Yc_WK/3.0+1.0*DY).AND.ymk_wk(J).LT.(Yc_WK-1.0*DY)) THEN
           DO I=ilo,ihi
           WaveMaker_Mass(I,J)=AA*EXP(-Beta_gen*(xmk_wk(I)-Xc_WK)**2) &
           *SIN(rlamda*(ymk_wk(J)-ZERO)-2.0*PI/Tperiod*TIME+PI)
           ENDDO
-        ELSEIF(ymk_wk(J).GT.(Yc_WK+2.0*DY).AND.ymk_wk(J).LT.(Yc_WK*5.0/3.0-2.0*DY)) THEN
+        ELSEIF(ymk_wk(J).GT.(Yc_WK+1.0*DY).AND.ymk_wk(J).LT.(Yc_WK*5.0/3.0-1.0*DY)) THEN
           DO I=ilo,ihi
             WaveMaker_Mass(I,J)=AA*EXP(-Beta_gen*(xmk_wk(I)-Xc_WK)**2) &
             *SIN(rlamda*(ymk_wk(J)-ZERO)-2.0*PI/Tperiod*TIME)
           ENDDO
-        ELSEIF(ymk_wk(J).LT.(Yc_WK/3.0-2.0*DY)) THEN
+        ELSEIF(ymk_wk(J).LT.(Yc_WK/3.0-1.0*DY)) THEN
           DO I=ilo,ihi
             WaveMaker_Mass(I,J)=AA*EXP(-Beta_gen*(xmk_wk(I)-Xc_WK)**2) &
             *SIN(rlamda*(ymk_wk(J)-ZERO)-2.0*PI/Tperiod*TIME)
           ENDDO
-        ELSEIF(ymk_wk(J).GT.(Yc_WK*5.0/3.0+2.0*DY)) THEN
+        ELSEIF(ymk_wk(J).GT.(Yc_WK*5.0/3.0+1.0*DY)) THEN
           DO I=ilo,ihi
             WaveMaker_Mass(I,J)=AA*EXP(-Beta_gen*(xmk_wk(I)-Xc_WK)**2) &
             *SIN(rlamda*(ymk_wk(J)-ZERO)-2.0*PI/Tperiod*TIME+PI)
