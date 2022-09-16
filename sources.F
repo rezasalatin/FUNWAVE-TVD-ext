@@ -114,24 +114,24 @@ SUBROUTINE SourceTerms
           *SIN(rlamda*(ymk_wk(J)-ZERO)-2.0_SP*PI/Tperiod*TIME)
         ENDDO
       ENDDO
-    ELSEIF(20.EQ.0)THEN
+    ELSEIF(0.EQ.0)THEN
     ! SPLIT WAVEMAKER INTO TWO with 0.5 m gap in between according to
     ! Choi 2021 experimental design
     ! first part has phase of pi and second has zero deg phase
-    !DO J=Jbeg,Jend
-    !  IF(ymk_wk(J).LT.(Yc_WK-2.0_SP*DY)) THEN
-    !    DO I=ilo,ihi
-    !      WaveMaker_Mass(I,J)=AA*EXP(-Beta_gen*(xmk_wk(I)-Xc_WK)**2) &
-    !      *SIN(rlamda*(ymk_wk(J)-ZERO)-2.0_SP*PI/Tperiod*TIME+PI)
-    !    ENDDO
-    !  ELSEIF(ymk_wk(J).GT.(Yc_WK+2.0_SP*DY)) THEN
-    !    DO I=ilo,ihi
-    !      WaveMaker_Mass(I,J)=AA*EXP(-Beta_gen*(xmk_wk(I)-Xc_WK)**2) &
-    !      *SIN(rlamda*(ymk_wk(J)-ZERO)-2.0_SP*PI/Tperiod*TIME)
-    !    ENDDO
-    !  ENDIF
-    !ENDDO
-    ELSEIF(0.EQ.0)THEN
+      DO J=Jbeg,Jend
+        IF(ymk_wk(J).LT.(Yc_WK-2.0_SP*DY)) THEN
+          DO I=ilo,ihi
+            WaveMaker_Mass(I,J)=AA*EXP(-Beta_gen*(xmk_wk(I)-Xc_WK)**2) &
+            *SIN(rlamda*(ymk_wk(J)-ZERO)-2.0_SP*PI/Tperiod*TIME+PI)
+          ENDDO
+        ELSEIF(ymk_wk(J).GT.(Yc_WK+2.0_SP*DY)) THEN
+          DO I=ilo,ihi
+            WaveMaker_Mass(I,J)=AA*EXP(-Beta_gen*(xmk_wk(I)-Xc_WK)**2) &
+            *SIN(rlamda*(ymk_wk(J)-ZERO)-2.0_SP*PI/Tperiod*TIME)
+          ENDDO
+        ENDIF
+      ENDDO
+    ELSEIF(30.EQ.0)THEN
       ! split into four parts
       DO J=Jbeg,Jend
         IF(ymk_wk(J).GT.(Yc_WK/3.0+2.0*DY).AND.ymk_wk(J).LT.(Yc_WK-2.0*DY)) THEN
