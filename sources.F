@@ -119,7 +119,7 @@ SUBROUTINE SourceTerms
     ! Choi 2021 experimental design
     ! first part has phase of pi and second has zero deg phase
       DO J=Jbeg,Jend
-        IF(ymk_wk(J).LT.(Yc_WK-0.0*DY)) THEN
+        IF(ymk_wk(J).LE.(Yc_WK-0.0*DY)) THEN
           DO I=ilo,ihi
             WaveMaker_Mass(I,J)=AA*EXP(-Beta_gen*(xmk_wk(I)-Xc_WK)**2) &
             *SIN(rlamda*(ymk_wk(J)-ZERO)-2.0*PI/Tperiod*TIME+PI)
