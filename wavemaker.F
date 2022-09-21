@@ -830,11 +830,6 @@ SUBROUTINE WK_NEW_WAVEMAKER_2D_SPECTRAL_DATA &
   ! change degree to radian
   Dire=DireD*DEG2RAD
 
-
-  if(myid==0)then
-      print *, 'hello'
-  endif
-
   IF(PERIODIC)THEN
     DO nfre=1,NumFreq
       tmp1 = -0.39_SP + 1.0_SP / 3.0_SP       ! alpha1
