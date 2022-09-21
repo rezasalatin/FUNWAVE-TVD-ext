@@ -821,14 +821,14 @@ SUBROUTINE WK_NEW_WAVEMAKER_2D_SPECTRAL_DATA &
   REAL(SP),INTENT(OUT) :: width
   REAL(SP),DIMENSION(NumFreq),INTENT(IN) :: Freq,Phase2D
   REAL(SP),DIMENSION(NumFreq),INTENT(IN) :: DireD
-  REAL(SP),DIMENSION(NumFreq) :: Dire
+  REAL(SP),DIMENSION(NumFreq) :: Dire, Dire_input, Hmo_output
   REAL(SP),DIMENSION(NumFreq,1),INTENT(IN) :: WAVE_COMP
   REAL(SP),INTENT(IN) :: H_gen,delta,PeakPeriod
   INTEGER :: nfre,ndir,I_temp
-  REAL(SP) :: angle1,angle2,Hmo_output
+  REAL(SP) :: angle1,angle2
 
   ! change degree to radian
-  Dire=DireD*DEG2RAD
+  Dire_input=DireD*DEG2RAD
 
   IF(PERIODIC)THEN
     DO nfre=1,NumFreq
@@ -839,32 +839,32 @@ SUBROUTINE WK_NEW_WAVEMAKER_2D_SPECTRAL_DATA &
       I_temp = 0
       tmp1 = SQRT((tmp3-SQRT(tmp3*tmp3-4.0_SP*tmp1*tmp2)) &
       /(2.0_SP*tmp1))/MAX(SMALL,H_gen)    ! wkn
-      Theta_temp = Dire(nfre)
+      Theta_temp = Dire_input(nfre)
 1001  IF(Theta_temp.GT.ZERO)THEN
-      tmp3=ZERO
-      I=0
-      Do WHILE (tmp3<Theta_temp)
-        I=I+1
+        tmp3=ZERO
+        I=0
+        Do WHILE (tmp3<Theta_temp)
+          I=I+1
 # if defined (CARTESIAN)
-        tmp2=I*2.0_SP*pi/DY/(Nglob-1.0_SP)
+          tmp2=I*2.0_SP*pi/DY/(Nglob)
 # else
-        tmp2=I*2.0_SP*pi/DY(1,1)/(Nglob-1.0_SP)     ! rlamda
+          tmp2=I*2.0_SP*pi/DY(1,1)/(Nglob)     ! rlamda
 # endif
-        IF(tmp2.GE.tmp1)THEN
-          Theta_temp = Theta_temp - 0.001_SP
-          I_temp = I_temp + 1
-          IF(I_temp.eq.1000)THEN
-            Theta_temp = 0.0_SP
-            goto 10001
+          IF(tmp2.GE.tmp1)THEN
+            Theta_temp = Theta_temp - 0.001_SP
+            I_temp = I_temp + 1
+            IF(I_temp.eq.1000)THEN
+              Theta_temp = 0.0_SP
+              goto 10001
+            ENDIF
+            goto 1001
+          ELSE
+            ! theta, based on rlamda=wkn*sin(theta)
+            tmp3=ASIN(tmp2/tmp1)
           ENDIF
-          goto 1001
-        ELSE
-          ! theta, based on rlamda=wkn*sin(theta)
-          tmp3=ASIN(tmp2/tmp1)
-        ENDIF
-      ENDDO
+        ENDDO
       IF(tmp2.LT.tmp1)THEN
-        tmp3=ASIN((I-1)*2.0_SP*pi/DY/(Nglob-1.0_SP)/tmp1)
+        tmp3=ASIN((I-1)*2.0_SP*pi/DY/(Nglob)/tmp1)
       ENDIF
     ELSEIF(Theta_temp.LT.ZERO)THEN
       tmp3=ZERO
@@ -872,9 +872,9 @@ SUBROUTINE WK_NEW_WAVEMAKER_2D_SPECTRAL_DATA &
       Do WHILE (tmp3>Theta_temp)
         I=I+1
 # if defined (CARTESIAN)
-        tmp2=I*2.0_SP*pi/DY/(Nglob-1.0_SP)
+        tmp2=I*2.0_SP*pi/DY/(Nglob)
 # else
-        tmp2=I*2.0_SP*pi/DY(1,1)/(Nglob-1.0_SP)     ! rlamda
+        tmp2=I*2.0_SP*pi/DY(1,1)/(Nglob)     ! rlamda
 # endif
         IF(tmp2.GE.tmp1)THEN
           Theta_temp = Theta_temp + 0.001_SP
@@ -891,26 +891,15 @@ SUBROUTINE WK_NEW_WAVEMAKER_2D_SPECTRAL_DATA &
       ENDDO
 
       IF(tmp2.LT.tmp1)THEN
-        tmp3=-ASIN((I-1)*2.0_SP*pi/DY/(Nglob-1.0_SP)/tmp1)
+        tmp3=-ASIN((I-1)*2.0_SP*pi/DY/(Nglob)/tmp1)
       ENDIF
     ELSEIF(Theta_temp==0.0_SP)THEN
       tmp3 = Theta_temp
     ENDIF
 
-10001       Hmo_output = WAVE_COMP(nfre,1)*2.0_SP*SQRT(2.0_SP)
-
-# if defined (PARALLEL)
-    if(myid==0)then
-      WRITE(3,'(A40)') 'Freq, Input Dire, PBC Dire, Amplitude, Phase'
-      WRITE(3,'(3F12.5)')  Freq(nfre),Dire(nfre)*180./pi,&
-      tmp3*180./pi,Hmo_output/2.0_SP/SQRT(2.0_SP),Phase2D(nfre)
-    endif
-# else
-    WRITE(3,'(A40)') 'Freq, Input Dire, PBC Dire, Amplitude, Phase'
-    WRITE(3,'(3F12.5)')  Freq(nfre),Dire(nfre)*180./pi,&
-    tmp3*180./pi,Hmo_output/2.0_SP/SQRT(2.0_SP),Phase2D(nfre)
-# endif
+10001       Hmo_output(nfre) = WAVE_COMP(nfre,1)*2.0_SP*SQRT(2.0_SP)
     Dire(nfre) = tmp3
+
   ENDDO ! "DO nfre=1,NumFreq"
 ENDIF   ! "IF(PERIODIC)THEN"
 !
@@ -943,6 +932,18 @@ DO nfre=1,NumFreq
   D_gen(nfre,1)=2.0_SP*AMP_WK  &
   *cos(Dire(nfre))*(omgn**2-alpha1*grav*wkn**4*h_gen**3) &
   /(omgn*wkn*rI*(1.0_SP-alpha*(wkn*h_gen)**2))
+
+# if defined (PARALLEL)
+  if(myid==0)then
+    WRITE(3,'(A40)') 'Freq, Input Dire, PBC Dire, Amplitude, Phase, wavelength'
+    WRITE(3,'(3F12.5)')  Freq(nfre),Dire_input(nfre)*180./pi,&
+    Dire(nfre)*180./pi,Hmo_output(nfre)/2.0_SP/SQRT(2.0_SP),Phase2D(nfre),wave_length
+  endif
+# else
+  WRITE(3,'(A40)') 'Freq, Input Dire, PBC Dire, Amplitude, Phase, wavelength'
+  WRITE(3,'(3F12.5)')  Freq(nfre),Dire_input(nfre)*180./pi,&
+  Dire(nfre)*180./pi,Hmo_output(nfre)/2.0_SP/SQRT(2.0_SP),Phase2D(nfre),wave_length
+# endif
 
 ENDDO ! "DO nfre=1,NumFreq"
 
