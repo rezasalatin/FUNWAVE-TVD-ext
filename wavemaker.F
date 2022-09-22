@@ -898,7 +898,7 @@ SUBROUTINE WK_NEW_WAVEMAKER_2D_SPECTRAL_DATA &
     ENDIF
 
 10001       Hmo_output(nfre) = WAVE_COMP(nfre,1)*2.0_SP*SQRT(2.0_SP)
-    Dire(nfre) = tmp3
+    Dire(nfre) = Dire_input(nfre)
 
   ENDDO ! "DO nfre=1,NumFreq"
 ENDIF   ! "IF(PERIODIC)THEN"
@@ -935,12 +935,12 @@ DO nfre=1,NumFreq
 
 # if defined (PARALLEL)
   if(myid==0)then
-    WRITE(3,'(A40)') 'Freq, Input Dire, PBC Dire, Amplitude, Phase, wavelength'
+    WRITE(3,'(A60)') 'Freq, Input Dire, PBC Dire, Amplitude, Phase, wavelength'
     WRITE(3,'(3F12.5)')  Freq(nfre),Dire_input(nfre)*180./pi,&
     Dire(nfre)*180./pi,Hmo_output(nfre)/2.0_SP/SQRT(2.0_SP),Phase2D(nfre),wave_length
   endif
 # else
-  WRITE(3,'(A40)') 'Freq, Input Dire, PBC Dire, Amplitude, Phase, wavelength'
+  WRITE(3,'(A60)') 'Freq, Input Dire, PBC Dire, Amplitude, Phase, wavelength'
   WRITE(3,'(3F12.5)')  Freq(nfre),Dire_input(nfre)*180./pi,&
   Dire(nfre)*180./pi,Hmo_output(nfre)/2.0_SP/SQRT(2.0_SP),Phase2D(nfre),wave_length
 # endif
