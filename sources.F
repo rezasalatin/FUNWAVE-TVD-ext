@@ -79,7 +79,6 @@ SUBROUTINE SourceTerms
   REAL(SP),DIMENSION(Mloc,Nloc) :: VorX,VorY,DEPTHDerX
   INTEGER :: VTYPE
   REAL(SP),DIMENSION(Mloc,Nloc) :: Mixing_eddy
-  REAL(SP),DIMENSION(Mloc,Nloc) :: divg_velocity,divg_velocityX,divg_velocityY
 
   !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
   !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
@@ -430,17 +429,8 @@ SUBROUTINE SourceTerms
     ENDDO
   ENDDO
 
-  VTYPE=1
-  CALL PHI_COLL(Mloc,Nloc,Ibeg,Iend,Jbeg,Jend,Nghost,vorticity,VTYPE,PERIODIC)
-  CALL DERIVATIVE_X(Mloc,Nloc,Ibeg,Iend,Jbeg,Jend,MASK,DX,vorticity,VorX)
-  CALL DERIVATIVE_Y(Mloc,Nloc,Ibeg,Iend,Jbeg,Jend,MASK,DY,vorticity,VorY)
-
-  divg_velocity = uMAx+vMAy
-  CALL DERIVATIVE_X(Mloc,Nloc,Ibeg,Iend,Jbeg,Jend,MASK,DX,divg_velocity,divg_velocityX)
-  CALL DERIVATIVE_Y(Mloc,Nloc,Ibeg,Iend,Jbeg,Jend,MASK,DY,divg_velocity,divg_velocityY)
-
   ! Horizontal Mixing
-  IF(H_MIXING)THEN 
+  IF(H_MIXING)THEN
     IF(MIX_MODEL.EQ.0)THEN
       ! default
       ! Mixing_eddy = SQRT(2.0*uMAx**2+2.0*vMAy**2+(uMAy+vMAx)**2)
@@ -449,12 +439,11 @@ SUBROUTINE SourceTerms
       Mixing_eddy = SQRT(uMAx**2+vMAy**2+((uMAy+vMAx)**2)/2.0)
       nu_smg = C_smg*DX*DY*Mixing_eddy
     ELSEIF(MIX_MODEL.EQ.1)THEN
-      
-      nu_smg=C_smg**2*DX*DY*(DEPTH+ETA)*SQRT(VorX**2+VorY**2)
-
-    ELSEIF(MIX_MODEL.EQ.6)THEN
-      nu_smg=C_smg**2*DX*DY*(DEPTH+ETA)*SQRT(VorX**2+VorY**2+divg_velocityX**2+divg_velocityY**2)
-
+      VTYPE=1
+      CALL PHI_COLL(Mloc,Nloc,Ibeg,Iend,Jbeg,Jend,Nghost,vorticity,VTYPE,PERIODIC)
+      CALL DERIVATIVE_X(Mloc,Nloc,Ibeg,Iend,Jbeg,Jend,MASK,DX,vorticity,VorX)
+      CALL DERIVATIVE_Y(Mloc,Nloc,Ibeg,Iend,Jbeg,Jend,MASK,DY,vorticity,VorY)
+      nu_smg=C_smg**2*DX*DY*(DEPTH+ETA)*SQRT(VorX*VorX+VorY*VorY)
     ELSEIF(MIX_MODEL.EQ.2)THEN
       nu_smg=C_smg*(DX*DY*(DEPTH+ETA))**(2.0_SP/3.0_SP)*SQRT(vorticity*vorticity/2)
     ELSEIF(MIX_MODEL.EQ.3)THEN
