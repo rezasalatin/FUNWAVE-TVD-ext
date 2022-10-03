@@ -431,11 +431,6 @@ SUBROUTINE SourceTerms
   ENDDO
 
   ! Horizontal Mixing
-  VTYPE=1
-  CALL PHI_COLL(Mloc,Nloc,Ibeg,Iend,Jbeg,Jend,Nghost,vorticity,VTYPE,PERIODIC)
-  CALL DERIVATIVE_X(Mloc,Nloc,Ibeg,Iend,Jbeg,Jend,MASK,DX,vorticity,VorX)
-  CALL DERIVATIVE_Y(Mloc,Nloc,Ibeg,Iend,Jbeg,Jend,MASK,DY,vorticity,VorY)
-
   IF(H_MIXING)THEN
     IF(MIX_MODEL.EQ.0)THEN
 
@@ -446,9 +441,18 @@ SUBROUTINE SourceTerms
 
     ELSEIF(MIX_MODEL.EQ.1)THEN
       
+      VTYPE=1
+      CALL PHI_COLL(Mloc,Nloc,Ibeg,Iend,Jbeg,Jend,Nghost,vorticity,VTYPE,PERIODIC)
+      CALL DERIVATIVE_X(Mloc,Nloc,Ibeg,Iend,Jbeg,Jend,MASK,DX,vorticity,VorX)
+      CALL DERIVATIVE_Y(Mloc,Nloc,Ibeg,Iend,Jbeg,Jend,MASK,DY,vorticity,VorY)
       nu_smg = C_smg**2*DX*DY*(DEPTH+ETA)*SQRT(VorX*VorX+VorY*VorY)
 
     ELSEIF(MIX_MODEL.EQ.11)THEN
+      
+      VTYPE=1
+      CALL PHI_COLL(Mloc,Nloc,Ibeg,Iend,Jbeg,Jend,Nghost,vorticity,VTYPE,PERIODIC)
+      CALL DERIVATIVE_X(Mloc,Nloc,Ibeg,Iend,Jbeg,Jend,MASK,DX,vorticity,VorX)
+      CALL DERIVATIVE_Y(Mloc,Nloc,Ibeg,Iend,Jbeg,Jend,MASK,DY,vorticity,VorY)
 
       CALL PHI_COLL(Mloc,Nloc,Ibeg,Iend,Jbeg,Jend,Nghost,divergence,VTYPE,PERIODIC)
       CALL DERIVATIVE_X(Mloc,Nloc,Ibeg,Iend,Jbeg,Jend,MASK,DX,divergence,DivX)
@@ -461,6 +465,10 @@ SUBROUTINE SourceTerms
     ELSEIF(MIX_MODEL.EQ.3)THEN
       nu_smg = C_smg**2*DX*DY*DEPTH/SQRT(DX**2+DY**2)*SQRT(2.0*uMAx**2+2.0*vMAy**2+(uMAy+vMAx)**2)
     ELSEIF(MIX_MODEL.EQ.4)THEN
+      VTYPE=1
+      CALL PHI_COLL(Mloc,Nloc,Ibeg,Iend,Jbeg,Jend,Nghost,vorticity,VTYPE,PERIODIC)
+      CALL DERIVATIVE_X(Mloc,Nloc,Ibeg,Iend,Jbeg,Jend,MASK,DX,vorticity,VorX)
+      CALL DERIVATIVE_Y(Mloc,Nloc,Ibeg,Iend,Jbeg,Jend,MASK,DY,vorticity,VorY)
       nu_smg=0.5*(C_smg*DX*DY*(DEPTH+ETA)*SQRT(VorX*VorX+VorY*VorY)) &
       +0.5*(C_smg*(DX*DY*(DEPTH+ETA))**(2.0_SP/3.0_SP)*SQRT(vorticity*vorticity/2))
     ELSEIF(MIX_MODEL.EQ.5)THEN
