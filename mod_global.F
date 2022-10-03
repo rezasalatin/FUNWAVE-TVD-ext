@@ -292,9 +292,6 @@ REAL(SP),DIMENSION(:,:),ALLOCATABLE :: vorticity,Vor_Mean,&
 Vor_Intensity,Vor2,&
 Vor2sum,Vorsum,Vorsum2
 
-! Divergence of velocity ! Chen, Salatin
-REAL(SP),DIMENSION(:,:),ALLOCATABLE :: divergence
-
 ! Chen, Salatin, Oct 2021, Radiation Stress
 REAL(SP),DIMENSION(:,:),ALLOCATABLE :: Syx_x
 REAL(SP),DIMENSION(:,:,:),ALLOCATABLE :: Syx_temp

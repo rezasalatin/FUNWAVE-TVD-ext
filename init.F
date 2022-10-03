@@ -219,10 +219,6 @@ SUBROUTINE ALLOCATE_VARIABLES
   Vorsum2=ZERO
 
   ! Chen, Salatin
-  ALLOCATE(divergence(Mloc,Nloc))
-  divergence=ZERO
-
-  ! Chen, Salatin
   ALLOCATE(xmk_wk(Mloc),ymk_wk(Nloc))
 
   ! Chen, Salatin, Oct 2021, Radiation Stress
