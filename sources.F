@@ -431,10 +431,16 @@ SUBROUTINE SourceTerms
   ! Horizontal Mixing
   IF(H_MIXING)THEN
       
-      VTYPE=1
-      CALL PHI_COLL(Mloc,Nloc,Ibeg,Iend,Jbeg,Jend,Nghost,vorticity,VTYPE,PERIODIC)
-      CALL DERIVATIVE_X(Mloc,Nloc,Ibeg,Iend,Jbeg,Jend,MASK,DX,vorticity,VorX)
-      CALL DERIVATIVE_Y(Mloc,Nloc,Ibeg,Iend,Jbeg,Jend,MASK,DY,vorticity,VorY)
+    VTYPE=1
+    CALL PHI_COLL(Mloc,Nloc,Ibeg,Iend,Jbeg,Jend,Nghost,vorticity,VTYPE,PERIODIC)
+    CALL DERIVATIVE_X(Mloc,Nloc,Ibeg,Iend,Jbeg,Jend,MASK,DX,vorticity,VorX)
+    CALL DERIVATIVE_Y(Mloc,Nloc,Ibeg,Iend,Jbeg,Jend,MASK,DY,vorticity,VorY)
+
+    ! Chen, Salatin, Divergence of velocity
+    div_uv = uMAx+vMAy
+    CALL DERIVATIVE_X(Mloc,Nloc,Ibeg,Iend,Jbeg,Jend,MASK,DX,div_uv,div_uvX)
+    CALL DERIVATIVE_Y(Mloc,Nloc,Ibeg,Iend,Jbeg,Jend,MASK,DY,div_uv,div_uvY)
+    
 
     IF(MIX_MODEL.EQ.0)THEN
       ! default
@@ -443,7 +449,7 @@ SUBROUTINE SourceTerms
     ELSEIF(MIX_MODEL.EQ.1)THEN
       nu_smg=C_smg**2*DX*DY*(DEPTH+ETA)*SQRT(VorX*VorX+VorY*VorY)
     ELSEIF(MIX_MODEL.EQ.11)THEN
-      nu_smg=C_smg**2*DX*DY*(DEPTH+ETA)*SQRT(VorX*VorX+VorY*VorY)
+      nu_smg=C_smg**2*DX*DY*(DEPTH+ETA)*SQRT(VorX*VorX+VorY*VorY+div_uvX*div_uvX+div_uvY*div_uvY)
     ELSEIF(MIX_MODEL.EQ.2)THEN
       nu_smg=C_smg*(DX*DY*(DEPTH+ETA))**(2.0_SP/3.0_SP)*SQRT(vorticity*vorticity/2)
     ELSEIF(MIX_MODEL.EQ.3)THEN
