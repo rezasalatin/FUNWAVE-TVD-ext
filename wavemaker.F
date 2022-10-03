@@ -898,7 +898,8 @@ SUBROUTINE WK_NEW_WAVEMAKER_2D_SPECTRAL_DATA &
     ENDIF
 
 10001       Hmo_output(nfre) = WAVE_COMP(nfre,1)*2.0_SP*SQRT(2.0_SP)
-    Dire(nfre) = Dire_input(nfre)
+    !Dire(nfre) = Dire_input(nfre) ! if you want PBC to have no effect on input wave direction
+    Dire(nfre) = tmp3
 
   ENDDO ! "DO nfre=1,NumFreq"
 ENDIF   ! "IF(PERIODIC)THEN"
