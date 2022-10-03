@@ -441,7 +441,10 @@ SUBROUTINE SourceTerms
       nu_smg = C_smg*DX*DY*Mixing_eddy
     ELSEIF(MIX_MODEL.EQ.1)THEN
       
-      
+      VTYPE=1
+      CALL PHI_COLL(Mloc,Nloc,Ibeg,Iend,Jbeg,Jend,Nghost,vorticity,VTYPE,PERIODIC)
+      CALL DERIVATIVE_X(Mloc,Nloc,Ibeg,Iend,Jbeg,Jend,MASK,DX,vorticity,VorX)
+      CALL DERIVATIVE_Y(Mloc,Nloc,Ibeg,Iend,Jbeg,Jend,MASK,DY,vorticity,VorY)
       nu_smg=C_smg**2*DX*DY*(DEPTH+ETA)*SQRT(VorX**2+VorY**2)
 
     ELSEIF(MIX_MODEL.EQ.6)THEN
@@ -450,7 +453,6 @@ SUBROUTINE SourceTerms
       CALL PHI_COLL(Mloc,Nloc,Ibeg,Iend,Jbeg,Jend,Nghost,vorticity,VTYPE,PERIODIC)
       CALL DERIVATIVE_X(Mloc,Nloc,Ibeg,Iend,Jbeg,Jend,MASK,DX,vorticity,VorX)
       CALL DERIVATIVE_Y(Mloc,Nloc,Ibeg,Iend,Jbeg,Jend,MASK,DY,vorticity,VorY)
-
       divg_velocity = uMAx+vMAy
       CALL DERIVATIVE_X(Mloc,Nloc,Ibeg,Iend,Jbeg,Jend,MASK,DX,divg_velocity,divg_velocityX)
       CALL DERIVATIVE_Y(Mloc,Nloc,Ibeg,Iend,Jbeg,Jend,MASK,DY,divg_velocity,divg_velocityY)
