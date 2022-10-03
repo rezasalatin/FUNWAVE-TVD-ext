@@ -79,8 +79,6 @@ SUBROUTINE SourceTerms
   REAL(SP),DIMENSION(Mloc,Nloc) :: VorX,VorY,DEPTHDerX
   INTEGER :: VTYPE
   REAL(SP),DIMENSION(Mloc,Nloc) :: Mixing_eddy
-  REAL(SP),DIMENSION(Mloc,Nloc) :: DivX,DivY
-
 
   !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
   !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
