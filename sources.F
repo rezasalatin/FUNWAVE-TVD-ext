@@ -443,11 +443,16 @@ SUBROUTINE SourceTerms
       
       VTYPE=1
       CALL PHI_COLL(Mloc,Nloc,Ibeg,Iend,Jbeg,Jend,Nghost,vorticity,VTYPE,PERIODIC)
-      CALL DERIVATIVE_X(Mloc,Nloc,Ibeg,Iend,Jbeg,Jend,MASK9,DX,vorticity,VorX)
-      CALL DERIVATIVE_Y(Mloc,Nloc,Ibeg,Iend,Jbeg,Jend,MASK9,DY,vorticity,VorY)
+      CALL DERIVATIVE_X(Mloc,Nloc,Ibeg,Iend,Jbeg,Jend,MASK,DX,vorticity,VorX)
+      CALL DERIVATIVE_Y(Mloc,Nloc,Ibeg,Iend,Jbeg,Jend,MASK,DY,vorticity,VorY)
       nu_smg=C_smg**2*DX*DY*(DEPTH+ETA)*SQRT(VorX**2.0+VorY**2.0)
 
+      print *, "hello this is mix 1"
+
     ELSEIF(MIX_MODEL.EQ.6)THEN
+
+      print *, "hello this is mix 6"
+
 
       VTYPE=1
       CALL PHI_COLL(Mloc,Nloc,Ibeg,Iend,Jbeg,Jend,Nghost,vorticity,VTYPE,PERIODIC)
