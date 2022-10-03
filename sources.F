@@ -438,11 +438,11 @@ SUBROUTINE SourceTerms
     CALL DERIVATIVE_Y(Mloc,Nloc,Ibeg,Iend,Jbeg,Jend,MASK,DY,vorticity,VorY)
 
     ! Chen, Salatin, Divergence of velocity
-    !div_uv = uMAx+vMAy
-    !CALL PHI_COLL(Mloc,Nloc,Ibeg,Iend,Jbeg,Jend,Nghost,div_uv,VTYPE,PERIODIC)
-    !CALL DERIVATIVE_X(Mloc,Nloc,Ibeg,Iend,Jbeg,Jend,MASK,DX,div_uv,div_uvX)
-    !CALL DERIVATIVE_Y(Mloc,Nloc,Ibeg,Iend,Jbeg,Jend,MASK,DY,div_uv,div_uvY)
-    !temp_output2 = div_uv
+    div_uv = uMAx+vMAy
+    CALL PHI_COLL(Mloc,Nloc,Ibeg,Iend,Jbeg,Jend,Nghost,div_uv,VTYPE,PERIODIC)
+    CALL DERIVATIVE_X(Mloc,Nloc,Ibeg,Iend,Jbeg,Jend,MASK,DX,div_uv,div_uvX)
+    CALL DERIVATIVE_Y(Mloc,Nloc,Ibeg,Iend,Jbeg,Jend,MASK,DY,div_uv,div_uvY)
+    temp_output2 = div_uv
     
 
     IF(MIX_MODEL.EQ.0)THEN
