@@ -444,7 +444,7 @@ SUBROUTINE SourceTerms
       CALL PHI_COLL(Mloc,Nloc,Ibeg,Iend,Jbeg,Jend,Nghost,vorticity,VTYPE,PERIODIC)
       CALL DERIVATIVE_X(Mloc,Nloc,Ibeg,Iend,Jbeg,Jend,MASK,DX,vorticity,VorX)
       CALL DERIVATIVE_Y(Mloc,Nloc,Ibeg,Iend,Jbeg,Jend,MASK,DY,vorticity,VorY)
-      nu_smg = C_smg*DX*DY*(DEPTH+ETA)*SQRT(VorX**2+VorY**2)
+      nu_smg = C_smg**2*DX*DY*(DEPTH+ETA) !*SQRT(VorX**2+VorY**2)
 
     ELSEIF(MIX_MODEL.EQ.11)THEN
       
