@@ -473,7 +473,7 @@ SUBROUTINE CAL_DISPERSION
             vorticity(I,J)=omega(I,J)
 
             ! Chen, Salatin, Divergence
-            divergence(I,J) = Ux(I,J)+Vy(I,J)
+            divergence(I,J) = uMAx(I,J)+vMAy(I,J)
 
 
             ken1=((Beta_1-1.0_SP/2.0_SP)*(reta+rh)*Beta_2)
