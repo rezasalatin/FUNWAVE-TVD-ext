@@ -76,7 +76,7 @@ SUBROUTINE SourceTerms
   INTEGER :: kf_index ! Chen, Salatin
   ! variables eddy viscosity terms (horizontal, vertical, breaking)
   REAL(SP),DIMENSION(Mloc,Nloc) :: Vis_BrkX,Vis_BrkY,VertX,VertY,nu_visMA_SUM
-  REAL(SP),DIMENSION(Mloc,Nloc) :: VorX,VorY,DEPTHDerX
+  REAL(SP),DIMENSION(Mloc,Nloc) :: VorX,VorY,DEPTHDerX,tempX
   INTEGER :: VTYPE
   ! divergence of velocity
   REAL(SP),DIMENSION(Mloc,Nloc) :: divergence
@@ -446,9 +446,8 @@ SUBROUTINE SourceTerms
       nu_smg=C_smg**2*DX*DY*(DEPTH+ETA)*SQRT(VorX**2+VorY**2)
 
       divergence = uMAx+vMAy
-      CALL DERIVATIVE_X(Mloc,Nloc,Ibeg,Iend,Jbeg,Jend,MASK9,DX,divergence,VorX)
-      divX = divergence
-      temp_output2 = VorX
+      CALL DERIVATIVE_X(Mloc,Nloc,Ibeg,Iend,Jbeg,Jend,MASK9,DX,divergence,tempX)
+      temp_output2 = tempX
     
     ELSEIF(MIX_MODEL.EQ.6)THEN
 
