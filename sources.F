@@ -79,7 +79,7 @@ SUBROUTINE SourceTerms
   REAL(SP),DIMENSION(Mloc,Nloc) :: TempX,TempY,Temp_abs1,Temp_abs2
   INTEGER :: VTYPE
   ! divergence of velocity
-  REAL(SP),DIMENSION(Mloc,Nloc) :: divergence
+  REAL(SP),DIMENSION(Mloc,Nloc) :: uv_divg
 
   !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
   !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
@@ -453,9 +453,9 @@ SUBROUTINE SourceTerms
       CALL DERIVATIVE_X(Mloc,Nloc,Ibeg,Iend,Jbeg,Jend,MASK,DX,vorticity,TempX)
       CALL DERIVATIVE_Y(Mloc,Nloc,Ibeg,Iend,Jbeg,Jend,MASK,DY,vorticity,TempY)
       Temp_abs1 = TempX**2+TempY**2
-      !divergence = uMAx+vMAy
-      !CALL DERIVATIVE_X(Mloc,Nloc,Ibeg,Iend,Jbeg,Jend,MASK,DX,divergence,TempX)
-      !CALL DERIVATIVE_Y(Mloc,Nloc,Ibeg,Iend,Jbeg,Jend,MASK,DY,divergence,TempY)
+      uv_divg = uMAx+vMAy
+      !CALL DERIVATIVE_X(Mloc,Nloc,Ibeg,Iend,Jbeg,Jend,MASK,DX,uv_divg,TempX)
+      !CALL DERIVATIVE_Y(Mloc,Nloc,Ibeg,Iend,Jbeg,Jend,MASK,DY,uv_divg,TempY)
 
       !nu_smg=C_smg**2*DX*DY*(DEPTH+ETA)*SQRT(TempX**2+TempY**2+divX**2+divY**2)
 
