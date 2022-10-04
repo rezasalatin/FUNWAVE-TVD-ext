@@ -453,10 +453,9 @@ SUBROUTINE SourceTerms
       CALL DERIVATIVE_X(Mloc,Nloc,Ibeg,Iend,Jbeg,Jend,MASK,DX,vorticity,TempX)
       CALL DERIVATIVE_Y(Mloc,Nloc,Ibeg,Iend,Jbeg,Jend,MASK,DY,vorticity,TempY)
       Temp_abs1 = TempX**2+TempY**2
-      nu_smg=C_smg**2*DX*DY*(DEPTH+ETA)*SQRT(Temp_abs1)
-      divergence = uMAx+vMAy
-      CALL DERIVATIVE_X(Mloc,Nloc,Ibeg,Iend,Jbeg,Jend,MASK,DX,divergence,TempX)
-      CALL DERIVATIVE_Y(Mloc,Nloc,Ibeg,Iend,Jbeg,Jend,MASK,DY,divergence,TempX)
+      !divergence = uMAx+vMAy
+      !CALL DERIVATIVE_X(Mloc,Nloc,Ibeg,Iend,Jbeg,Jend,MASK,DX,divergence,TempX)
+      !CALL DERIVATIVE_Y(Mloc,Nloc,Ibeg,Iend,Jbeg,Jend,MASK,DY,divergence,TempY)
 
       !nu_smg=C_smg**2*DX*DY*(DEPTH+ETA)*SQRT(TempX**2+TempY**2+divX**2+divY**2)
 
