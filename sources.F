@@ -78,7 +78,6 @@ SUBROUTINE SourceTerms
   REAL(SP),DIMENSION(Mloc,Nloc) :: Vis_BrkX,Vis_BrkY,VertX,VertY,nu_visMA_SUM
   REAL(SP),DIMENSION(Mloc,Nloc) :: VorX,VorY,DEPTHDerX
   INTEGER :: VTYPE
-  REAL(SP),DIMENSION(Mloc,Nloc) :: divergence,divergenceX,divergenceY
   !REAL(SP),DIMENSION(Mloc,Nloc) :: divergence,divergenceX,divergenceY
 
   !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
@@ -450,7 +449,7 @@ SUBROUTINE SourceTerms
       CALL PHI_COLL(Mloc,Nloc,Ibeg,Iend,Jbeg,Jend,Nghost,vorticity,VTYPE,PERIODIC)
       CALL DERIVATIVE_X(Mloc,Nloc,Ibeg,Iend,Jbeg,Jend,MASK,DX,vorticity,VorX)
       CALL DERIVATIVE_Y(Mloc,Nloc,Ibeg,Iend,Jbeg,Jend,MASK,DY,vorticity,VorY)
-      
+
       divergence = uMAx+vMAy
       CALL DERIVATIVE_X(Mloc,Nloc,Ibeg,Iend,Jbeg,Jend,MASK,DX,divergence,divergenceX)
       CALL DERIVATIVE_Y(Mloc,Nloc,Ibeg,Iend,Jbeg,Jend,MASK,DY,divergence,divergenceY)
