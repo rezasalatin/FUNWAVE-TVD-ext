@@ -446,8 +446,8 @@ SUBROUTINE SourceTerms
       nu_smg=C_smg**2*DX*DY*(DEPTH+ETA)*SQRT(VorX**2+VorY**2)
 
       divergence = uMAx+vMAy
-      CALL DERIVATIVE_X(Mloc,Nloc,Ibeg,Iend,Jbeg,Jend,MASK9,DX,divergence,tempX)
-      temp_output2 = tempX
+      CALL DERIVATIVE_X(Mloc,Nloc,Ibeg,Iend,Jbeg,Jend,MASK9,DX,divergence,VorX)
+      temp_output2 = VorX
     
     ELSEIF(MIX_MODEL.EQ.6)THEN
 
