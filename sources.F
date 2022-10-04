@@ -448,13 +448,15 @@ SUBROUTINE SourceTerms
     
     ELSEIF(MIX_MODEL.EQ.6)THEN
 
-      !VTYPE=1
-      !CALL PHI_COLL(Mloc,Nloc,Ibeg,Iend,Jbeg,Jend,Nghost,vorticity,VTYPE,PERIODIC)
-      !CALL DERIVATIVE_X(Mloc,Nloc,Ibeg,Iend,Jbeg,Jend,MASK,DX,vorticity,TempX)
-      !CALL DERIVATIVE_Y(Mloc,Nloc,Ibeg,Iend,Jbeg,Jend,MASK,DY,vorticity,TempY)
-      !divergence = uMAx+vMAy
-      !CALL DERIVATIVE_X(Mloc,Nloc,Ibeg,Iend,Jbeg,Jend,MASK,DX,divergence,TempX)
-      !CALL DERIVATIVE_Y(Mloc,Nloc,Ibeg,Iend,Jbeg,Jend,MASK,DY,divergence,TempX)
+      VTYPE=1
+      CALL PHI_COLL(Mloc,Nloc,Ibeg,Iend,Jbeg,Jend,Nghost,vorticity,VTYPE,PERIODIC)
+      CALL DERIVATIVE_X(Mloc,Nloc,Ibeg,Iend,Jbeg,Jend,MASK,DX,vorticity,TempX)
+      CALL DERIVATIVE_Y(Mloc,Nloc,Ibeg,Iend,Jbeg,Jend,MASK,DY,vorticity,TempY)
+      Temp_abs1 = TempX**2+TempY**2
+      nu_smg=C_smg**2*DX*DY*(DEPTH+ETA)*SQRT(Temp_abs1)
+      divergence = uMAx+vMAy
+      CALL DERIVATIVE_X(Mloc,Nloc,Ibeg,Iend,Jbeg,Jend,MASK,DX,divergence,TempX)
+      CALL DERIVATIVE_Y(Mloc,Nloc,Ibeg,Iend,Jbeg,Jend,MASK,DY,divergence,TempX)
 
       !nu_smg=C_smg**2*DX*DY*(DEPTH+ETA)*SQRT(TempX**2+TempY**2+divX**2+divY**2)
 
