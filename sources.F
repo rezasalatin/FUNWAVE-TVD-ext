@@ -76,10 +76,11 @@ SUBROUTINE SourceTerms
   INTEGER :: kf_index ! Chen, Salatin
   ! variables eddy viscosity terms (horizontal, vertical, breaking)
   REAL(SP),DIMENSION(Mloc,Nloc) :: Vis_BrkX,Vis_BrkY,VertX,VertY,nu_visMA_SUM
-  REAL(SP),DIMENSION(Mloc,Nloc) :: VorX,VorY,DEPTHDerX,tempX,tempY
+  REAL(SP),DIMENSION(Mloc,Nloc) :: VorX,VorY,DEPTHDerX
   INTEGER :: VTYPE
   ! divergence of velocity
-  REAL(SP),DIMENSION(Mloc,Nloc) :: divergence,divX,divY
+  REAL(SP),DIMENSION(Mloc,Nloc) :: divergence
+  REAL(SP),DIMENSION(Mloc,Nloc) :: divX,divY
 
   !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
   !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
@@ -440,26 +441,25 @@ SUBROUTINE SourceTerms
     
       VTYPE=1
       CALL PHI_COLL(Mloc,Nloc,Ibeg,Iend,Jbeg,Jend,Nghost,vorticity,VTYPE,PERIODIC)
-      CALL DERIVATIVE_X(Mloc,Nloc,Ibeg,Iend,Jbeg,Jend,MASK,DX,vorticity,tempX)
-      CALL DERIVATIVE_Y(Mloc,Nloc,Ibeg,Iend,Jbeg,Jend,MASK,DY,vorticity,tempY)
-      tempX = VorX
-      tempY = VorY
+      CALL DERIVATIVE_X(Mloc,Nloc,Ibeg,Iend,Jbeg,Jend,MASK,DX,vorticity,VorX)
+      CALL DERIVATIVE_Y(Mloc,Nloc,Ibeg,Iend,Jbeg,Jend,MASK,DY,vorticity,VorY)
       nu_smg=C_smg**2*DX*DY*(DEPTH+ETA)*SQRT(VorX**2+VorY**2)
 
-      divergence = uMAx+vMAy
-      CALL DERIVATIVE_X(Mloc,Nloc,Ibeg,Iend,Jbeg,Jend,MASK9,DX,divergence,VorX)
       temp_output2 = VorX
+
+      divergence = uMAx+vMAy
+      CALL DERIVATIVE_X(Mloc,Nloc,Ibeg,Iend,Jbeg,Jend,MASK,DX,divergence,VorX)
+      temp_output3 = divergence
+      temp_output4 = VorX
     
     ELSEIF(MIX_MODEL.EQ.6)THEN
 
-      VTYPE=1
-      CALL PHI_COLL(Mloc,Nloc,Ibeg,Iend,Jbeg,Jend,Nghost,vorticity,VTYPE,PERIODIC)
-      CALL DERIVATIVE_X(Mloc,Nloc,Ibeg,Iend,Jbeg,Jend,MASK,DX,vorticity,VorX)
-      CALL DERIVATIVE_Y(Mloc,Nloc,Ibeg,Iend,Jbeg,Jend,MASK,DY,vorticity,VorY)
+      !VTYPE=1
+      !CALL PHI_COLL(Mloc,Nloc,Ibeg,Iend,Jbeg,Jend,Nghost,vorticity,VTYPE,PERIODIC)
+      !CALL DERIVATIVE_X(Mloc,Nloc,Ibeg,Iend,Jbeg,Jend,MASK,DX,vorticity,VorX)
+      !CALL DERIVATIVE_Y(Mloc,Nloc,Ibeg,Iend,Jbeg,Jend,MASK,DY,vorticity,VorY)
 
-      print *, "hello"
-
-      divergence = uMAx+vMAy
+      !divergence = uMAx+vMAy
       !CALL DERIVATIVE_X(Mloc,Nloc,Ibeg,Iend,Jbeg,Jend,MASK,DX,divergence,divX)
       !CALL DERIVATIVE_Y(Mloc,Nloc,Ibeg,Iend,Jbeg,Jend,MASK,DY,divergence,divY)
       !nu_smg=C_smg**2*DX*DY*(DEPTH+ETA)*SQRT(VorX**2+VorY**2+divX**2+divY**2)

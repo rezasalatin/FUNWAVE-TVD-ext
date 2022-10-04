@@ -4394,10 +4394,10 @@ SUBROUTINE PREVIEW
   call PutFile(TMP_NAME,temp_output1)
   TMP_NAME = TRIM(FDIR)//'var2_'//TRIM(FILE_NAME)
   call PutFile(TMP_NAME,temp_output2)
-  !TMP_NAME = TRIM(FDIR)//'var3_'//TRIM(FILE_NAME)
-  !call PutFile(TMP_NAME,temp_output3)
-  !TMP_NAME = TRIM(FDIR)//'var4_'//TRIM(FILE_NAME)
-  !call PutFile(TMP_NAME,temp_output4)
+  TMP_NAME = TRIM(FDIR)//'var3_'//TRIM(FILE_NAME)
+  call PutFile(TMP_NAME,temp_output3)
+  TMP_NAME = TRIM(FDIR)//'var4_'//TRIM(FILE_NAME)
+  call PutFile(TMP_NAME,temp_output4)
 
     ! variables to get output
   TMP_NAME = TRIM(FDIR)//'nubrkMA_'//TRIM(FILE_NAME)
