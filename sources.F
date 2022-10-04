@@ -76,10 +76,10 @@ SUBROUTINE SourceTerms
   INTEGER :: kf_index ! Chen, Salatin
   ! variables eddy viscosity terms (horizontal, vertical, breaking)
   REAL(SP),DIMENSION(Mloc,Nloc) :: Vis_BrkX,Vis_BrkY,VertX,VertY,nu_visMA_SUM
-  REAL(SP),DIMENSION(Mloc,Nloc) :: TempX,TempY,DEPTHDerX
+  REAL(SP),DIMENSION(Mloc,Nloc) :: TempX,TempY,Temp1,Temp2
   INTEGER :: VTYPE
   ! divergence of velocity
-  REAL(SP),DIMENSION(Mloc,Nloc) :: divergence,divX,divY
+  REAL(SP),DIMENSION(Mloc,Nloc) :: divergence
 
   !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
   !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
@@ -442,7 +442,8 @@ SUBROUTINE SourceTerms
       CALL PHI_COLL(Mloc,Nloc,Ibeg,Iend,Jbeg,Jend,Nghost,vorticity,VTYPE,PERIODIC)
       CALL DERIVATIVE_X(Mloc,Nloc,Ibeg,Iend,Jbeg,Jend,MASK,DX,vorticity,TempX)
       CALL DERIVATIVE_Y(Mloc,Nloc,Ibeg,Iend,Jbeg,Jend,MASK,DY,vorticity,TempY)
-      nu_smg=C_smg**2*DX*DY*(DEPTH+ETA)*SQRT(TempX**2+TempY**2)
+      Temp1 = TempX**2+TempY**2
+      nu_smg=C_smg**2*DX*DY*(DEPTH+ETA)*SQRT(Temp1)
     
     ELSEIF(MIX_MODEL.EQ.6)THEN
 
@@ -453,7 +454,7 @@ SUBROUTINE SourceTerms
       divergence = uMAx+vMAy
       CALL DERIVATIVE_X(Mloc,Nloc,Ibeg,Iend,Jbeg,Jend,MASK,DX,divergence,TempX)
       CALL DERIVATIVE_Y(Mloc,Nloc,Ibeg,Iend,Jbeg,Jend,MASK,DY,divergence,TempX)
-      
+
       !nu_smg=C_smg**2*DX*DY*(DEPTH+ETA)*SQRT(TempX**2+TempY**2+divX**2+divY**2)
 
     ELSEIF(MIX_MODEL.EQ.2)THEN
