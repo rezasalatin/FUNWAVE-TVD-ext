@@ -76,11 +76,10 @@ SUBROUTINE SourceTerms
   INTEGER :: kf_index ! Chen, Salatin
   ! variables eddy viscosity terms (horizontal, vertical, breaking)
   REAL(SP),DIMENSION(Mloc,Nloc) :: Vis_BrkX,Vis_BrkY,VertX,VertY,nu_visMA_SUM
-  REAL(SP),DIMENSION(Mloc,Nloc) :: VorX,VorY,DEPTHDerX
+  REAL(SP),DIMENSION(Mloc,Nloc) :: VorX,VorY,DEPTHDerX,Temp1,Temp2
   INTEGER :: VTYPE
   ! divergence of velocity
-  REAL(SP),DIMENSION(Mloc,Nloc) :: divergence
-  REAL(SP),DIMENSION(Mloc,Nloc) :: divX,divY
+  REAL(SP),DIMENSION(Mloc,Nloc) :: divergence,divX,divY
 
   !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
   !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
@@ -443,7 +442,8 @@ SUBROUTINE SourceTerms
       CALL PHI_COLL(Mloc,Nloc,Ibeg,Iend,Jbeg,Jend,Nghost,vorticity,VTYPE,PERIODIC)
       CALL DERIVATIVE_X(Mloc,Nloc,Ibeg,Iend,Jbeg,Jend,MASK,DX,vorticity,VorX)
       CALL DERIVATIVE_Y(Mloc,Nloc,Ibeg,Iend,Jbeg,Jend,MASK,DY,vorticity,VorY)
-      nu_smg=C_smg**2*DX*DY*(DEPTH+ETA)*SQRT(VorX**2+VorY**2)
+      Temp1 = VorX**2+VorY**2
+      nu_smg=C_smg**2*DX*DY*(DEPTH+ETA)*SQRT(Temp1)
 
       temp_output2 = VorX
 
