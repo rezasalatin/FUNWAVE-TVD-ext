@@ -79,7 +79,7 @@ SUBROUTINE SourceTerms
   REAL(SP),DIMENSION(Mloc,Nloc) :: VorX,VorY,DEPTHDerX
   INTEGER :: VTYPE
   REAL(SP),DIMENSION(Mloc,Nloc) :: Mixing_eddy
-  REAL(SP),DIMENSION(Mloc,Nloc) :: divergence,divergenceX,divergenceY
+  !REAL(SP),DIMENSION(Mloc,Nloc) :: divergence,divergenceX,divergenceY
 
   !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
   !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
@@ -449,10 +449,10 @@ SUBROUTINE SourceTerms
     
     ELSEIF(MIX_MODEL.EQ.6)THEN
     
-      divergence = uMAx+vMAy
-      CALL DERIVATIVE_X(Mloc,Nloc,Ibeg,Iend,Jbeg,Jend,MASK,DX,divergence,divergenceX)
-      CALL DERIVATIVE_Y(Mloc,Nloc,Ibeg,Iend,Jbeg,Jend,MASK,DY,divergence,divergenceY)
-      nu_smg=C_smg**2*DX*DY*(DEPTH+ETA)*SQRT(VorX**2+VorY**2+divergenceX**2+divergenceY**2)
+      !divergence = uMAx+vMAy
+      !CALL DERIVATIVE_X(Mloc,Nloc,Ibeg,Iend,Jbeg,Jend,MASK,DX,divergence,divergenceX)
+      !CALL DERIVATIVE_Y(Mloc,Nloc,Ibeg,Iend,Jbeg,Jend,MASK,DY,divergence,divergenceY)
+      !nu_smg=C_smg**2*DX*DY*(DEPTH+ETA)*SQRT(VorX**2+VorY**2+divergenceX**2+divergenceY**2)
 
     ELSEIF(MIX_MODEL.EQ.2)THEN
       nu_smg=C_smg*(DX*DY*(DEPTH+ETA))**(2.0_SP/3.0_SP)*SQRT(vorticity*vorticity/2)
