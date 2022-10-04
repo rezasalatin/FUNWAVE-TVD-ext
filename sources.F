@@ -78,7 +78,9 @@ SUBROUTINE SourceTerms
   REAL(SP),DIMENSION(Mloc,Nloc) :: Vis_BrkX,Vis_BrkY,VertX,VertY,nu_visMA_SUM
   REAL(SP),DIMENSION(Mloc,Nloc) :: VorX,VorY,DEPTHDerX
   INTEGER :: VTYPE
-  REAL(SP),DIMENSION(Mloc,Nloc) :: divergence,divX,divY
+  ! divergence of velocity
+  REAL(SP),DIMENSION(Mloc,Nloc) :: divergence
+  REAL(SP),DIMENSION(Mloc,Nloc) :: divX,divY
 
   !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
   !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
