@@ -445,7 +445,7 @@ SUBROUTINE SourceTerms
 
       divergence = uMAx+vMAy
       CALL DERIVATIVE_X(Mloc,Nloc,Ibeg,Iend,Jbeg,Jend,MASK9,DX,vorticity,VorX)
-      temp_output2 = divergenceX
+      temp_output2 = VorX
     
     ELSEIF(MIX_MODEL.EQ.6)THEN
 
