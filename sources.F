@@ -76,7 +76,7 @@ SUBROUTINE SourceTerms
   INTEGER :: kf_index ! Chen, Salatin
   ! variables eddy viscosity terms (horizontal, vertical, breaking)
   REAL(SP),DIMENSION(Mloc,Nloc) :: Vis_BrkX,Vis_BrkY,VertX,VertY,nu_visMA_SUM
-  REAL(SP),DIMENSION(Mloc,Nloc) :: TempX,TempY,Temp_abs1,Temp_abs2
+  REAL(SP),DIMENSION(Mloc,Nloc) :: Temp1,Temp2,Temp_abs1,Temp_abs2
   INTEGER :: VTYPE
   ! divergence of velocity
   REAL(SP),DIMENSION(Mloc,Nloc) :: uv_divg
@@ -441,23 +441,23 @@ SUBROUTINE SourceTerms
     
       VTYPE=1
       CALL PHI_COLL(Mloc,Nloc,Ibeg,Iend,Jbeg,Jend,Nghost,vorticity,VTYPE,PERIODIC)
-      CALL DERIVATIVE_X(Mloc,Nloc,Ibeg,Iend,Jbeg,Jend,MASK,DX,vorticity,TempX)
-      CALL DERIVATIVE_Y(Mloc,Nloc,Ibeg,Iend,Jbeg,Jend,MASK,DY,vorticity,TempY)
-      Temp_abs1 = TempX**2+TempY**2
+      CALL DERIVATIVE_X(Mloc,Nloc,Ibeg,Iend,Jbeg,Jend,MASK,DX,vorticity,Temp1)
+      CALL DERIVATIVE_Y(Mloc,Nloc,Ibeg,Iend,Jbeg,Jend,MASK,DY,vorticity,Temp2)
+      Temp_abs1 = Temp1**2+Temp2**2
       nu_smg=C_smg**2*DX*DY*(DEPTH+ETA)*SQRT(Temp_abs1)
     
     ELSEIF(MIX_MODEL.EQ.6)THEN
 
       VTYPE=1
       CALL PHI_COLL(Mloc,Nloc,Ibeg,Iend,Jbeg,Jend,Nghost,vorticity,VTYPE,PERIODIC)
-      CALL DERIVATIVE_X(Mloc,Nloc,Ibeg,Iend,Jbeg,Jend,MASK,DX,vorticity,TempX)
-      CALL DERIVATIVE_Y(Mloc,Nloc,Ibeg,Iend,Jbeg,Jend,MASK,DY,vorticity,TempY)
-      Temp_abs1 = TempX**2+TempY**2
-      uv_divg = uMAx+vMAy
-      !CALL DERIVATIVE_X(Mloc,Nloc,Ibeg,Iend,Jbeg,Jend,MASK,DX,uv_divg,TempX)
-      !CALL DERIVATIVE_Y(Mloc,Nloc,Ibeg,Iend,Jbeg,Jend,MASK,DY,uv_divg,TempY)
+      CALL DERIVATIVE_X(Mloc,Nloc,Ibeg,Iend,Jbeg,Jend,MASK,DX,vorticity,Temp1)
+      CALL DERIVATIVE_Y(Mloc,Nloc,Ibeg,Iend,Jbeg,Jend,MASK,DY,vorticity,Temp2)
+      Temp_abs1 = Temp1**2+Temp2**2
+      Temp1 = uMAx+vMAy
+      !CALL DERIVATIVE_X(Mloc,Nloc,Ibeg,Iend,Jbeg,Jend,MASK,DX,Temp1,Temp2)
+      !CALL DERIVATIVE_Y(Mloc,Nloc,Ibeg,Iend,Jbeg,Jend,MASK,DY,Temp1,Temp1)
 
-      !nu_smg=C_smg**2*DX*DY*(DEPTH+ETA)*SQRT(TempX**2+TempY**2+divX**2+divY**2)
+      !nu_smg=C_smg**2*DX*DY*(DEPTH+ETA)*SQRT(Temp1**2+Temp2**2+divX**2+divY**2)
 
     ELSEIF(MIX_MODEL.EQ.2)THEN
       nu_smg=C_smg*(DX*DY*(DEPTH+ETA))**(2.0_SP/3.0_SP)*SQRT(vorticity*vorticity/2)
@@ -466,9 +466,9 @@ SUBROUTINE SourceTerms
     ELSEIF(MIX_MODEL.EQ.4)THEN
       VTYPE=1
       CALL PHI_COLL(Mloc,Nloc,Ibeg,Iend,Jbeg,Jend,Nghost,vorticity,VTYPE,PERIODIC)
-      CALL DERIVATIVE_X(Mloc,Nloc,Ibeg,Iend,Jbeg,Jend,MASK,DX,vorticity,TempX)
-      CALL DERIVATIVE_Y(Mloc,Nloc,Ibeg,Iend,Jbeg,Jend,MASK,DY,vorticity,TempY)
-      nu_smg=0.5*(C_smg*DX*DY*(DEPTH+ETA)*SQRT(TempX*TempX+TempY*TempY)) &
+      CALL DERIVATIVE_X(Mloc,Nloc,Ibeg,Iend,Jbeg,Jend,MASK,DX,vorticity,Temp1)
+      CALL DERIVATIVE_Y(Mloc,Nloc,Ibeg,Iend,Jbeg,Jend,MASK,DY,vorticity,Temp2)
+      nu_smg=0.5*(C_smg*DX*DY*(DEPTH+ETA)*SQRT(Temp1*Temp1+Temp2*Temp2)) &
       +0.5*(C_smg*(DX*DY*(DEPTH+ETA))**(2.0_SP/3.0_SP)*SQRT(vorticity*vorticity/2))
     ELSEIF(MIX_MODEL.EQ.5)THEN
       nu_smg = C_smg**2*DX*DY*SQRT(2.0*Ux**2+2.0*Vy**2+(Uy+Vx)**2)
