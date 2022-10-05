@@ -445,6 +445,8 @@ SUBROUTINE SourceTerms
       CALL DERIVATIVE_Y(Mloc,Nloc,Ibeg,Iend,Jbeg,Jend,MASK,DY,vorticity,Temp2)
       Temp_abs1 = Temp1**2+Temp2**2
       nu_smg = C_smg**2*DX*DY*(DEPTH+ETA)*SQRT(Temp_abs1)
+
+      deallocate(Temp_abs1,Temp1,Temp2)
     
     ELSEIF(MIX_MODEL.EQ.6)THEN
 
@@ -454,10 +456,17 @@ SUBROUTINE SourceTerms
       CALL DERIVATIVE_Y(Mloc,Nloc,Ibeg,Iend,Jbeg,Jend,MASK,DY,vorticity,Temp2)
       Temp_abs1 = Temp1**2+Temp2**2
       Temp1 = uMAx+vMAy
+      temp_output2 = Temp1
+
       CALL DERIVATIVE_Y(Mloc,Nloc,Ibeg,Iend,Jbeg,Jend,MASK,DY,Temp1,Temp2)
       CALL DERIVATIVE_X(Mloc,Nloc,Ibeg,Iend,Jbeg,Jend,MASK,DX,Temp1,Temp1)
+
+      temp_output3 = Temp1
+      temp_output4 = Temp2
       
       nu_smg = C_smg**2*DX*DY*(DEPTH+ETA)*SQRT(Temp_abs1+Temp1**2+Temp2**2)
+
+      deallocate(Temp_abs1,Temp1,Temp2)
 
     ELSEIF(MIX_MODEL.EQ.61)THEN
 
@@ -467,10 +476,18 @@ SUBROUTINE SourceTerms
       CALL DERIVATIVE_Y(Mloc,Nloc,Ibeg,Iend,Jbeg,Jend,MASK,DY,vorticity,Temp2)
       Temp_abs1 = Temp1**2+Temp2**2
       Temp1 = Ux+Vy
+
+      temp_output2 = Temp1
+
       CALL DERIVATIVE_Y(Mloc,Nloc,Ibeg,Iend,Jbeg,Jend,MASK,DY,Temp1,Temp2)
       CALL DERIVATIVE_X(Mloc,Nloc,Ibeg,Iend,Jbeg,Jend,MASK,DX,Temp1,Temp1)
+
+      temp_output3 = Temp1
+      temp_output4 = Temp2
       
       nu_smg = C_smg**2*DX*DY*(DEPTH+ETA)*SQRT(Temp_abs1+Temp1**2+Temp2**2)
+
+      deallocate(Temp_abs1,Temp1,Temp2)
 
     ELSEIF(MIX_MODEL.EQ.2)THEN
       nu_smg=C_smg*(DX*DY*(DEPTH+ETA))**(2.0_SP/3.0_SP)*SQRT(vorticity*vorticity/2)
