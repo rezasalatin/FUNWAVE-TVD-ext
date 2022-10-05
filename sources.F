@@ -483,8 +483,6 @@ SUBROUTINE SourceTerms
       
       nu_smg = C_smg**2*DX*DY*(DEPTH+ETA)*SQRT(Temp_abs1+Temp1**2+Temp2**2)
 
-      deallocate(Temp_abs1,Temp1,Temp2)
-
     ELSEIF(MIX_MODEL.EQ.2)THEN
       nu_smg=C_smg*(DX*DY*(DEPTH+ETA))**(2.0_SP/3.0_SP)*SQRT(vorticity*vorticity/2)
     ELSEIF(MIX_MODEL.EQ.3)THEN
