@@ -445,8 +445,6 @@ SUBROUTINE SourceTerms
       CALL DERIVATIVE_Y(Mloc,Nloc,Ibeg,Iend,Jbeg,Jend,MASK,DY,vorticity,Temp2)
       Temp_abs1 = Temp1**2+Temp2**2
       nu_smg = C_smg**2*DX*DY*(DEPTH+ETA)*SQRT(Temp_abs1)
-
-      deallocate(Temp_abs1,Temp1,Temp2)
     
     ELSEIF(MIX_MODEL.EQ.6)THEN
 
@@ -465,8 +463,6 @@ SUBROUTINE SourceTerms
       temp_output4 = Temp2
       
       nu_smg = C_smg**2*DX*DY*(DEPTH+ETA)*SQRT(Temp_abs1+Temp1**2+Temp2**2)
-
-      deallocate(Temp_abs1,Temp1,Temp2)
 
     ELSEIF(MIX_MODEL.EQ.61)THEN
 
