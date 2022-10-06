@@ -454,7 +454,8 @@ SUBROUTINE SourceTerms
       CALL DERIVATIVE_Y(Mloc,Nloc,Ibeg,Iend,Jbeg,Jend,MASK,DY,vorticity,Temp2)
       Temp_abs1 = Temp1**2+Temp2**2
       Temp1 = uMAx+vMAy
-      temp_output2 = Temp1
+
+      temp_output2 = uMAx+vMAy
 
       CALL DERIVATIVE_Y(Mloc,Nloc,Ibeg,Iend,Jbeg,Jend,MASK,DY,Temp1,Temp2)
       CALL DERIVATIVE_X(Mloc,Nloc,Ibeg,Iend,Jbeg,Jend,MASK,DX,Temp1,Temp1)
