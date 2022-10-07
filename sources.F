@@ -457,9 +457,8 @@ SUBROUTINE SourceTerms
       CALL DERIVATIVE_X(Mloc,Nloc,Ibeg,Iend,Jbeg,Jend,MASK,DX,uMAx+vMAy,Temp1)
       CALL DERIVATIVE_Y(Mloc,Nloc,Ibeg,Iend,Jbeg,Jend,MASK,DY,uMAx+vMAy,Temp2)
    
-      temp_output2 = uMAx+vMAy
-      temp_output3 = Temp1
-      temp_output4 = Temp2
+      temp_output2 = Temp_abs1
+      temp_output3 = Temp1**2+Temp2**2
       
       nu_smg = C_smg**2*DX*DY*(DEPTH+ETA)*SQRT(Temp_abs1+Temp1**2+Temp2**2)
 
@@ -474,9 +473,8 @@ SUBROUTINE SourceTerms
       CALL DERIVATIVE_X(Mloc,Nloc,Ibeg,Iend,Jbeg,Jend,MASK,DX,Ux+Vy,Temp1)
       CALL DERIVATIVE_Y(Mloc,Nloc,Ibeg,Iend,Jbeg,Jend,MASK,DY,Ux+Vy,Temp2)
    
-      temp_output2 = Ux+Vy
-      temp_output3 = Temp1
-      temp_output4 = Temp2
+      temp_output2 = Temp_abs1
+      temp_output3 = Temp1**2+Temp2**2
       
       nu_smg = C_smg**2*DX*DY*(DEPTH+ETA)*SQRT(Temp_abs1+Temp1**2+Temp2**2)
 
