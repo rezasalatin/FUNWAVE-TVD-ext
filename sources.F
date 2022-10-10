@@ -444,7 +444,9 @@ SUBROUTINE SourceTerms
       CALL DERIVATIVE_X(Mloc,Nloc,Ibeg,Iend,Jbeg,Jend,MASK,DX,vorticity,Temp1)
       CALL DERIVATIVE_Y(Mloc,Nloc,Ibeg,Iend,Jbeg,Jend,MASK,DY,vorticity,Temp2)
       Temp_abs1 = Temp1**2+Temp2**2
-      nu_smg = C_smg**2*DX*DY*(DEPTH+ETA)*SQRT(Temp_abs1)
+
+      ! Lambda is 1 for Leith et al
+      nu_smg = (1.0_SP*SQRT(DX*DY)/pi)**3*SQRT(Temp_abs1)
     
     ELSEIF(MIX_MODEL.EQ.6)THEN
 
@@ -460,7 +462,8 @@ SUBROUTINE SourceTerms
       temp_output2 = Temp_abs1
       temp_output3 = Temp1**2+Temp2**2
       
-      nu_smg = C_smg**2*DX*DY*(DEPTH+ETA)*SQRT(Temp_abs1+Temp1**2+Temp2**2)
+      ! Lambda is 1 for Fox-Kemper
+      nu_smg = (1.0_SP*SQRT(DX*DY)/pi)**3*SQRT(Temp_abs1+Temp1**2+Temp2**2)
 
     ELSEIF(MIX_MODEL.EQ.61)THEN
 
@@ -476,7 +479,8 @@ SUBROUTINE SourceTerms
       temp_output2 = Temp_abs1
       temp_output3 = Temp1**2+Temp2**2
       
-      nu_smg = C_smg**2*DX*DY*(DEPTH+ETA)*SQRT(Temp_abs1+Temp1**2+Temp2**2)
+      ! Lambda is 1 for Fox-Kemper
+      nu_smg = (1.0_SP*SQRT(DX*DY)/pi)**3*SQRT(Temp_abs1+Temp1**2+Temp2**2)
 
     ELSEIF(MIX_MODEL.EQ.2)THEN
       nu_smg=C_smg**2*(DX*DY*(DEPTH+ETA))**(2.0_SP/3.0_SP)*SQRT(vorticity*vorticity/2)
