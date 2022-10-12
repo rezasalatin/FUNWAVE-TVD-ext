@@ -431,7 +431,6 @@ SUBROUTINE SourceTerms
       0.5_SP/DY*(P(I-1,J+1)-P(I-1,J-1))) )
     ENDDO
   ENDDO
-
   SourceX = SourceX + breaking_termX
   SourceY = SourceY + breaking_termY
 
