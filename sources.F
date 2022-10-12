@@ -80,6 +80,8 @@ SUBROUTINE SourceTerms
   INTEGER :: VTYPE
   ! divergence of velocity
   REAL(SP),DIMENSION(Mloc,Nloc) :: uv_divg
+  ! divergence of velocity
+  REAL(SP),DIMENSION(Mloc,Nloc) :: breaking_termX,breaking_termY
 
   !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
   !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
@@ -396,7 +398,7 @@ SUBROUTINE SourceTerms
   ! breaking
   DO J=Jbeg,Jend
     DO I=Ibeg,Iend
-      SourceX(I,J) = SourceX(I,J) + 1.0_SP * (1.0_SP/DX*( &
+      breaking_termX(I,J) = 1.0_SP * (1.0_SP/DX*( &
       0.5_SP*(nu_vis(I,J)+nu_vis(I+1,J)) &
       *1.0_SP/DX*(P(I+1,J)-P(I,J))  &
       -0.5_SP*(nu_vis(I-1,J)+nu_vis(I,J)) &
@@ -412,7 +414,7 @@ SUBROUTINE SourceTerms
       -nu_vis(I,J-1) &
       *0.5_SP/DX*(Q(I+1,J-1)-Q(I-1,J-1))) )
 
-      SourceY(I,J) = SourceY(I,J) + 1.0_SP * (1.0_SP/DY*( &
+      breaking_termY(I,J) = 1.0_SP * (1.0_SP/DY*( &
       0.5_SP*(nu_vis(I,J)+nu_vis(I,J+1)) &
       *1.0_SP/DY*(Q(I,J+1)-Q(I,J))  &
       - 0.5_SP*(nu_vis(I,J-1)+nu_vis(I,J)) &
@@ -429,6 +431,9 @@ SUBROUTINE SourceTerms
       0.5_SP/DY*(P(I-1,J+1)-P(I-1,J-1))) )
     ENDDO
   ENDDO
+
+  SourceX = SourceX + breaking_termX
+  SourceY = SourceY + breaking_termY
 
   ! Horizontal Mixing
   IF(H_MIXING)THEN
@@ -545,81 +550,6 @@ SUBROUTINE SourceTerms
     temp_output1 = nu_smg
   ENDIF
   !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-  
-  !IF(V_MIXING)THEN
-    !nu_ver_x = 0.4/6.0*Depth*SQRT(Cd*abs(uMA)*SQRT(uMA*uMA+vMA*vMA))
-    !nu_ver_y = 0.4/6.0*Depth*SQRT(Cd*abs(vMA)*SQRT(uMA*uMA+vMA*vMA))
-    !nu_ver_x = 0.4/6.0*(Depth+Eta)*SQRT(Cd*abs(U)*SQRT(U*U+V*V))
-    !nu_ver_y = 0.4/6.0*(Depth+Eta)*SQRT(Cd*abs(V)*SQRT(U*U+V*V))
-  !ENDIF
-
-  IF(10.EQ.0)THEN    
-    DO J=Jbeg,Jend
-      DO I=Ibeg,Iend
-        SourceX(I,J) = SourceX(I,J) + &
-        1.0_SP * ( 1.0_SP/DX*( &
-        0.5_SP*(nu_vis(I,J)+nu_vis(I+1,J)) &
-        *1.0_SP/DX*(HU(I+1,J)-HU(I,J))  &
-        -0.5_SP*(nu_vis(I-1,J)+nu_vis(I,J)) &
-        *1.0_SP/DX*(HU(I,J)-HU(I-1,J))) ) &
-        + 0.5_SP * ( 1.0_SP/DY*( &
-        0.5_SP*(nu_vis(I,J)+nu_vis(I,J+1)) &
-        *1.0_SP/DY*(HU(I,J+1)-HU(I,J)) &
-        -0.5_SP*(nu_vis(I,J-1)+nu_vis(I,J)) &
-        *1.0_SP/DY*(HU(I,J)-HU(I,J-1))) &
-        + 0.5_SP/DY*( &
-        nu_vis(I,J+1) &
-        *0.5_SP/DX*(HV(I+1,J+1)-HV(I-1,J+1)) &
-        -nu_vis(I,J-1) &
-        *0.5_SP/DX*(HV(I+1,J-1)-HV(I-1,J-1))) )
-
-        SourceY(I,J) = SourceY(I,J) + &
-        1.0_SP * (1.0_SP/DY*( &
-        0.5_SP*(nu_vis(I,J)+nu_vis(I,J+1)) &
-        *1.0_SP/DY*(HV(I,J+1)-HV(I,J))  &
-        - 0.5_SP*(nu_vis(I,J-1)+nu_vis(I,J)) &
-        *1.0_SP/DY*(HV(I,J)-HV(I,J-1))) ) &
-        + 0.5_SP * ( 1.0_SP/DX*( &
-        0.5_SP*(nu_vis(I,J)+nu_vis(I+1,J)) &
-        *1.0_SP/DX*(HV(I+1,J)-HV(I,J)) &
-        -0.5_SP*(nu_vis(I-1,J)+nu_vis(I,J)) &
-        *1.0_SP/DX*(HV(I,J)-HV(I-1,J))) &
-        + 0.5_SP/DX*( &
-        nu_vis(I+1,J) &
-        *0.5_SP/DY*(HU(I+1,J+1)-HU(I+1,J-1)) &
-        -nu_vis(I-1,J)* &
-        0.5_SP/DY*(HU(I-1,J+1)-HU(I-1,J-1))) )
-      ENDDO
-    ENDDO
-  ELSEIF(1.EQ.0)THEN
-    DO J=Jbeg,Jend
-      DO I=Ibeg,Iend
-        SourceX(I,J) = SourceX(I,J) &
-        + 0.5_SP/DX*( &
-        (nu_vis(I+1,J)+nu_vis(I,J)) &
-        *1.0_SP/DX*(HU(I+1,J)-HU(I,J)) &
-        -(nu_vis(I-1,J)+nu_vis(I,J)) &
-        *1.0_SP/DX*(HU(I,J)-HU(I-1,J)) ) &
-        + 0.5_SP/DY*( &
-        (nu_vis(I,J+1)+nu_vis(I,J)) &
-        *1.0_SP/DY*(HU(I,J+1)-HU(I,J)) &
-        -(nu_vis(I,J-1)+nu_vis(I,J)) &
-        *1.0_SP/DY*(HU(I,J)-HU(I,J-1)) )
-
-       SourceY(I,J) = SourceY(I,J) &
-       + 0.5_SP/DX*( &
-        (nu_vis(I+1,J)+nu_vis(I,J)) &
-        *1.0_SP/DX*(HV(I+1,J)-HV(I,J)) &
-        -(nu_vis(I-1,J)+nu_vis(I,J)) &
-        *1.0_SP/DX*(HV(I,J)-HV(I-1,J)) ) &
-        + 0.5_SP/DY*( &
-        (nu_vis(I,J+1)+nu_vis(I,J)) &
-        *1.0_SP/DY*(HV(I,J+1)-HV(I,J)) &
-        -(nu_vis(I,J-1)+nu_vis(I,J)) &
-        *1.0_SP/DY*(HV(I,J)-HV(I,J-1)) )
-      ENDDO
-    ENDDO
-  ENDIF
 
 ! else Cartesian
 # else
