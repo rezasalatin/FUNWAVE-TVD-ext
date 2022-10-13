@@ -429,8 +429,16 @@ SUBROUTINE SourceTerms
 
   SourceX = SourceX + Temp1
   SourceY = SourceY + Temp2
+  CALL DERIVATIVE_X(Mloc,Nloc,Ibeg,Iend,Jbeg,Jend,MASK,DX,Temp2,Temp3)
+  CALL DERIVATIVE_Y(Mloc,Nloc,Ibeg,Iend,Jbeg,Jend,MASK,DY,Temp1,Temp4)
   Temp1 = ZERO
   Temp2 = ZERO
+  ! curl of breaking (vorticity source)
+  temp_output2 = Temp3 - Temp4
+  Temp3 = ZERO
+  Temp4 = ZERO
+
+
 
   ! Horizontal Mixing
   IF(H_MIXING)THEN
@@ -460,8 +468,8 @@ SUBROUTINE SourceTerms
       Temp2 = ZERO
       CALL DERIVATIVE_X(Mloc,Nloc,Ibeg,Iend,Jbeg,Jend,MASK,DX,uMAx+vMAy,Temp1)
       CALL DERIVATIVE_Y(Mloc,Nloc,Ibeg,Iend,Jbeg,Jend,MASK,DY,uMAx+vMAy,Temp2)
-      temp_output2 = Temp3
-      temp_output3 = Temp1**2+Temp2**2
+      !temp_output2 = Temp3
+      !temp_output3 = Temp1**2+Temp2**2
       ! Lambda (C_smg) is 1 for Fox-Kemper
       nu_smg = (C_smg*SQRT(DX*DY)/pi)**3*SQRT(Temp3+Temp1**2+Temp2**2)
       Temp1 = ZERO
@@ -476,8 +484,8 @@ SUBROUTINE SourceTerms
       Temp2 = ZERO
       CALL DERIVATIVE_X(Mloc,Nloc,Ibeg,Iend,Jbeg,Jend,MASK,DX,Ux+Vy,Temp1)
       CALL DERIVATIVE_Y(Mloc,Nloc,Ibeg,Iend,Jbeg,Jend,MASK,DY,Ux+Vy,Temp2)
-      temp_output2 = Temp3
-      temp_output3 = Temp1**2+Temp2**2
+      !temp_output2 = Temp3
+      !temp_output3 = Temp1**2+Temp2**2
       ! Lambda (C_smg) is 1 for Fox-Kemper
       nu_smg = (C_smg*SQRT(DX*DY)/pi)**3*SQRT(Temp3+Temp1**2+Temp2**2)
       Temp1 = ZERO
@@ -493,7 +501,7 @@ SUBROUTINE SourceTerms
 
     DO J=Jbeg,Jend
       DO I=Ibeg,Iend
-        SourceX(I,J) = SourceX(I,J) + 1.0_SP * (1.0_SP/DX*( &
+        Temp1(I,J) + 1.0_SP * (1.0_SP/DX*( &
         0.5_SP*(nu_smg(I,J)+nu_smg(I+1,J)) &
         *1.0_SP/DX*(P(I+1,J)-P(I,J))  &
         -0.5_SP*(nu_smg(I-1,J)+nu_smg(I,J)) &
@@ -509,7 +517,7 @@ SUBROUTINE SourceTerms
         -nu_smg(I,J-1) &
         *0.5_SP/DX*(Q(I+1,J-1)-Q(I-1,J-1))) )
 
-        SourceY(I,J) = SourceY(I,J) + 1.0_SP * (1.0_SP/DY*( &
+        Temp2(I,J) + 1.0_SP * (1.0_SP/DY*( &
         0.5_SP*(nu_smg(I,J)+nu_smg(I,J+1)) &
         *1.0_SP/DY*(Q(I,J+1)-Q(I,J))  &
         - 0.5_SP*(nu_smg(I,J-1)+nu_smg(I,J)) &
@@ -526,6 +534,17 @@ SUBROUTINE SourceTerms
         0.5_SP/DY*(P(I-1,J+1)-P(I-1,J-1))) )
       ENDDO
     ENDDO
+
+    SourceX = SourceX + Temp1
+    SourceY = SourceY + Temp2
+    CALL DERIVATIVE_X(Mloc,Nloc,Ibeg,Iend,Jbeg,Jend,MASK,DX,Temp2,Temp3)
+    CALL DERIVATIVE_Y(Mloc,Nloc,Ibeg,Iend,Jbeg,Jend,MASK,DY,Temp1,Temp4)
+    Temp1 = ZERO
+    Temp2 = ZERO
+    ! curl of mixing (vorticity sink)
+    temp_output3 = Temp3 - Temp4
+    Temp3 = ZERO
+    Temp4 = ZERO
 
   ELSE
     nu_smg = ZERO
