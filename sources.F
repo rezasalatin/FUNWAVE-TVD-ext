@@ -80,8 +80,6 @@ SUBROUTINE SourceTerms
   INTEGER :: VTYPE
   ! divergence of velocity
   REAL(SP),DIMENSION(Mloc,Nloc) :: uv_divg
-  ! divergence of velocity
-  REAL(SP),DIMENSION(Mloc,Nloc) :: breaking_termX,breaking_termY
 
   !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
   !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
@@ -398,7 +396,7 @@ SUBROUTINE SourceTerms
   ! breaking
   DO J=Jbeg,Jend
     DO I=Ibeg,Iend
-      breaking_termX(I,J) = 1.0_SP * (1.0_SP/DX*( &
+      Temp1(I,J) = 1.0_SP * (1.0_SP/DX*( &
       0.5_SP*(nu_vis(I,J)+nu_vis(I+1,J)) &
       *1.0_SP/DX*(P(I+1,J)-P(I,J))  &
       -0.5_SP*(nu_vis(I-1,J)+nu_vis(I,J)) &
@@ -414,7 +412,7 @@ SUBROUTINE SourceTerms
       -nu_vis(I,J-1) &
       *0.5_SP/DX*(Q(I+1,J-1)-Q(I-1,J-1))) )
 
-      breaking_termY(I,J) = 1.0_SP * (1.0_SP/DY*( &
+      Temp2(I,J) = 1.0_SP * (1.0_SP/DY*( &
       0.5_SP*(nu_vis(I,J)+nu_vis(I,J+1)) &
       *1.0_SP/DY*(Q(I,J+1)-Q(I,J))  &
       - 0.5_SP*(nu_vis(I,J-1)+nu_vis(I,J)) &
@@ -431,8 +429,10 @@ SUBROUTINE SourceTerms
       0.5_SP/DY*(P(I-1,J+1)-P(I-1,J-1))) )
     ENDDO
   ENDDO
-  SourceX = SourceX + breaking_termX
-  SourceY = SourceY + breaking_termY
+
+  SourceX = SourceX + Temp1
+  SourceY = SourceY + Temp2
+  
 
   ! Horizontal Mixing
   IF(H_MIXING)THEN
