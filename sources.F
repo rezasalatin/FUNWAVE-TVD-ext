@@ -449,6 +449,8 @@ SUBROUTINE SourceTerms
       CALL DERIVATIVE_X(Mloc,Nloc,Ibeg,Iend,Jbeg,Jend,MASK,DX,vorticity,Temp1)
       CALL DERIVATIVE_Y(Mloc,Nloc,Ibeg,Iend,Jbeg,Jend,MASK,DY,vorticity,Temp2)
       Temp_abs1 = Temp1**2+Temp2**2
+      Temp1 = ZERO
+      Temp2 = ZERO
 
       ! Lambda (C_smg) is 1 for Leith et al
       nu_smg = (C_smg*SQRT(DX*DY)/pi)**3*SQRT(Temp_abs1)
@@ -461,6 +463,8 @@ SUBROUTINE SourceTerms
       CALL DERIVATIVE_X(Mloc,Nloc,Ibeg,Iend,Jbeg,Jend,MASK,DX,vorticity,Temp1)
       CALL DERIVATIVE_Y(Mloc,Nloc,Ibeg,Iend,Jbeg,Jend,MASK,DY,vorticity,Temp2)
       Temp_abs1 = Temp1**2+Temp2**2
+      Temp1 = ZERO
+      Temp2 = ZERO
 
       CALL DERIVATIVE_X(Mloc,Nloc,Ibeg,Iend,Jbeg,Jend,MASK,DX,uMAx+vMAy,Temp1)
       CALL DERIVATIVE_Y(Mloc,Nloc,Ibeg,Iend,Jbeg,Jend,MASK,DY,uMAx+vMAy,Temp2)
@@ -470,6 +474,8 @@ SUBROUTINE SourceTerms
 
       ! Lambda (C_smg) is 1 for Fox-Kemper
       nu_smg = (C_smg*SQRT(DX*DY)/pi)**3*SQRT(Temp_abs1+Temp1**2+Temp2**2)
+      Temp1 = ZERO
+      Temp2 = ZERO
 
     ELSEIF(MIX_MODEL.EQ.61)THEN
 
@@ -478,6 +484,8 @@ SUBROUTINE SourceTerms
       CALL DERIVATIVE_X(Mloc,Nloc,Ibeg,Iend,Jbeg,Jend,MASK,DX,vorticity,Temp1)
       CALL DERIVATIVE_Y(Mloc,Nloc,Ibeg,Iend,Jbeg,Jend,MASK,DY,vorticity,Temp2)
       Temp_abs1 = Temp1**2+Temp2**2
+      Temp1 = ZERO
+      Temp2 = ZERO
 
       CALL DERIVATIVE_X(Mloc,Nloc,Ibeg,Iend,Jbeg,Jend,MASK,DX,Ux+Vy,Temp1)
       CALL DERIVATIVE_Y(Mloc,Nloc,Ibeg,Iend,Jbeg,Jend,MASK,DY,Ux+Vy,Temp2)
@@ -487,20 +495,11 @@ SUBROUTINE SourceTerms
       
       ! Lambda (C_smg) is 1 for Fox-Kemper
       nu_smg = (C_smg*SQRT(DX*DY)/pi)**3*SQRT(Temp_abs1+Temp1**2+Temp2**2)
+      Temp1 = ZERO
+      Temp2 = ZERO
 
     ELSEIF(MIX_MODEL.EQ.2)THEN
       nu_smg=C_smg**2*(DX*DY*(DEPTH+ETA))**(2.0_SP/3.0_SP)*SQRT(vorticity*vorticity/2)
-    ELSEIF(MIX_MODEL.EQ.3)THEN
-      nu_smg = C_smg**2*DX*DY*DEPTH/SQRT(DX**2+DY**2)*SQRT(2.0*uMAx**2+2.0*vMAy**2+(uMAy+vMAx)**2)
-    ELSEIF(MIX_MODEL.EQ.4)THEN
-      VTYPE=1
-      CALL PHI_COLL(Mloc,Nloc,Ibeg,Iend,Jbeg,Jend,Nghost,vorticity,VTYPE,PERIODIC)
-      CALL DERIVATIVE_X(Mloc,Nloc,Ibeg,Iend,Jbeg,Jend,MASK,DX,vorticity,Temp1)
-      CALL DERIVATIVE_Y(Mloc,Nloc,Ibeg,Iend,Jbeg,Jend,MASK,DY,vorticity,Temp2)
-      nu_smg=0.5*(C_smg*DX*DY*(DEPTH+ETA)*SQRT(Temp1*Temp1+Temp2*Temp2)) &
-      +0.5*(C_smg*(DX*DY*(DEPTH+ETA))**(2.0_SP/3.0_SP)*SQRT(vorticity*vorticity/2))
-    ELSEIF(MIX_MODEL.EQ.5)THEN
-      nu_smg = C_smg**2*DX*DY*SQRT(2.0*Ux**2+2.0*Vy**2+(Uy+Vx)**2)
     ENDIF
 
     ! when there is breaking, deactivate the horizontal mixing
