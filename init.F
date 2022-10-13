@@ -392,7 +392,6 @@ SUBROUTINE INITIALIZATION
   Umean = ZERO
   Vmean = ZERO
   ETAmean = ZERO
-  nu_ver_y = ZERO
   Num_Zero_Up = 0
   WaveHeightRMS = ZERO
   WaveHeightAve =ZERO
