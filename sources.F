@@ -501,7 +501,7 @@ SUBROUTINE SourceTerms
 
     DO J=Jbeg,Jend
       DO I=Ibeg,Iend
-        Temp1(I,J) + 1.0_SP * (1.0_SP/DX*( &
+        Temp1(I,J) = 1.0_SP * (1.0_SP/DX*( &
         0.5_SP*(nu_smg(I,J)+nu_smg(I+1,J)) &
         *1.0_SP/DX*(P(I+1,J)-P(I,J))  &
         -0.5_SP*(nu_smg(I-1,J)+nu_smg(I,J)) &
@@ -517,7 +517,7 @@ SUBROUTINE SourceTerms
         -nu_smg(I,J-1) &
         *0.5_SP/DX*(Q(I+1,J-1)-Q(I-1,J-1))) )
 
-        Temp2(I,J) + 1.0_SP * (1.0_SP/DY*( &
+        Temp2(I,J) = 1.0_SP * (1.0_SP/DY*( &
         0.5_SP*(nu_smg(I,J)+nu_smg(I,J+1)) &
         *1.0_SP/DY*(Q(I,J+1)-Q(I,J))  &
         - 0.5_SP*(nu_smg(I,J-1)+nu_smg(I,J)) &
