@@ -75,11 +75,8 @@ SUBROUTINE SourceTerms
   REAL(SP), DIMENSION(NumFreq) :: BB2,CC2 ! for WK_DATA (optimized)
   INTEGER :: kf_index ! Chen, Salatin
   ! variables eddy viscosity terms (horizontal, vertical, breaking)
-  REAL(SP),DIMENSION(Mloc,Nloc) :: Vis_BrkX,Vis_BrkY,nu_visMA_SUM
-  REAL(SP),DIMENSION(Mloc,Nloc) :: Temp1,Temp2,Temp_abs1,Temp_abs2
+  REAL(SP),DIMENSION(Mloc,Nloc) :: Temp1,Temp2,Temp3,Temp4
   INTEGER :: VTYPE
-  ! divergence of velocity
-  REAL(SP),DIMENSION(Mloc,Nloc) :: uv_divg
 
   !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
   !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
@@ -396,7 +393,7 @@ SUBROUTINE SourceTerms
   ! breaking
   DO J=Jbeg,Jend
     DO I=Ibeg,Iend
-      Vis_BrkX(I,J) = 1.0_SP * (1.0_SP/DX*( &
+      Temp1(I,J) = 1.0_SP * (1.0_SP/DX*( &
       0.5_SP*(nu_vis(I,J)+nu_vis(I+1,J)) &
       *1.0_SP/DX*(P(I+1,J)-P(I,J))  &
       -0.5_SP*(nu_vis(I-1,J)+nu_vis(I,J)) &
@@ -412,7 +409,7 @@ SUBROUTINE SourceTerms
       -nu_vis(I,J-1) &
       *0.5_SP/DX*(Q(I+1,J-1)-Q(I-1,J-1))) )
 
-      Vis_BrkY(I,J) = 1.0_SP * (1.0_SP/DY*( &
+      Temp2(I,J) = 1.0_SP * (1.0_SP/DY*( &
       0.5_SP*(nu_vis(I,J)+nu_vis(I,J+1)) &
       *1.0_SP/DY*(Q(I,J+1)-Q(I,J))  &
       - 0.5_SP*(nu_vis(I,J-1)+nu_vis(I,J)) &
@@ -430,9 +427,10 @@ SUBROUTINE SourceTerms
     ENDDO
   ENDDO
 
-  SourceX = SourceX + Vis_BrkX
-  SourceY = SourceY + Vis_BrkY
-  
+  SourceX = SourceX + Temp1
+  SourceY = SourceY + Temp2
+  Temp1 = ZERO
+  Temp2 = ZERO
 
   ! Horizontal Mixing
   IF(H_MIXING)THEN
@@ -440,64 +438,50 @@ SUBROUTINE SourceTerms
       ! default
       ! nu_smg = C_smg**2*DX*DY*SQRT(2.0*uMAx**2+2.0*vMAy**2+(uMAy+vMAx)**2)
       nu_smg = C_smg*DX*DY*SQRT(uMAx**2+vMAy**2+((uMAy+vMAx)**2)/2.0)
-
     ELSEIF(MIX_MODEL.EQ.1)THEN
     ! Leith
-    
       VTYPE=1
       CALL PHI_COLL(Mloc,Nloc,Ibeg,Iend,Jbeg,Jend,Nghost,vorticity,VTYPE,PERIODIC)
       CALL DERIVATIVE_X(Mloc,Nloc,Ibeg,Iend,Jbeg,Jend,MASK,DX,vorticity,Temp1)
       CALL DERIVATIVE_Y(Mloc,Nloc,Ibeg,Iend,Jbeg,Jend,MASK,DY,vorticity,Temp2)
-      Temp_abs1 = Temp1**2+Temp2**2
+      Temp3 = Temp1**2+Temp2**2
       Temp1 = ZERO
       Temp2 = ZERO
-
       ! Lambda (C_smg) is 1 for Leith et al
-      nu_smg = (C_smg*SQRT(DX*DY)/pi)**3*SQRT(Temp_abs1)
-    
+      nu_smg = (C_smg*SQRT(DX*DY)/pi)**3*SQRT(Temp3)
     ELSEIF(MIX_MODEL.EQ.6)THEN
     ! Fox-Kemper
-
       VTYPE=1
       CALL PHI_COLL(Mloc,Nloc,Ibeg,Iend,Jbeg,Jend,Nghost,vorticity,VTYPE,PERIODIC)
       CALL DERIVATIVE_X(Mloc,Nloc,Ibeg,Iend,Jbeg,Jend,MASK,DX,vorticity,Temp1)
       CALL DERIVATIVE_Y(Mloc,Nloc,Ibeg,Iend,Jbeg,Jend,MASK,DY,vorticity,Temp2)
-      Temp_abs1 = Temp1**2+Temp2**2
+      Temp3 = Temp1**2+Temp2**2
       Temp1 = ZERO
       Temp2 = ZERO
-
       CALL DERIVATIVE_X(Mloc,Nloc,Ibeg,Iend,Jbeg,Jend,MASK,DX,uMAx+vMAy,Temp1)
       CALL DERIVATIVE_Y(Mloc,Nloc,Ibeg,Iend,Jbeg,Jend,MASK,DY,uMAx+vMAy,Temp2)
-
-      temp_output2 = Temp_abs1
+      temp_output2 = Temp3
       temp_output3 = Temp1**2+Temp2**2
-
       ! Lambda (C_smg) is 1 for Fox-Kemper
-      nu_smg = (C_smg*SQRT(DX*DY)/pi)**3*SQRT(Temp_abs1+Temp1**2+Temp2**2)
+      nu_smg = (C_smg*SQRT(DX*DY)/pi)**3*SQRT(Temp3+Temp1**2+Temp2**2)
       Temp1 = ZERO
       Temp2 = ZERO
-
     ELSEIF(MIX_MODEL.EQ.61)THEN
-
       VTYPE=1
       CALL PHI_COLL(Mloc,Nloc,Ibeg,Iend,Jbeg,Jend,Nghost,vorticity,VTYPE,PERIODIC)
       CALL DERIVATIVE_X(Mloc,Nloc,Ibeg,Iend,Jbeg,Jend,MASK,DX,vorticity,Temp1)
       CALL DERIVATIVE_Y(Mloc,Nloc,Ibeg,Iend,Jbeg,Jend,MASK,DY,vorticity,Temp2)
-      Temp_abs1 = Temp1**2+Temp2**2
+      Temp3 = Temp1**2+Temp2**2
       Temp1 = ZERO
       Temp2 = ZERO
-
       CALL DERIVATIVE_X(Mloc,Nloc,Ibeg,Iend,Jbeg,Jend,MASK,DX,Ux+Vy,Temp1)
       CALL DERIVATIVE_Y(Mloc,Nloc,Ibeg,Iend,Jbeg,Jend,MASK,DY,Ux+Vy,Temp2)
-   
-      temp_output2 = Temp_abs1
+      temp_output2 = Temp3
       temp_output3 = Temp1**2+Temp2**2
-      
       ! Lambda (C_smg) is 1 for Fox-Kemper
-      nu_smg = (C_smg*SQRT(DX*DY)/pi)**3*SQRT(Temp_abs1+Temp1**2+Temp2**2)
+      nu_smg = (C_smg*SQRT(DX*DY)/pi)**3*SQRT(Temp3+Temp1**2+Temp2**2)
       Temp1 = ZERO
       Temp2 = ZERO
-
     ELSEIF(MIX_MODEL.EQ.2)THEN
       nu_smg=C_smg**2*(DX*DY*(DEPTH+ETA))**(2.0_SP/3.0_SP)*SQRT(vorticity*vorticity/2)
     ENDIF
