@@ -429,6 +429,9 @@ SUBROUTINE SourceTerms
 
   SourceX = SourceX + Temp1
   SourceY = SourceY + Temp2
+  VTYPE=1
+  CALL PHI_COLL(Mloc,Nloc,Ibeg,Iend,Jbeg,Jend,Nghost,Temp1,VTYPE,PERIODIC)
+  CALL PHI_COLL(Mloc,Nloc,Ibeg,Iend,Jbeg,Jend,Nghost,Temp2,VTYPE,PERIODIC)
   CALL DERIVATIVE_X(Mloc,Nloc,Ibeg,Iend,Jbeg,Jend,MASK,DX,Temp2,Temp3)
   CALL DERIVATIVE_Y(Mloc,Nloc,Ibeg,Iend,Jbeg,Jend,MASK,DY,Temp1,Temp4)
   Temp1 = ZERO
@@ -537,6 +540,9 @@ SUBROUTINE SourceTerms
 
     SourceX = SourceX + Temp1
     SourceY = SourceY + Temp2
+    VTYPE=1
+    CALL PHI_COLL(Mloc,Nloc,Ibeg,Iend,Jbeg,Jend,Nghost,Temp1,VTYPE,PERIODIC)
+    CALL PHI_COLL(Mloc,Nloc,Ibeg,Iend,Jbeg,Jend,Nghost,Temp2,VTYPE,PERIODIC)
     CALL DERIVATIVE_X(Mloc,Nloc,Ibeg,Iend,Jbeg,Jend,MASK,DX,Temp2,Temp3)
     CALL DERIVATIVE_Y(Mloc,Nloc,Ibeg,Iend,Jbeg,Jend,MASK,DY,Temp1,Temp4)
     Temp1 = ZERO
