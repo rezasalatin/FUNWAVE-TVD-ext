@@ -3491,20 +3491,6 @@ WRITE(3,'(A13,F12.2)')'Csmg_fixed = ', Csmg_fixed
 
 !!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
-CALL READ_FLOAT(C_VMixing,FILE_NAME,'C_VMixing',ierr)
-IF(ierr==1)THEN
-  C_VMixing = 1.0_SP
-# if defined (PARALLEL)
-  if (myid.eq.0) THEN
-    WRITE(*,'(A40)')'Vertical Mixing Coefficient Default:  1.0'
-    WRITE(3,'(A40)')'Vertical Mixing Coefficient Default:  1.0'
-  endif
-# else
-  WRITE(*,'(A40)')'Vertical Mixing Coefficient Default:  1.0'
-  WRITE(3,'(A40)')'Vertical Mixing Coefficient Default:  1.0'
-# endif
-ENDIF
-
 # if defined (PARALLEL)
 if (myid.eq.0) WRITE(3,'(A14,F12.6)')'T_INTV_mean =', T_INTV_mean
 ! Chen, Salatin
@@ -3513,7 +3499,6 @@ if (myid.eq.0) WRITE(3,'(A14,F12.6)')'T_MA_STEP =', T_MA_STEP
 if (myid.eq.0) WRITE(3,'(A14,F12.6)')'MA_Window =', MA_Window
 !!
 if (myid.eq.0) WRITE(3,'(A14,F12.6)')'STEADY_TIME =', STEADY_TIME
-if (myid.eq.0) WRITE(3,'(A8,F12.6)')'C_VMixing =', C_VMixing
 # else
 WRITE(3,'(A14,F12.6)')'T_INTV_mean =', T_INTV_mean
 ! Chen, Salatin
@@ -3522,7 +3507,6 @@ WRITE(3,'(A14,F12.6)')'T_MA_STEP =', T_MA_STEP
 WRITE(3,'(A14,F12.6)')'MA_Window =', MA_Window
 !!
 WRITE(3,'(A14,F12.6)')'STEADY_TIME =', STEADY_TIME
-WRITE(3,'(A8,F12.6)')'C_VMixing =', C_VMixing
 # endif
 
 CALL READ_FLOAT(nu_bkg,FILE_NAME,'nu_bkg',ierr)
@@ -3694,7 +3678,6 @@ CALL READ_LOGICAL(OUT_etaMA,FILE_NAME,'etaMA',ierr) ! Chen, Salatin
 CALL READ_LOGICAL(OUT_VorMA,FILE_NAME,'VorMA',ierr) ! Chen, Salatin
 ! Salatin, MIXING is better to be determined in the input file
 CALL READ_LOGICAL(H_MIXING,FILE_NAME,'H_MIXING',ierr) ! Chen, Salatin
-CALL READ_LOGICAL(V_MIXING,FILE_NAME,'V_MIXING',ierr) ! Chen, Salatin
 
 !ykchoi
 !	CALL READ_FLOAT(EtaBlowVal,FILE_NAME,'EtaBlowVal',ierr)
@@ -3756,7 +3739,6 @@ if (myid.eq.0)   then
   WRITE(3,'(A15,L2)')'OUT_VorMA',OUT_VorMA ! Chen, Salatin
 
   WRITE(3,'(A15,L2)')'HRZ MIXING',H_MIXING ! Chen, Salatin
-  WRITE(3,'(A15,L2)')'VRT MIXING',V_MIXING ! Chen, Salatin
 
 # if defined (PARALLEL)
 endif
@@ -4405,13 +4387,6 @@ SUBROUTINE PREVIEW
     ! variables to get output
   TMP_NAME = TRIM(FDIR)//'nusmgMA_'//TRIM(FILE_NAME)
   call PutFile(TMP_NAME,temp1_MA)
-
-  IF(V_MIXING)THEN
-    TMP_NAME = TRIM(FDIR)//'nu_verx_'//TRIM(FILE_NAME)
-    call PutFile(TMP_NAME,nu_ver_x)
-    TMP_NAME = TRIM(FDIR)//'nu_very_'//TRIM(FILE_NAME)
-    call PutFile(TMP_NAME,nu_ver_y)
-  ENDIF
 
 101   continue
 

@@ -75,7 +75,7 @@ SUBROUTINE SourceTerms
   REAL(SP), DIMENSION(NumFreq) :: BB2,CC2 ! for WK_DATA (optimized)
   INTEGER :: kf_index ! Chen, Salatin
   ! variables eddy viscosity terms (horizontal, vertical, breaking)
-  REAL(SP),DIMENSION(Mloc,Nloc) :: Vis_BrkX,Vis_BrkY,VertX,VertY,nu_visMA_SUM
+  REAL(SP),DIMENSION(Mloc,Nloc) :: Vis_BrkX,Vis_BrkY,nu_visMA_SUM
   REAL(SP),DIMENSION(Mloc,Nloc) :: Temp1,Temp2,Temp_abs1,Temp_abs2
   INTEGER :: VTYPE
   ! divergence of velocity
@@ -396,7 +396,7 @@ SUBROUTINE SourceTerms
   ! breaking
   DO J=Jbeg,Jend
     DO I=Ibeg,Iend
-      Temp1(I,J) = 1.0_SP * (1.0_SP/DX*( &
+      Vis_BrkX(I,J) = 1.0_SP * (1.0_SP/DX*( &
       0.5_SP*(nu_vis(I,J)+nu_vis(I+1,J)) &
       *1.0_SP/DX*(P(I+1,J)-P(I,J))  &
       -0.5_SP*(nu_vis(I-1,J)+nu_vis(I,J)) &
@@ -412,7 +412,7 @@ SUBROUTINE SourceTerms
       -nu_vis(I,J-1) &
       *0.5_SP/DX*(Q(I+1,J-1)-Q(I-1,J-1))) )
 
-      Temp2(I,J) = 1.0_SP * (1.0_SP/DY*( &
+      Vis_BrkY(I,J) = 1.0_SP * (1.0_SP/DY*( &
       0.5_SP*(nu_vis(I,J)+nu_vis(I,J+1)) &
       *1.0_SP/DY*(Q(I,J+1)-Q(I,J))  &
       - 0.5_SP*(nu_vis(I,J-1)+nu_vis(I,J)) &
@@ -430,8 +430,8 @@ SUBROUTINE SourceTerms
     ENDDO
   ENDDO
 
-  SourceX = SourceX + Temp1
-  SourceY = SourceY + Temp2
+  SourceX = SourceX + Vis_BrkX
+  SourceY = SourceY + Vis_BrkY
   
 
   ! Horizontal Mixing

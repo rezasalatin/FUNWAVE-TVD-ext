@@ -317,9 +317,6 @@ REAL(SP),DIMENSION(:,:),ALLOCATABLE :: C_smg
 REAL(SP),DIMENSION(:,:),ALLOCATABLE :: nu_smg
 REAL(SP),DIMENSION(:,:),ALLOCATABLE :: nu_smg_mean,nu_smg_sum
 
-! vertical eddy viscosity
-REAL(SP),DIMENSION(:,:),ALLOCATABLE :: nu_ver_x,nu_ver_y
-REAL(SP) :: C_VMixing=1.0
 ! viscosity BREAKING MA
 REAL(SP),DIMENSION(:,:),ALLOCATABLE :: nu_visMA
 REAL(SP),DIMENSION(:,:,:),ALLOCATABLE :: nu_visMA_temp
