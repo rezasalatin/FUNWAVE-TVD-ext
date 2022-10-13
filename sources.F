@@ -460,10 +460,10 @@ SUBROUTINE SourceTerms
 
       CALL DERIVATIVE_X(Mloc,Nloc,Ibeg,Iend,Jbeg,Jend,MASK,DX,uMAx+vMAy,Temp1)
       CALL DERIVATIVE_Y(Mloc,Nloc,Ibeg,Iend,Jbeg,Jend,MASK,DY,uMAx+vMAy,Temp2)
-   
+
       temp_output2 = Temp_abs1
       temp_output3 = Temp1**2+Temp2**2
-      
+
       ! Lambda (C_smg) is 1 for Fox-Kemper
       nu_smg = (C_smg*SQRT(DX*DY)/pi)**3*SQRT(Temp_abs1+Temp1**2+Temp2**2)
 
