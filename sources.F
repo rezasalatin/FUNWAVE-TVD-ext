@@ -490,11 +490,21 @@ SUBROUTINE SourceTerms
       !temp_output2 = Temp3
       !temp_output3 = Temp1**2+Temp2**2
       ! Lambda (C_smg) is 1 for Fox-Kemper
+<<<<<<< Updated upstream
+=======
+<<<<<<< HEAD
+      nu_smg = (C_smg*SQRT(DX*DY)/pi)**3*SQRT(Temp_abs1+Temp1**2+Temp2**2)
+=======
+>>>>>>> Stashed changes
       nu_smg = (C_smg*SQRT(DX*DY)/pi)**3*SQRT(Temp3+Temp1**2+Temp2**2)
       Temp1 = ZERO
       Temp2 = ZERO
     ELSEIF(MIX_MODEL.EQ.2)THEN
       nu_smg=C_smg**2*(DX*DY*(DEPTH+ETA))**(2.0_SP/3.0_SP)*SQRT(vorticity*vorticity/2)
+<<<<<<< Updated upstream
+=======
+>>>>>>> 49bdd91aa723fc11983bda66e42b8ef02818c3fa
+>>>>>>> Stashed changes
     ENDIF
 
     ! when there is breaking, deactivate the horizontal mixing
