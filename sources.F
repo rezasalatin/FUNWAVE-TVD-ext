@@ -268,19 +268,11 @@ SUBROUTINE SourceTerms
     DO I=Ibeg,Iend
       ! depth gradient term
       ! second order, move the second term to left-hand side
+
       !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
       !!! Source term in X direction
       SourceX(I,J)=GRAV*Eta(I,J)*(Depthx(I+1,J)-Depthx(I,J))/DX &
       *MASK(I,J) &
-      ! friction
-# if defined (MANNING)
-      -(GRAV*Cd(I,J)**2/  &
-      Max(H(I,J),MinDepthFrc)**(0.333333_SP))   &
-      *U(I,J)*SQRT(U(I,J)*U(I,J)+V(I,J)*V(I,J)) &
-# else
-      -Cd(I,J)*U(I,J)*SQRT(U(I,J)*U(I,J)+V(I,J)*V(I,J)) &
-      ! end Manning
-# endif
       ! dispersion
       ! (h+eta)(u*\nabla V4 + V4 * \nabla u - v1pp-v2-v3)
       + Gamma1*MASK9(I,J)*Max(H(I,J),MinDepthFrc)*(  &
@@ -298,18 +290,8 @@ SUBROUTINE SourceTerms
 
       !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
       !!! Source term in Y direction
-
       SourceY(I,J)=GRAV*Eta(I,J)*(Depthy(I,J+1)-Depthy(I,J))/DY &
       *MASK(I,J) &
-      ! friction
-# if defined (MANNING)
-      -(GRAV*Cd(I,J)**2/  &
-      Max(H(I,J),MinDepthFrc)**(0.333333_SP))  &
-      *V(I,J)*SQRT(U(I,J)*U(I,J)+V(I,J)*V(I,J)) &
-# else
-      -Cd(I,J)*V(I,J)*SQRT(U(I,J)*U(I,J)+V(I,J)*V(I,J)) &
-      ! end Manning
-# endif
       ! dispersion
       ! (h+eta)(u*\nabla V4 + V4 * \nabla u -v1pp-v2-v3)
       + Gamma1*MASK9(I,J)*Max(H(I,J),MinDepthFrc)*( &
@@ -328,7 +310,6 @@ SUBROUTINE SourceTerms
 
       !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
       !!! CURRENT BALANCE
-
       IF(WaveMakerCurrentBalance)THEN
 # if defined (PARALLEL)
         xmk=(I-Ibeg)*DXg + (iista-1)*DXg
@@ -350,6 +331,31 @@ SUBROUTINE SourceTerms
       ENDIF ! current balance
     ENDDO
   ENDDO
+
+  !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+  !!! Bottom Friction
+# if defined (MANNING)
+  Temp1 = -(GRAV*Cd**2/Max(H,MinDepthFrc)**(0.333333_SP))*U*SQRT(U*U+V*V)
+  Temp2 = -(GRAV*Cd**2/Max(H,MinDepthFrc)**(0.333333_SP))*V*SQRT(U*U+V*V)
+# else
+  Temp1 = -Cd*U*SQRT(U*U+V*V)
+  Temp2 = -Cd*V*SQRT(U*U+V*V)
+  ! end Manning
+# endif
+  SourceX = SourceX + Temp1
+  SourceY = SourceY + Temp2
+  VTYPE=1
+  CALL PHI_COLL(Mloc,Nloc,Ibeg,Iend,Jbeg,Jend,Nghost,Temp1,VTYPE,PERIODIC)
+  CALL PHI_COLL(Mloc,Nloc,Ibeg,Iend,Jbeg,Jend,Nghost,Temp2,VTYPE,PERIODIC)
+  CALL DERIVATIVE_X(Mloc,Nloc,Ibeg,Iend,Jbeg,Jend,MASK,DX,Temp2,Temp3)
+  CALL DERIVATIVE_Y(Mloc,Nloc,Ibeg,Iend,Jbeg,Jend,MASK,DY,Temp1,Temp4)
+  Temp1 = ZERO
+  Temp2 = ZERO
+  ! curl of breaking (vorticity source)
+  temp_output4 = Temp3 - Temp4
+  Temp3 = ZERO
+  Temp4 = ZERO
+
 
   !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
   !!! FRICTION SPONGE
