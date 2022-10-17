@@ -457,8 +457,6 @@ SUBROUTINE SourceTerms
   Temp3 = ZERO
   Temp4 = ZERO
 
-
-
   ! Horizontal Mixing
   IF(H_MIXING)THEN
     IF(MIX_MODEL.EQ.0)THEN
