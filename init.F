@@ -245,8 +245,8 @@ SUBROUTINE ALLOCATE_VARIABLES
   ALLOCATE(VorMA(Mloc,Nloc),VorT(Mloc,Nloc))
   VorMA=ZERO
   VorT=ZERO
-  ALLOCATE(VorMA_Window(Mloc,Nloc,MA_Window))
-  VorMA_Window=ZERO
+  ALLOCATE(Vor_Window(Mloc,Nloc,MA_Window))
+  Vor_Window=ZERO
 
   ! Reza Salatin, May 2022, horizontal eddy viscosity (with moving ave)
   ALLOCATE(C_smg(Mloc,Nloc))
