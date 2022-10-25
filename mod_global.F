@@ -307,6 +307,8 @@ REAL(SP),DIMENSION(:,:),ALLOCATABLE :: VorMA,VorMA_T
 REAL(SP),DIMENSION(:,:),ALLOCATABLE :: temp1_MA,temp2_MA
 REAL(SP),DIMENSION(:,:,:),ALLOCATABLE :: temp1_Window, temp2_Window
 
+REAL(SP),DIMENSION(:,:,:),ALLOCATABLE :: brksrcX_Window, brksrcY_Window
+
 ! horizontal eddy viscosity
 INTEGER :: MIX_MODEL
 LOGICAL :: IN_Csmg=.FALSE.

@@ -435,6 +435,16 @@ SUBROUTINE SourceTerms
 
   SourceX = SourceX + Temp1
   SourceY = SourceY + Temp2
+
+  brksrcX_Window = CSHIFT(brksrcX_Window,-1,3)
+  brksrcY_Window = CSHIFT(brksrcY_Window,-1,3)
+  ! replace oldest variable by the newest
+  brksrcX_Window(:,:,1) = Temp1
+  brksrcY_Window(:,:,1) = Temp2
+  ! do averaging
+  Temp1 = SUM(brksrcX_Window,3)/MA_Window
+  Temp2 = SUM(brksrcY_Window,3)/MA_Window
+
   VTYPE=1
   CALL PHI_COLL(Mloc,Nloc,Ibeg,Iend,Jbeg,Jend,Nghost,Temp1,VTYPE,PERIODIC)
   CALL PHI_COLL(Mloc,Nloc,Ibeg,Iend,Jbeg,Jend,Nghost,Temp2,VTYPE,PERIODIC)
@@ -446,8 +456,6 @@ SUBROUTINE SourceTerms
   temp_output2 = Temp3 - Temp4
   Temp3 = ZERO
   Temp4 = ZERO
-
-
 
   ! Horizontal Mixing
   IF(H_MIXING)THEN
