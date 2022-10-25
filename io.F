@@ -4368,7 +4368,9 @@ SUBROUTINE PREVIEW
   ! Chen, Salatin, output moving average of the vorticity
   IF(OUT_VorMA)THEN
     TMP_NAME = TRIM(FDIR)//'VorMA_'//TRIM(FILE_NAME)
-    call PutFile(TMP_NAME,Vor_MA)
+    call PutFile(TMP_NAME,VorMA)
+    TMP_NAME = TRIM(FDIR)//'VorMA_T_'//TRIM(FILE_NAME)
+    call PutFile(TMP_NAME,VorMA_T)
   ENDIF
 
   ! variables to get output

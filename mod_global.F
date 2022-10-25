@@ -298,10 +298,10 @@ REAL(SP),DIMENSION(:,:,:),ALLOCATABLE :: Syx_temp
 ! Chen, Salatin, Oct 2021, moving average of u, v, eta, and vorticity
 REAL(SP),DIMENSION(:,:),ALLOCATABLE :: uMA,vMA
 REAL(SP),DIMENSION(:,:),ALLOCATABLE :: uMAx,vMAx,uMAy,vMAy
-REAL(SP),DIMENSION(:,:,:),ALLOCATABLE :: U_Window, V_Window
+REAL(SP),DIMENSION(:,:,:),ALLOCATABLE :: U_Window, V_Window, VorMA_Window
 REAL(SP),DIMENSION(:,:),ALLOCATABLE :: eta_MA
 REAL(SP),DIMENSION(:,:,:),ALLOCATABLE :: eta_MA_temp
-REAL(SP),DIMENSION(:,:),ALLOCATABLE :: Vor_MA
+REAL(SP),DIMENSION(:,:),ALLOCATABLE :: VorMA,VorMA_T
 
 ! Chen, Salatin, two more MA
 REAL(SP),DIMENSION(:,:),ALLOCATABLE :: temp1_MA,temp2_MA
@@ -468,7 +468,6 @@ LOGICAL :: WAVEMAKER_VIS=.FALSE.
 !	 REAL(SP) :: PLOT_SMALLINTV
 ! Chen, Salatin, Mixing is better to be determined in the input file
 LOGICAL :: H_MIXING=.FALSE.
-LOGICAL :: V_MIXING=.FALSE.
 
 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 ! Chen, Salatin
