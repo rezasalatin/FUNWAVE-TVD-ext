@@ -312,7 +312,7 @@ SUBROUTINE CALCULATE_MovingAverage(DT,M,N,U,V,ETA,MASK,DX,DY,Depth,&
       uMA = SUM(U_Window,3)/MA_Window
       vMA = SUM(V_Window,3)/MA_Window
       VorMA = SUM(Vor_Window,3)/MA_Window
-      VorT = SUM((Vor_Window(:,:,1)-Vor_Window(:,:,2)),3)/T_MA_STEP
+      VorT = (Vor_Window(:,:,1)-Vor_Window(:,:,2))/T_MA_STEP
       CALL DERIVATIVE_X(M,N,Ibeg,Iend,Jbeg,Jend,MASK,DX,vMA,vMAx)
       CALL DERIVATIVE_Y(M,N,Ibeg,Iend,Jbeg,Jend,MASK,DY,vMA,vMAy)
       CALL DERIVATIVE_X(M,N,Ibeg,Iend,Jbeg,Jend,MASK,DX,uMA,uMAx)
