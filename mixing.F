@@ -72,7 +72,7 @@ SUBROUTINE MIXING_STUFF
   Ibeg,Iend,Jbeg,Jend,&
   OUT_uvMA,OUT_VorMA,OUT_RadStr,OUT_etaMA,&
   MA_Window,T_MA_Sum,T_MA_STEP,&
-  Syx_temp,Syx_x,U_Window,V_Window,uMA,vMA,eta_MA_temp,eta_MA,vorticity,VorMA,VorMA_Window,VorT,&
+  Syx_temp,Syx_x,U_Window,V_Window,uMA,vMA,eta_MA_temp,eta_MA,vorticity,VorMA,Vor_Window,VorT,&
   ! Smagorinsky subgrid scale turbulence calculated here
   PERIODIC,Nghost,uMAx,uMAy,vMAx,vMAy,&
   temp1_Window,temp2_Window,temp1_MA,temp2_MA,nu_smg,nu_break)
@@ -257,7 +257,7 @@ SUBROUTINE CALCULATE_MovingAverage(DT,M,N,U,V,ETA,MASK,DX,DY,Depth,&
   Ibeg,Iend,Jbeg,Jend, &
   OUT_uvMA,OUT_VorMA,OUT_RadStr,OUT_etaMA,&
   MA_Window,T_MA_Sum,T_MA_STEP,&
-  Syx_temp,Syx_x,U_Window,V_Window,uMA,vMA,eta_MA_temp,eta_MA,vorticity,VorMA,VorMA_Window,VorT,&
+  Syx_temp,Syx_x,U_Window,V_Window,uMA,vMA,eta_MA_temp,eta_MA,vorticity,VorMA,Vor_Window,VorT,&
   PERIODIC,Nghost,uMAx,uMAy,vMAx,vMAy,&
   temp1_Window,temp2_Window,temp1_MA,temp2_MA,nu_smg,nu_break)
 
@@ -274,7 +274,7 @@ SUBROUTINE CALCULATE_MovingAverage(DT,M,N,U,V,ETA,MASK,DX,DY,Depth,&
   REAL(SP),INTENT(OUT) :: T_MA_Sum
   ! moving average of current speed
   REAL(SP),DIMENSION(M,N) :: U_temp1,V_temp1
-  REAL(SP),DIMENSION(M,N,MA_Window),INTENT(INOUT) :: U_Window,V_Window,VorMA_Window
+  REAL(SP),DIMENSION(M,N,MA_Window),INTENT(INOUT) :: U_Window,V_Window,Vor_Window
   REAL(SP),DIMENSION(M,N),INTENT(OUT) :: uMA,vMA
   REAL(SP),DIMENSION(M,N),INTENT(OUT) :: uMAx, uMAy, vMAx, vMAy
   ! moving averaged of radiation shear stress
