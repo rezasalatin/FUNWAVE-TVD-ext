@@ -242,9 +242,9 @@ SUBROUTINE ALLOCATE_VARIABLES
   eta_MA_temp=ZERO
   ALLOCATE(eta_MA(Mloc,Nloc))
   eta_MA=ZERO
-  ALLOCATE(VorMA(Mloc,Nloc),VorMA_T(Mloc,Nloc))
+  ALLOCATE(VorMA(Mloc,Nloc),VorT(Mloc,Nloc))
   VorMA=ZERO
-  VorMA_T=ZERO
+  VorT=ZERO
   ALLOCATE(VorMA_Window(Mloc,Nloc,MA_Window))
   VorMA_Window=ZERO
 

@@ -4369,8 +4369,8 @@ SUBROUTINE PREVIEW
   IF(OUT_VorMA)THEN
     TMP_NAME = TRIM(FDIR)//'VorMA_'//TRIM(FILE_NAME)
     call PutFile(TMP_NAME,VorMA)
-    TMP_NAME = TRIM(FDIR)//'VorMA_T_'//TRIM(FILE_NAME)
-    call PutFile(TMP_NAME,VorMA_T)
+    TMP_NAME = TRIM(FDIR)//'VorT_'//TRIM(FILE_NAME)
+    call PutFile(TMP_NAME,VorT)
   ENDIF
 
   ! variables to get output
