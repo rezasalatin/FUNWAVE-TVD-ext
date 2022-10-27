@@ -347,14 +347,11 @@ SUBROUTINE SourceTerms
   VTYPE=1
   CALL PHI_COLL(Mloc,Nloc,Ibeg,Iend,Jbeg,Jend,Nghost,Temp1,VTYPE,PERIODIC)
   CALL PHI_COLL(Mloc,Nloc,Ibeg,Iend,Jbeg,Jend,Nghost,Temp2,VTYPE,PERIODIC)
-  CALL DERIVATIVE_X(Mloc,Nloc,Ibeg,Iend,Jbeg,Jend,MASK,DX,Temp2,Temp3)
-  CALL DERIVATIVE_Y(Mloc,Nloc,Ibeg,Iend,Jbeg,Jend,MASK,DY,Temp1,Temp4)
+  ! bottom friction (vorticity source)
+  temp_output1 = Temp1
+  temp_output2 = Temp2
   Temp1 = ZERO
   Temp2 = ZERO
-  ! curl of breaking (vorticity source)
-  temp_output4 = Temp3 - Temp4
-  Temp3 = ZERO
-  Temp4 = ZERO
 
 
   !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
@@ -448,14 +445,11 @@ SUBROUTINE SourceTerms
   VTYPE=1
   CALL PHI_COLL(Mloc,Nloc,Ibeg,Iend,Jbeg,Jend,Nghost,Temp1,VTYPE,PERIODIC)
   CALL PHI_COLL(Mloc,Nloc,Ibeg,Iend,Jbeg,Jend,Nghost,Temp2,VTYPE,PERIODIC)
-  CALL DERIVATIVE_X(Mloc,Nloc,Ibeg,Iend,Jbeg,Jend,MASK,DX,Temp2,Temp3)
-  CALL DERIVATIVE_Y(Mloc,Nloc,Ibeg,Iend,Jbeg,Jend,MASK,DY,Temp1,Temp4)
+  ! breaking (vorticity source)
+  temp_output3 = Temp1
+  temp_output4 = Temp2
   Temp1 = ZERO
   Temp2 = ZERO
-  ! curl of breaking (vorticity source)
-  temp_output2 = Temp3 - Temp4
-  Temp3 = ZERO
-  Temp4 = ZERO
 
   ! Horizontal Mixing
   IF(H_MIXING)THEN
@@ -485,8 +479,8 @@ SUBROUTINE SourceTerms
       Temp2 = ZERO
       CALL DERIVATIVE_X(Mloc,Nloc,Ibeg,Iend,Jbeg,Jend,MASK,DX,uMAx+vMAy,Temp1)
       CALL DERIVATIVE_Y(Mloc,Nloc,Ibeg,Iend,Jbeg,Jend,MASK,DY,uMAx+vMAy,Temp2)
-      !temp_output2 = Temp3
-      !temp_output3 = Temp1**2+Temp2**2
+      !temp_1_output = Temp3
+      !temp_1_output = Temp1**2+Temp2**2
       ! Lambda (C_smg) is 1 for Fox-Kemper
       nu_smg = (C_smg*SQRT(DX*DY)/pi)**3*SQRT(Temp3+Temp1**2+Temp2**2)
       Temp1 = ZERO
@@ -501,8 +495,8 @@ SUBROUTINE SourceTerms
       Temp2 = ZERO
       CALL DERIVATIVE_X(Mloc,Nloc,Ibeg,Iend,Jbeg,Jend,MASK,DX,Ux+Vy,Temp1)
       CALL DERIVATIVE_Y(Mloc,Nloc,Ibeg,Iend,Jbeg,Jend,MASK,DY,Ux+Vy,Temp2)
-      !temp_output2 = Temp3
-      !temp_output3 = Temp1**2+Temp2**2
+      !temp_1_output = Temp3
+      !temp_1_output = Temp1**2+Temp2**2
       ! Lambda (C_smg) is 1 for Fox-Kemper
       nu_smg = (C_smg*SQRT(DX*DY)/pi)**3*SQRT(Temp3+Temp1**2+Temp2**2)
       Temp1 = ZERO
@@ -511,8 +505,6 @@ SUBROUTINE SourceTerms
 
     ! when there is breaking, deactivate the horizontal mixing
     nu_smg = nu_smg*(1-CEILING(nu_vis))
-
-    temp_output1 = nu_smg
 
     DO J=Jbeg,Jend
       DO I=Ibeg,Iend
@@ -557,16 +549,14 @@ SUBROUTINE SourceTerms
     CALL PHI_COLL(Mloc,Nloc,Ibeg,Iend,Jbeg,Jend,Nghost,Temp2,VTYPE,PERIODIC)
     CALL DERIVATIVE_X(Mloc,Nloc,Ibeg,Iend,Jbeg,Jend,MASK,DX,Temp2,Temp3)
     CALL DERIVATIVE_Y(Mloc,Nloc,Ibeg,Iend,Jbeg,Jend,MASK,DY,Temp1,Temp4)
+    ! bottom mixing (vorticity source)
+    temp_output5 = Temp1
+    temp_output6 = Temp2
     Temp1 = ZERO
     Temp2 = ZERO
-    ! curl of mixing (vorticity sink)
-    temp_output3 = Temp3 - Temp4
-    Temp3 = ZERO
-    Temp4 = ZERO
 
   ELSE
     nu_smg = ZERO
-    temp_output1 = nu_smg
   ENDIF
   !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
