@@ -4374,19 +4374,25 @@ SUBROUTINE PREVIEW
   ENDIF
 
   ! variables to get output
-  TMP_NAME = TRIM(FDIR)//'nusmg_'//TRIM(FILE_NAME)
+  TMP_NAME = TRIM(FDIR)//'friX_'//TRIM(FILE_NAME)
   call PutFile(TMP_NAME,temp_output1)
-  TMP_NAME = TRIM(FDIR)//'var2_'//TRIM(FILE_NAME)
+  TMP_NAME = TRIM(FDIR)//'friY_'//TRIM(FILE_NAME)
   call PutFile(TMP_NAME,temp_output2)
-  TMP_NAME = TRIM(FDIR)//'var3_'//TRIM(FILE_NAME)
+  TMP_NAME = TRIM(FDIR)//'brkX_'//TRIM(FILE_NAME)
   call PutFile(TMP_NAME,temp_output3)
-  TMP_NAME = TRIM(FDIR)//'var4_'//TRIM(FILE_NAME)
+  TMP_NAME = TRIM(FDIR)//'brkY_'//TRIM(FILE_NAME)
   call PutFile(TMP_NAME,temp_output4)
+    TMP_NAME = TRIM(FDIR)//'mixX_'//TRIM(FILE_NAME)
+  call PutFile(TMP_NAME,temp_output5)
+  TMP_NAME = TRIM(FDIR)//'mixY_'//TRIM(FILE_NAME)
+  call PutFile(TMP_NAME,temp_output6)
 
     ! variables to get output
   TMP_NAME = TRIM(FDIR)//'nubrkMA_'//TRIM(FILE_NAME)
   call PutFile(TMP_NAME,temp2_MA)
     ! variables to get output
+  TMP_NAME = TRIM(FDIR)//'nusmg_'//TRIM(FILE_NAME)
+  call PutFile(TMP_NAME,nu_smg)
   TMP_NAME = TRIM(FDIR)//'nusmgMA_'//TRIM(FILE_NAME)
   call PutFile(TMP_NAME,temp1_MA)
 

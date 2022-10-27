@@ -252,11 +252,14 @@ SUBROUTINE ALLOCATE_VARIABLES
   ALLOCATE(C_smg(Mloc,Nloc))
   ! two variables to print some variables
   ALLOCATE(temp_output1(Mloc,Nloc),temp_output2(Mloc,Nloc), &
-      temp_output3(Mloc,Nloc),temp_output4(Mloc,Nloc))
+      temp_output3(Mloc,Nloc),temp_output4(Mloc,Nloc), &
+      temp_output5(Mloc,Nloc),temp_output6(Mloc,Nloc))
   temp_output1=ZERO
   temp_output2=ZERO
   temp_output3=ZERO
   temp_output4=ZERO
+  temp_output5=ZERO
+  temp_output6=ZERO
 
   ! Chen, Salatin, some more MA
   ALLOCATE(temp1_Window(Mloc,Nloc,MA_Window),temp2_Window(Mloc,Nloc,MA_Window))

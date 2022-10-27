@@ -479,5 +479,6 @@ REAL(SP), DIMENSION(:),ALLOCATABLE :: xmk_wk, ymk_wk !Chen, Salatin (July 19, 20
 ! two additional variables to save some output
 REAL(SP), DIMENSION(:,:),ALLOCATABLE :: temp_output1,temp_output2
 REAL(SP), DIMENSION(:,:),ALLOCATABLE :: temp_output3,temp_output4
+REAL(SP), DIMENSION(:,:),ALLOCATABLE :: temp_output5,temp_output6
 
 END MODULE GLOBAL

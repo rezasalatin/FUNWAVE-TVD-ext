@@ -347,7 +347,7 @@ SUBROUTINE SourceTerms
   VTYPE=1
   CALL PHI_COLL(Mloc,Nloc,Ibeg,Iend,Jbeg,Jend,Nghost,Temp1,VTYPE,PERIODIC)
   CALL PHI_COLL(Mloc,Nloc,Ibeg,Iend,Jbeg,Jend,Nghost,Temp2,VTYPE,PERIODIC)
-  ! bottom friction (vorticity source)
+  ! bottom friction (vorticity source/sink)
   temp_output1 = Temp1
   temp_output2 = Temp2
   Temp1 = ZERO
@@ -547,9 +547,7 @@ SUBROUTINE SourceTerms
     VTYPE=1
     CALL PHI_COLL(Mloc,Nloc,Ibeg,Iend,Jbeg,Jend,Nghost,Temp1,VTYPE,PERIODIC)
     CALL PHI_COLL(Mloc,Nloc,Ibeg,Iend,Jbeg,Jend,Nghost,Temp2,VTYPE,PERIODIC)
-    CALL DERIVATIVE_X(Mloc,Nloc,Ibeg,Iend,Jbeg,Jend,MASK,DX,Temp2,Temp3)
-    CALL DERIVATIVE_Y(Mloc,Nloc,Ibeg,Iend,Jbeg,Jend,MASK,DY,Temp1,Temp4)
-    ! bottom mixing (vorticity source)
+    ! mixing (vorticity source/sink)
     temp_output5 = Temp1
     temp_output6 = Temp2
     Temp1 = ZERO
