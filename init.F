@@ -182,6 +182,9 @@ SUBROUTINE ALLOCATE_VARIABLES
     nu_break=ZERO
   ENDIF
 
+  ALLOCATE(nu_smg(Mloc,Nloc))
+  nu_smg=ZERO
+
   IF(DIFFUSION_SPONGE)THEN
     ALLOCATE(nu_sponge(Mloc,Nloc))
     nu_sponge=ZERO

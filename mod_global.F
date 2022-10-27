@@ -317,11 +317,6 @@ CHARACTER(LEN=80) Csmg_file
 REAL(SP),DIMENSION(:,:),ALLOCATABLE :: C_smg
 
 REAL(SP),DIMENSION(:,:),ALLOCATABLE :: nu_smg
-REAL(SP),DIMENSION(:,:),ALLOCATABLE :: nu_smg_mean,nu_smg_sum
-
-! viscosity BREAKING MA
-REAL(SP),DIMENSION(:,:),ALLOCATABLE :: nu_visMA
-REAL(SP),DIMENSION(:,:,:),ALLOCATABLE :: nu_visMA_temp
 
 ! smagorinsky and wave height
 REAL(SP),DIMENSION(:,:),ALLOCATABLE :: Umean,Vmean,&
