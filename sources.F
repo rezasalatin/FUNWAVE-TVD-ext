@@ -559,11 +559,6 @@ SUBROUTINE SourceTerms
   ENDIF
   !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
-  ! calculate V1 and V2 (higher order dispersive terms)
-  Z_alpha_temp = -0.53*DEPTH+0.47*ETA
-
-
-
 ! else Cartesian
 # else
 
