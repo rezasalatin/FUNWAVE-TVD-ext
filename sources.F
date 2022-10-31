@@ -290,6 +290,7 @@ SUBROUTINE SourceTerms
 
       !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
       !!! Source term in Y direction
+      ! Equation 22 in Shi et al. 2012
       SourceY(I,J)=GRAV*Eta(I,J)*(Depthy(I,J+1)-Depthy(I,J))/DY &
       *MASK(I,J) &
       ! dispersion
@@ -348,7 +349,7 @@ SUBROUTINE SourceTerms
   CALL PHI_COLL(Mloc,Nloc,Ibeg,Iend,Jbeg,Jend,Nghost,Temp1,VTYPE,PERIODIC)
   CALL PHI_COLL(Mloc,Nloc,Ibeg,Iend,Jbeg,Jend,Nghost,Temp2,VTYPE,PERIODIC)
   ! bottom friction (vorticity source/sink)
-  temp_output1 = Temp1
+  temp_output1 = Temp1  ! R_f with units m2/s2
   temp_output2 = Temp2
   Temp1 = ZERO
   Temp2 = ZERO
@@ -557,6 +558,11 @@ SUBROUTINE SourceTerms
     nu_smg = ZERO
   ENDIF
   !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
+  ! calculate V1 and V2 (higher order dispersive terms)
+  Z_alpha_temp = -0.53*DEPTH+0.47*ETA
+
+
 
 ! else Cartesian
 # else
