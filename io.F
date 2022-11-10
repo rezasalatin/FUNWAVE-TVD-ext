@@ -4369,8 +4369,6 @@ SUBROUTINE PREVIEW
   IF(OUT_VorMA)THEN
     TMP_NAME = TRIM(FDIR)//'VorMA_'//TRIM(FILE_NAME)
     call PutFile(TMP_NAME,VorMA)
-    TMP_NAME = TRIM(FDIR)//'VorT_'//TRIM(FILE_NAME)
-    call PutFile(TMP_NAME,VorT)
   ENDIF
 
   ! variables to get output and use in vorticity source
@@ -4399,8 +4397,8 @@ SUBROUTINE PREVIEW
   call PutFile(TMP_NAME,U3)
   TMP_NAME = TRIM(FDIR)//'V3_'//TRIM(FILE_NAME)
   call PutFile(TMP_NAME,V3)
-
-
+  TMP_NAME = TRIM(FDIR)//'VorT_'//TRIM(FILE_NAME)
+  call PutFile(TMP_NAME,VorT)
 
     ! variables to get output
   TMP_NAME = TRIM(FDIR)//'nubrkMA_'//TRIM(FILE_NAME)

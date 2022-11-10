@@ -251,9 +251,6 @@ SUBROUTINE ALLOCATE_VARIABLES
   ALLOCATE(Vor_Window(Mloc,Nloc,MA_Window))
   Vor_Window=ZERO
 
-  ALLOCATE(Vor_Window_DT(Mloc,Nloc,2))
-  Vor_Window_DT=ZERO
-
   ! Reza Salatin, May 2022, horizontal eddy viscosity (with moving ave)
   ALLOCATE(C_smg(Mloc,Nloc))
   ! two variables to print some variables
@@ -279,13 +276,19 @@ SUBROUTINE ALLOCATE_VARIABLES
   brksrcX_Window=ZERO
   brksrcY_Window=ZERO
 
-  ALLOCATE(U1(Mloc,Nloc),V1(Mloc,Nloc),U1p_Old(Mloc,Nloc),V1p_Old(Mloc,Nloc),U1pT(Mloc,Nloc),V1pT(Mloc,Nloc))
+  ALLOCATE(U1(Mloc,Nloc),V1(Mloc,Nloc))
+  ALLOCATE(U1p_Old(Mloc,Nloc),V1p_Old(Mloc,Nloc))
+  ALLOCATE(U1pT(Mloc,Nloc),V1pT(Mloc,Nloc))
   U1=ZERO
   V1=ZERO
   U1p_Old=ZERO
   V1p_Old=ZERO
   U1pT=ZERO
   V1pT=ZERO
+  ALLOCATE(VorT(Mloc,Nloc))
+  ALLOCATE(Vor_Old(Mloc,Nloc))
+  VorT=ZERO
+  Vor_Old=ZERO
   
 END SUBROUTINE ALLOCATE_VARIABLES
 
