@@ -655,6 +655,14 @@ SUBROUTINE SourceTerms
   ENDIF
 # endif
 
+  U1p_Window_DT = CSHIFT(U1p_Window_DT,-1,3)
+  U1p_Window_DT(:,:,1) = U1p
+  U1pT = (U1p_Window_DT(:,:,1)-U1p_Window_DT(:,:,2))/DT
+
+  V1p_Window_DT = CSHIFT(V1p_Window_DT,-1,3)
+  V1p_Window_DT(:,:,1) = V1p
+  V1pT = (V1p_Window_DT(:,:,1)-V1p_Window_DT(:,:,2))/DT
+
 END SUBROUTINE SourceTerms
 
 ! filtering based on FUNWAVE 1.0 code to smooth out nu_vis
