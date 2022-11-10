@@ -4399,6 +4399,10 @@ SUBROUTINE PREVIEW
   call PutFile(TMP_NAME,V3)
   TMP_NAME = TRIM(FDIR)//'VorT_'//TRIM(FILE_NAME)
   call PutFile(TMP_NAME,VorT)
+  TMP_NAME = TRIM(FDIR)//'uT_'//TRIM(FILE_NAME)
+  call PutFile(TMP_NAME,Ut)
+  TMP_NAME = TRIM(FDIR)//'vT_'//TRIM(FILE_NAME)
+  call PutFile(TMP_NAME,Vt)
 
     ! variables to get output
   TMP_NAME = TRIM(FDIR)//'nubrkMA_'//TRIM(FILE_NAME)
