@@ -279,11 +279,9 @@ SUBROUTINE ALLOCATE_VARIABLES
   brksrcX_Window=ZERO
   brksrcY_Window=ZERO
 
-  ALLOCATE(U1(Mloc,Nloc),V1(Mloc,Nloc),U1p(Mloc,Nloc),V1p(Mloc,Nloc),U1p_Old(Mloc,Nloc),V1p_Old(Mloc,Nloc),U1pT(Mloc,Nloc),V1pT(Mloc,Nloc))
+  ALLOCATE(U1(Mloc,Nloc),V1(Mloc,Nloc),U1p_Old(Mloc,Nloc),V1p_Old(Mloc,Nloc),U1pT(Mloc,Nloc),V1pT(Mloc,Nloc))
   U1=ZERO
   V1=ZERO
-  U1p=ZERO
-  V1p=ZERO
   U1p_Old=ZERO
   V1p_Old=ZERO
   U1pT=ZERO

@@ -298,10 +298,13 @@ REAL(SP),DIMENSION(:,:,:),ALLOCATABLE :: Syx_temp
 ! Chen, Salatin, Oct 2021, moving average of u, v, eta, and vorticity
 REAL(SP),DIMENSION(:,:),ALLOCATABLE :: uMA,vMA
 REAL(SP),DIMENSION(:,:),ALLOCATABLE :: uMAx,vMAx,uMAy,vMAy
-REAL(SP),DIMENSION(:,:,:),ALLOCATABLE :: U_Window,V_Window,Vor_Window,Vor_Window_DT
+REAL(SP),DIMENSION(:,:,:),ALLOCATABLE :: U_Window,V_Window,Vor_Window
 REAL(SP),DIMENSION(:,:),ALLOCATABLE :: eta_MA
 REAL(SP),DIMENSION(:,:,:),ALLOCATABLE :: eta_MA_temp
 REAL(SP),DIMENSION(:,:),ALLOCATABLE :: VorMA,VorT
+
+! Chen, Salatin, Nov 2022, V1, V2, V3
+REAL(SP),DIMENSION(:,:),ALLOCATABLE :: U1,V1,U1pT,V1pT,U1p_Old,V1p_Old
 
 ! Chen, Salatin, two more MA
 REAL(SP),DIMENSION(:,:),ALLOCATABLE :: temp1_MA,temp2_MA
