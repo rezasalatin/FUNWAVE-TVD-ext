@@ -274,7 +274,7 @@ SUBROUTINE CALCULATE_MovingAverage(DT,M,N,U,V,ETA,MASK,DX,DY,Depth,&
   REAL(SP),INTENT(OUT) :: T_MA_Sum
   ! moving average of current speed
   REAL(SP),DIMENSION(M,N) :: U_temp1,V_temp1
-  REAL(SP),DIMENSION(M,N,MA_Window),INTENT(INOUT) :: U_Window,V_Window,Vor_Window
+  REAL(SP),DIMENSION(M,N,MA_Window),INTENT(INOUT) :: U_Window,V_Window,Vor_Window,Vor_Window_DT
   REAL(SP),DIMENSION(M,N),INTENT(OUT) :: uMA,vMA
   REAL(SP),DIMENSION(M,N),INTENT(OUT) :: uMAx, uMAy, vMAx, vMAy
   ! moving averaged of radiation shear stress
@@ -290,8 +290,6 @@ SUBROUTINE CALCULATE_MovingAverage(DT,M,N,U,V,ETA,MASK,DX,DY,Depth,&
   INTEGER :: VTYPE,Nghost
   LOGICAL :: PERIODIC
 
-  REAL(SP),DIMENSION(M,N,2),INTENT(INOUT) :: Vor_Window_DT
-
   REAL(SP),DIMENSION(M,N,MA_Window),INTENT(INOUT) :: temp1_Window,temp2_Window
   REAL(SP),DIMENSION(M,N) :: temp1_Window_Sum,temp2_Window_Sum
   REAL(SP),DIMENSION(M,N),INTENT(OUT) :: temp1_MA,temp2_MA
@@ -300,8 +298,6 @@ SUBROUTINE CALCULATE_MovingAverage(DT,M,N,U,V,ETA,MASK,DX,DY,Depth,&
   Vor_Window_DT = CSHIFT(Vor_Window_DT,-1,3)
   Vor_Window_DT(:,:,1) = vorticity
   VorT = (Vor_Window_DT(:,:,1)-Vor_Window_DT(:,:,2))/DT
-
-
 
   T_MA_Sum=T_MA_Sum+DT
 
