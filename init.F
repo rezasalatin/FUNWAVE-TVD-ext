@@ -251,6 +251,9 @@ SUBROUTINE ALLOCATE_VARIABLES
   ALLOCATE(Vor_Window(Mloc,Nloc,MA_Window))
   Vor_Window=ZERO
 
+  ALLOCATE(Vor_Window_DT(Mloc,Nloc,2))
+  Vor_Window_DT=ZERO
+
   ! Reza Salatin, May 2022, horizontal eddy viscosity (with moving ave)
   ALLOCATE(C_smg(Mloc,Nloc))
   ! two variables to print some variables

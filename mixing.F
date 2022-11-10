@@ -75,7 +75,7 @@ SUBROUTINE MIXING_STUFF
   Syx_temp,Syx_x,U_Window,V_Window,uMA,vMA,eta_MA_temp,eta_MA,vorticity,VorMA,Vor_Window,VorT,&
   ! Smagorinsky subgrid scale turbulence calculated here
   PERIODIC,Nghost,uMAx,uMAy,vMAx,vMAy,&
-  temp1_Window,temp2_Window,temp1_MA,temp2_MA,nu_smg,nu_break)
+  temp1_Window,temp2_Window,temp1_MA,temp2_MA,nu_smg,nu_break,Vor_Window_DT)
 
 END SUBROUTINE MIXING_STUFF
 
@@ -259,7 +259,7 @@ SUBROUTINE CALCULATE_MovingAverage(DT,M,N,U,V,ETA,MASK,DX,DY,Depth,&
   MA_Window,T_MA_Sum,T_MA_STEP,&
   Syx_temp,Syx_x,U_Window,V_Window,uMA,vMA,eta_MA_temp,eta_MA,vorticity,VorMA,Vor_Window,VorT,&
   PERIODIC,Nghost,uMAx,uMAy,vMAx,vMAy,&
-  temp1_Window,temp2_Window,temp1_MA,temp2_MA,nu_smg,nu_break)
+  temp1_Window,temp2_Window,temp1_MA,temp2_MA,nu_smg,nu_break,Vor_Window_DT)
 
   USE PARAM
   IMPLICIT NONE
@@ -274,7 +274,7 @@ SUBROUTINE CALCULATE_MovingAverage(DT,M,N,U,V,ETA,MASK,DX,DY,Depth,&
   REAL(SP),INTENT(OUT) :: T_MA_Sum
   ! moving average of current speed
   REAL(SP),DIMENSION(M,N) :: U_temp1,V_temp1
-  REAL(SP),DIMENSION(M,N,MA_Window),INTENT(INOUT) :: U_Window,V_Window,Vor_Window
+  REAL(SP),DIMENSION(M,N,MA_Window),INTENT(INOUT) :: U_Window,V_Window,Vor_Window,Vor_Window_DT
   REAL(SP),DIMENSION(M,N),INTENT(OUT) :: uMA,vMA
   REAL(SP),DIMENSION(M,N),INTENT(OUT) :: uMAx, uMAy, vMAx, vMAy
   ! moving averaged of radiation shear stress
@@ -294,7 +294,10 @@ SUBROUTINE CALCULATE_MovingAverage(DT,M,N,U,V,ETA,MASK,DX,DY,Depth,&
   REAL(SP),DIMENSION(M,N) :: temp1_Window_Sum,temp2_Window_Sum
   REAL(SP),DIMENSION(M,N),INTENT(OUT) :: temp1_MA,temp2_MA
   REAL(SP),DIMENSION(M,N),INTENT(IN) :: nu_smg,nu_break
-  
+
+  Vor_Window_DT = CSHIFT(Vor_Window_DT,-1,3)
+  Vor_Window_DT(:,:,1) = vorticity
+  VorT = (Vor_Window_DT(:,:,1)-Vor_Window_DT(:,:,2))/DT
 
   T_MA_Sum=T_MA_Sum+DT
 
@@ -312,7 +315,6 @@ SUBROUTINE CALCULATE_MovingAverage(DT,M,N,U,V,ETA,MASK,DX,DY,Depth,&
       uMA = SUM(U_Window,3)/MA_Window
       vMA = SUM(V_Window,3)/MA_Window
       VorMA = SUM(Vor_Window,3)/MA_Window
-      VorT = (Vor_Window(:,:,1)-Vor_Window(:,:,2))/T_MA_STEP
       CALL DERIVATIVE_X(M,N,Ibeg,Iend,Jbeg,Jend,MASK,DX,vMA,vMAx)
       CALL DERIVATIVE_Y(M,N,Ibeg,Iend,Jbeg,Jend,MASK,DY,vMA,vMAy)
       CALL DERIVATIVE_X(M,N,Ibeg,Iend,Jbeg,Jend,MASK,DX,uMA,uMAx)
