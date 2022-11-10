@@ -4373,7 +4373,7 @@ SUBROUTINE PREVIEW
     call PutFile(TMP_NAME,VorT)
   ENDIF
 
-  ! variables to get output
+  ! variables to get output and use in vorticity source
   TMP_NAME = TRIM(FDIR)//'friX_'//TRIM(FILE_NAME)
   call PutFile(TMP_NAME,temp_output1)
   TMP_NAME = TRIM(FDIR)//'friY_'//TRIM(FILE_NAME)
@@ -4382,10 +4382,25 @@ SUBROUTINE PREVIEW
   call PutFile(TMP_NAME,temp_output3)
   TMP_NAME = TRIM(FDIR)//'brkY_'//TRIM(FILE_NAME)
   call PutFile(TMP_NAME,temp_output4)
-    TMP_NAME = TRIM(FDIR)//'mixX_'//TRIM(FILE_NAME)
+  TMP_NAME = TRIM(FDIR)//'mixX_'//TRIM(FILE_NAME)
   call PutFile(TMP_NAME,temp_output5)
   TMP_NAME = TRIM(FDIR)//'mixY_'//TRIM(FILE_NAME)
   call PutFile(TMP_NAME,temp_output6)
+  
+  TMP_NAME = TRIM(FDIR)//'U1pp_'//TRIM(FILE_NAME)
+  call PutFile(TMP_NAME,U1pp)
+  TMP_NAME = TRIM(FDIR)//'V1pp_'//TRIM(FILE_NAME)
+  call PutFile(TMP_NAME,V1pp)
+  TMP_NAME = TRIM(FDIR)//'U2_'//TRIM(FILE_NAME)
+  call PutFile(TMP_NAME,U2)
+  TMP_NAME = TRIM(FDIR)//'V2_'//TRIM(FILE_NAME)
+  call PutFile(TMP_NAME,V2)
+  TMP_NAME = TRIM(FDIR)//'U3_'//TRIM(FILE_NAME)
+  call PutFile(TMP_NAME,U3)
+  TMP_NAME = TRIM(FDIR)//'V3_'//TRIM(FILE_NAME)
+  call PutFile(TMP_NAME,V3)
+
+
 
     ! variables to get output
   TMP_NAME = TRIM(FDIR)//'nubrkMA_'//TRIM(FILE_NAME)
