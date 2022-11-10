@@ -655,6 +655,15 @@ SUBROUTINE SourceTerms
   ENDIF
 # endif
 
+! calculate U1 and V1 
+! Chen, Salatin
+U1pT = (U1p - U1p_Old)/DT
+V1pT = (V1p - V1p_Old)/DT
+U1 = U1pt-U1pp
+V1 = V1pt-V1pp
+U1p_Old = U1p
+V1p_Old = V1p
+
 END SUBROUTINE SourceTerms
 
 ! filtering based on FUNWAVE 1.0 code to smooth out nu_vis
