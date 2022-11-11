@@ -277,13 +277,10 @@ SUBROUTINE ALLOCATE_VARIABLES
 
   ALLOCATE(U1(Mloc,Nloc),V1(Mloc,Nloc))
   ALLOCATE(U1p_Old(Mloc,Nloc),V1p_Old(Mloc,Nloc))
-  ALLOCATE(U1pT(Mloc,Nloc),V1pT(Mloc,Nloc))
   U1=ZERO
   V1=ZERO
   U1p_Old=ZERO
   V1p_Old=ZERO
-  U1pT=ZERO
-  V1pT=ZERO
   ALLOCATE(VorT(Mloc,Nloc))
   ALLOCATE(Vor_Old(Mloc,Nloc))
   VorT=ZERO
