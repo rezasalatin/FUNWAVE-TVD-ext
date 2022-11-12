@@ -663,8 +663,8 @@ U1p0 = U1p
 V1p0 = V1p
 
 ! calculate VorT
-VorT = (vorticity - Vor_Old)/DT
-Vor_Old = vorticity
+VorT = (vorticity - vorticity0)/DT
+vorticity0 = vorticity
 
 END SUBROUTINE SourceTerms
 
