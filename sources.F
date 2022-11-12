@@ -655,12 +655,13 @@ SUBROUTINE SourceTerms
   ENDIF
 # endif
 
-! calculate U1 and V1 
+! calculate U1 and V1 according to Shi et al. 2012
 ! Chen, Salatin
-U1 = (U1p - U1p_Old)/DT + U1pp
-V1 = (V1p - V1p_Old)/DT + V1pp
-U1p_Old = U1p
-V1p_Old = V1p
+U1 = (U1p - U1p0)/DT + U1pp
+V1 = (V1p - V1p0)/DT + V1pp
+U1p0 = U1p
+V1p0 = V1p
+
 ! calculate VorT
 VorT = (vorticity - Vor_Old)/DT
 Vor_Old = vorticity
