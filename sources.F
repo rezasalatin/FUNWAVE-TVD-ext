@@ -668,9 +668,8 @@ V_gradT = (V-V_0)/DT
 U_0 = U
 V_0 = V
 
-
-! calculate VorT
-VorT = (vorticity - vorticity0)/DT
+! calculate vorticity_gradT
+vorticity_gradT = (vorticity - vorticity0)/DT
 vorticity0 = vorticity
 
 END SUBROUTINE SourceTerms

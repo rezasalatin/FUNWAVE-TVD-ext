@@ -4398,7 +4398,7 @@ SUBROUTINE PREVIEW
   TMP_NAME = TRIM(FDIR)//'V3_'//TRIM(FILE_NAME)
   call PutFile(TMP_NAME,V3)
   TMP_NAME = TRIM(FDIR)//'VorT_'//TRIM(FILE_NAME)
-  call PutFile(TMP_NAME,VorT)
+  call PutFile(TMP_NAME,vorticity_gradT)
   TMP_NAME = TRIM(FDIR)//'uT_'//TRIM(FILE_NAME)
   call PutFile(TMP_NAME,U_gradT)
   TMP_NAME = TRIM(FDIR)//'vT_'//TRIM(FILE_NAME)
