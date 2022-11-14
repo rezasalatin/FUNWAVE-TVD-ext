@@ -306,6 +306,7 @@ REAL(SP),DIMENSION(:,:),ALLOCATABLE :: VorMA
 ! Chen, Salatin, Nov 2022, V1, V2, V3, VorT
 REAL(SP),DIMENSION(:,:),ALLOCATABLE :: U1,V1,U1p0,V1p0
 REAL(SP),DIMENSION(:,:),ALLOCATABLE :: vorticity0,VorT
+REAL(SP),DIMENSION(:,:),ALLOCATABLE :: U_gradT,V_gradT,U_0,V_0
 
 ! Chen, Salatin, two more MA
 REAL(SP),DIMENSION(:,:),ALLOCATABLE :: temp1_MA,temp2_MA

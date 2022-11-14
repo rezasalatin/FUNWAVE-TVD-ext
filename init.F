@@ -281,6 +281,14 @@ SUBROUTINE ALLOCATE_VARIABLES
   V1=ZERO
   U1p0=ZERO
   V1p0=ZERO
+
+  ALLOCATE(U_0(Mloc,Nloc),V_0(Mloc,Nloc))
+  U_0=ZERO
+  V_0=ZERO
+  ALLOCATE(U_gradT(Mloc,Nloc),V_gradT(Mloc,Nloc))
+  U_gradT=ZERO
+  V_gradT=ZERO
+
   ALLOCATE(VorT(Mloc,Nloc))
   ALLOCATE(vorticity0(Mloc,Nloc))
   VorT=ZERO

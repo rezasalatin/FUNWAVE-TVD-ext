@@ -4400,9 +4400,9 @@ SUBROUTINE PREVIEW
   TMP_NAME = TRIM(FDIR)//'VorT_'//TRIM(FILE_NAME)
   call PutFile(TMP_NAME,VorT)
   TMP_NAME = TRIM(FDIR)//'uT_'//TRIM(FILE_NAME)
-  call PutFile(TMP_NAME,Ut)
+  call PutFile(TMP_NAME,U_gradT)
   TMP_NAME = TRIM(FDIR)//'vT_'//TRIM(FILE_NAME)
-  call PutFile(TMP_NAME,Vt)
+  call PutFile(TMP_NAME,V_gradT)
 
     ! variables to get output
   TMP_NAME = TRIM(FDIR)//'nubrkMA_'//TRIM(FILE_NAME)
