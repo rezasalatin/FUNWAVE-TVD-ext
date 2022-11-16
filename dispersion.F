@@ -132,7 +132,6 @@ SUBROUTINE CAL_DISPERSION
 
       DO J=1,Nloc
         DO I=1,Mloc
-
           Ut(I,J) = (U(I,J)-U0(I,J)) / DT   !ykchoi
           Vt(I,J) = (V(I,J)-V0(I,J)) / DT   !ykchoi
 

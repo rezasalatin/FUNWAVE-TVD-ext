@@ -435,7 +435,10 @@ Program FUNWAVE_TVD
 #    endif
 # endif
 
-  END DO
+    U_gradT=(U-U0)/DT   !ykchoi
+    V_gradT=(V-V0)/DT   !ykchoi
+
+  ENDDO
 
 # if defined (COUPLING)
   CLOSE(11)

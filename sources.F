@@ -663,10 +663,10 @@ U1p0 = U1p
 V1p0 = V1p
 
 ! Chen, Salatin calculate momentum eq balance
-U_gradT = (U-U_0)/DT
-V_gradT = (V-V_0)/DT
-U_0 = U
-V_0 = V
+!U_gradT = (U-U_0)/DT
+!V_gradT = (V-V_0)/DT
+!U_0 = U
+!V_0 = V
 
 ! calculate vorticity_gradT
 vorticity_gradT = (vorticity - vorticity0)/DT
