@@ -435,8 +435,9 @@ Program FUNWAVE_TVD
 #    endif
 # endif
 
-    U_gradT=(U-U0)/DT   !ykchoi
-    V_gradT=(V-V0)/DT   !ykchoi
+    ! Chen, Salatin, to get ut for vorticity budget
+    U_gradT=(U-U0)/DT
+    V_gradT=(V-V0)/DT
 
   ENDDO
 
