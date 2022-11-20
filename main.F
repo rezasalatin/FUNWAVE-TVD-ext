@@ -301,6 +301,13 @@ Program FUNWAVE_TVD
     U0=U   !ykchoi(15. 08. 06.)
     V0=V   !ykchoi
 
+
+    !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+    ! These should be moved inside mixing.F
+    ! Chen, Salatin
+    U1p0 = U1p
+    V1p0 = V1p
+
 # if defined (VESSEL)
     CALL VESSEL_FORCING
 # endif
@@ -435,9 +442,15 @@ Program FUNWAVE_TVD
 #    endif
 # endif
 
+    !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+    ! These should be moved inside mixing.F
     ! Chen, Salatin, to get ut for vorticity budget
     U_gradT=(U-U0)/DT
     V_gradT=(V-V0)/DT
+    ! calculate U1 and V1 according to Shi et al. 2012
+    ! Chen, Salatin
+    U1 = (U1p - U1p0)/DT + U1pp
+    V1 = (V1p - V1p0)/DT + V1pp
 
   ENDDO
 

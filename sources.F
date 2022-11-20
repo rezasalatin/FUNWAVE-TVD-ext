@@ -655,23 +655,6 @@ SUBROUTINE SourceTerms
   ENDIF
 # endif
 
-! calculate U1 and V1 according to Shi et al. 2012
-! Chen, Salatin
-U1 = (U1p - U1p0)/DT + U1pp
-V1 = (V1p - V1p0)/DT + V1pp
-U1p0 = U1p
-V1p0 = V1p
-
-! Chen, Salatin calculate momentum eq balance
-!U_gradT = (U-U_0)/DT
-!V_gradT = (V-V_0)/DT
-!U_0 = U
-!V_0 = V
-
-! calculate vorticity_gradT
-vorticity_gradT = (vorticity - vorticity0)/DT
-vorticity0 = vorticity
-
 END SUBROUTINE SourceTerms
 
 ! filtering based on FUNWAVE 1.0 code to smooth out nu_vis

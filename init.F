@@ -288,11 +288,6 @@ SUBROUTINE ALLOCATE_VARIABLES
   ALLOCATE(U_gradT(Mloc,Nloc),V_gradT(Mloc,Nloc))
   U_gradT=ZERO
   V_gradT=ZERO
-
-  ALLOCATE(vorticity_gradT(Mloc,Nloc))
-  ALLOCATE(vorticity0(Mloc,Nloc))
-  vorticity_gradT=ZERO
-  vorticity0=ZERO
   
 END SUBROUTINE ALLOCATE_VARIABLES
 
