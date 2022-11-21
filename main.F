@@ -410,7 +410,7 @@ Program FUNWAVE_TVD
         CALL SPONGE_DAMPING
       ENDIF
 
-    ENDDO
+    ENDDO ! end RK3
 
 # if defined (SEDIMENT)
     !   moved out of the RK loop 07/02/2019
