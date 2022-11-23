@@ -4430,6 +4430,8 @@ SUBROUTINE PREVIEW
   call PutFile(TMP_NAME,SourceX_U3)
   TMP_NAME = TRIM(FDIR)//'SourceX_etatU1p_'//TRIM(FILE_NAME)
   call PutFile(TMP_NAME,SourceX_etatU1p)
+  TMP_NAME = TRIM(FDIR)//'SourceX_WK_'//TRIM(FILE_NAME)
+  call PutFile(TMP_NAME,SourceX_WK)
 
 101   continue
 

@@ -301,6 +301,7 @@ SUBROUTINE SourceTerms
       SourceX_U3(I,J)=Gamma1*MASK9(I,J)*Max(H(I,J),MinDepthFrc)*(-Gamma2*MASK9(I,J)*(U3(I,J)))
       SourceX_etatU1p(I,J)=Gamma1*MASK9(I,J)* &
         ((P(I+1,J)-P(I,J))/DX+(Q(I,J+1)-Q(I,J))/DY)*(U4(I,J)-U1p(I,J))
+      SourceX_WK(I,J)=WaveMaker_Mass(I,J)*U(I,J)
 
       !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
       !!! Source term in Y direction

@@ -311,7 +311,7 @@ REAL(SP),DIMENSION(:,:),ALLOCATABLE :: U_gradT,V_gradT,U_0,V_0
 REAL(SP),DIMENSION(:,:),ALLOCATABLE :: R2_temp,Ubart
 
 REAL(SP),DIMENSION(:,:),ALLOCATABLE :: SourceX_getagradh,SourceX_convective,SourceX_U1pp
-REAL(SP),DIMENSION(:,:),ALLOCATABLE :: SourceX_U2,SourceX_U3,SourceX_etatU1p
+REAL(SP),DIMENSION(:,:),ALLOCATABLE :: SourceX_U2,SourceX_U3,SourceX_etatU1p,SourceX_WK
 
 
 ! Chen, Salatin, two more MA

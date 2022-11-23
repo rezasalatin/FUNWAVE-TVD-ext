@@ -294,7 +294,7 @@ SUBROUTINE ALLOCATE_VARIABLES
   Ubart=ZERO
 
   ALLOCATE(SourceX_getagradh(Mloc,Nloc),SourceX_convective(Mloc,Nloc),SourceX_U1pp(Mloc,Nloc))
-  ALLOCATE(SourceX_U2(Mloc,Nloc),SourceX_U3(Mloc,Nloc),SourceX_etatU1p(Mloc,Nloc))
+  ALLOCATE(SourceX_U2(Mloc,Nloc),SourceX_U3(Mloc,Nloc),SourceX_etatU1p(Mloc,Nloc),SourceX_WK(Mloc,Nloc))
   
 END SUBROUTINE ALLOCATE_VARIABLES
 
