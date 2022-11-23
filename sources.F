@@ -288,6 +288,20 @@ SUBROUTINE SourceTerms
       ! wavemaker
       +WaveMaker_Mass(I,J)*U(I,J)
 
+
+      ! Chen, Salatin, Vorticity Budget
+      SourceX_getagradh(I,J)=GRAV*Eta(I,J)*(Depthx(I+1,J)-Depthx(I,J))/DX*MASK(I,J)
+      SourceX_convective(I,J)=Gamma1*MASK9(I,J)*Max(H(I,J),MinDepthFrc)*(  &
+        U(I,J)*0.5_SP*(U4(I+1,J)-U4(I-1,J))/DX+V(I,J)  &
+        *0.5_SP*(U4(I,J+1)-U4(I,J-1))/DY &
+        +U4(I,J)*0.5_SP*(U(I+1,J)-U(I-1,J))/DX+V4(I,J) &
+        *0.5_SP*(U(I,J+1)-U(I,J-1))/DY)
+      SourceX_U1pp(I,J)=Gamma1*MASK9(I,J)*Max(H(I,J),MinDepthFrc)*(-Gamma2*MASK9(I,J)*(U1pp(I,J)))
+      SourceX_U2(I,J)=Gamma1*MASK9(I,J)*Max(H(I,J),MinDepthFrc)*(-Gamma2*MASK9(I,J)*(U2(I,J)))
+      SourceX_U3(I,J)=Gamma1*MASK9(I,J)*Max(H(I,J),MinDepthFrc)*(-Gamma2*MASK9(I,J)*(U3(I,J)))
+      SourceX_etatU1p(I,J)=Gamma1*MASK9(I,J)* &
+        ((P(I+1,J)-P(I,J))/DX+(Q(I,J+1)-Q(I,J))/DY)*(U4(I,J)-U1p(I,J))
+
       !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
       !!! Source term in Y direction
       ! Equation 22 in Shi et al. 2012

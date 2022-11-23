@@ -4413,11 +4413,23 @@ SUBROUTINE PREVIEW
 
   TMP_NAME = TRIM(FDIR)//'R2temp_'//TRIM(FILE_NAME)
   call PutFile(TMP_NAME,R2_temp)
-  TMP_NAME = TRIM(FDIR)//'SourceX_'//TRIM(FILE_NAME)
-  call PutFile(TMP_NAME,SourceX)
   TMP_NAME = TRIM(FDIR)//'Ubart_'//TRIM(FILE_NAME)
   call PutFile(TMP_NAME,Ubart)
+  TMP_NAME = TRIM(FDIR)//'SourceX_'//TRIM(FILE_NAME)
+  call PutFile(TMP_NAME,SourceX)
 
+  TMP_NAME = TRIM(FDIR)//'SourceX_getagradh_'//TRIM(FILE_NAME)
+  call PutFile(TMP_NAME,SourceX_getagradh)
+  TMP_NAME = TRIM(FDIR)//'SourceX_convective_'//TRIM(FILE_NAME)
+  call PutFile(TMP_NAME,SourceX_convective)
+  TMP_NAME = TRIM(FDIR)//'SourceX_U1pp_'//TRIM(FILE_NAME)
+  call PutFile(TMP_NAME,SourceX_U1pp)
+  TMP_NAME = TRIM(FDIR)//'SourceX_U2_'//TRIM(FILE_NAME)
+  call PutFile(TMP_NAME,SourceX_U2)
+  TMP_NAME = TRIM(FDIR)//'SourceX_U3_'//TRIM(FILE_NAME)
+  call PutFile(TMP_NAME,SourceX_U3)
+  TMP_NAME = TRIM(FDIR)//'SourceX_etatU1p_'//TRIM(FILE_NAME)
+  call PutFile(TMP_NAME,SourceX_etatU1p)
 
 101   continue
 

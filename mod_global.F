@@ -303,11 +303,16 @@ REAL(SP),DIMENSION(:,:),ALLOCATABLE :: eta_MA
 REAL(SP),DIMENSION(:,:,:),ALLOCATABLE :: eta_MA_temp
 REAL(SP),DIMENSION(:,:),ALLOCATABLE :: VorMA
 
+
 ! Chen, Salatin, Nov 2022, V1, V2, V3, vorticity_gradT
 REAL(SP),DIMENSION(:,:),ALLOCATABLE :: U1,V1,U1p0,V1p0
 REAL(SP),DIMENSION(:,:),ALLOCATABLE :: vorticity0,vorticity_gradT
 REAL(SP),DIMENSION(:,:),ALLOCATABLE :: U_gradT,V_gradT,U_0,V_0
 REAL(SP),DIMENSION(:,:),ALLOCATABLE :: R2_temp,Ubart
+
+REAL(SP),DIMENSION(:,:),ALLOCATABLE :: SourceX_getagradh,SourceX_convective,SourceX_U1pp
+REAL(SP),DIMENSION(:,:),ALLOCATABLE :: SourceX_U2,SourceX_U3,SourceX_etatU1p
+
 
 ! Chen, Salatin, two more MA
 REAL(SP),DIMENSION(:,:),ALLOCATABLE :: temp1_MA,temp2_MA

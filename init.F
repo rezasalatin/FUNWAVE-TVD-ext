@@ -293,6 +293,8 @@ SUBROUTINE ALLOCATE_VARIABLES
   R2_temp=ZERO
   Ubart=ZERO
 
+  ALLOCATE(SourceX_getagradh(Mloc,Nloc),SourceX_convective(Mloc,Nloc),SourceX_U1pp(Mloc,Nloc))
+  ALLOCATE(SourceX_U2(Mloc,Nloc),SourceX_U3(Mloc,Nloc),SourceX_etatU1p(Mloc,Nloc))
   
 END SUBROUTINE ALLOCATE_VARIABLES
 
