@@ -308,10 +308,13 @@ REAL(SP),DIMENSION(:,:),ALLOCATABLE :: VorMA
 REAL(SP),DIMENSION(:,:),ALLOCATABLE :: U1,V1,U1p0,V1p0
 REAL(SP),DIMENSION(:,:),ALLOCATABLE :: vorticity0,vorticity_gradT
 REAL(SP),DIMENSION(:,:),ALLOCATABLE :: U_gradT,V_gradT,U_0,V_0
-REAL(SP),DIMENSION(:,:),ALLOCATABLE :: R2_temp,Ubart
 
+REAL(SP),DIMENSION(:,:),ALLOCATABLE :: R2_temp,Ubart
 REAL(SP),DIMENSION(:,:),ALLOCATABLE :: SourceX_getagradh,SourceX_convective,SourceX_U1pp
 REAL(SP),DIMENSION(:,:),ALLOCATABLE :: SourceX_U2,SourceX_U3,SourceX_etatU1p,SourceX_WK
+REAL(SP),DIMENSION(:,:),ALLOCATABLE :: R3_temp,Vbart
+REAL(SP),DIMENSION(:,:),ALLOCATABLE :: SourceY_getagradh,SourceY_convective,SourceY_V1pp
+REAL(SP),DIMENSION(:,:),ALLOCATABLE :: SourceY_V2,SourceY_V3,SourceY_etatV1p,SourceY_WK
 
 
 ! Chen, Salatin, two more MA

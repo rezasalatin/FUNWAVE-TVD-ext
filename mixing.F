@@ -78,7 +78,7 @@ SUBROUTINE MIXING_STUFF
   temp1_Window,temp2_Window,temp1_MA,temp2_MA,nu_smg,nu_break)
 
 
-  CALL CALCULATE_VorticityBudget(DT,Mloc,Nloc,Ubar,Ubar0,Ubart)
+  CALL CALCULATE_VorticityBudget(DT,Mloc,Nloc,Ubar,Ubar0,Ubart,Vbar,Vbar0,Vbart)
 
 END SUBROUTINE MIXING_STUFF
 
@@ -377,15 +377,16 @@ END SUBROUTINE CALCULATE_MovingAverage
 !      11/22/2022 Salatin
 !
 !-------------------------------------------------------------------------------------
-SUBROUTINE CALCULATE_VorticityBudget(DT,M,N,Ubar,Ubar0,Ubart)
+SUBROUTINE CALCULATE_VorticityBudget(DT,M,N,Ubar,Ubar0,Ubart,Vbar,Vbar0,Vbart)
 
   USE PARAM
   IMPLICIT NONE
   REAL(SP),INTENT(IN) :: DT
   INTEGER, INTENT(IN) :: M,N
-  REAL(SP),DIMENSION(M,N),INTENT(IN) :: Ubar,Ubar0
-  REAL(SP),DIMENSION(M,N),INTENT(OUT) :: Ubart
+  REAL(SP),DIMENSION(M,N),INTENT(IN) :: Ubar,Ubar0,Vbar,Vbar0
+  REAL(SP),DIMENSION(M,N),INTENT(OUT) :: Ubart,Vbart
 
   Ubart = (Ubar-Ubar0)/DT
+  Vbart = (Vbar-Vbar0)/DT
 
 END SUBROUTINE CALCULATE_VorticityBudget

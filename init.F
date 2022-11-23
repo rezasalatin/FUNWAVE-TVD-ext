@@ -295,6 +295,13 @@ SUBROUTINE ALLOCATE_VARIABLES
 
   ALLOCATE(SourceX_getagradh(Mloc,Nloc),SourceX_convective(Mloc,Nloc),SourceX_U1pp(Mloc,Nloc))
   ALLOCATE(SourceX_U2(Mloc,Nloc),SourceX_U3(Mloc,Nloc),SourceX_etatU1p(Mloc,Nloc),SourceX_WK(Mloc,Nloc))
+
+  ALLOCATE(R3_temp(Mloc,Nloc),Vbart(Mloc,Nloc))
+  R3_temp=ZERO
+  Vbart=ZERO
+
+  ALLOCATE(SourceY_getagradh(Mloc,Nloc),SourceY_convective(Mloc,Nloc),SourceY_U1pp(Mloc,Nloc))
+  ALLOCATE(SourceY_U2(Mloc,Nloc),SourceY_U3(Mloc,Nloc),SourceY_etatU1p(Mloc,Nloc),SourceY_WK(Mloc,Nloc))
   
 END SUBROUTINE ALLOCATE_VARIABLES
 

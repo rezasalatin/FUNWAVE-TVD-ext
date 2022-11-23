@@ -324,6 +324,21 @@ SUBROUTINE SourceTerms
       ! wavemaker
       +WaveMaker_Mass(I,J)*V(I,J)
 
+
+      ! Chen, Salatin, Vorticity Budget
+      SourceY_getagradh(I,J)=GRAV*Eta(I,J)*(Depthy(I,J+1)-Depthy(I,J))/DY*MASK(I,J)
+      SourceY_convective(I,J)=Gamma1*MASK9(I,J)*Max(H(I,J),MinDepthFrc)*( &
+      U(I,J)*0.5_SP*(V4(I+1,J)-V4(I-1,J))/DX+V(I,J) &
+      *0.5_SP*(V4(I,J+1)-V4(I,J-1))/DY &
+      +U4(I,J)*0.5_SP*(V(I+1,J)-V(I-1,J))/DX+V4(I,J) &
+      *0.5_SP*(V(I,J+1)-V(I,J-1))/DY)
+      SourceY_V1pp(I,J)=Gamma1*MASK9(I,J)*Max(H(I,J),MinDepthFrc)*(-Gamma2*MASK9(I,J)*(V1pp(I,J)))
+      SourceY_V2(I,J)=Gamma1*MASK9(I,J)*Max(H(I,J),MinDepthFrc)*(-Gamma2*MASK9(I,J)*(V2(I,J)))
+      SourceY_V3(I,J)=Gamma1*MASK9(I,J)*Max(H(I,J),MinDepthFrc)*(-Gamma2*MASK9(I,J)*(V3(I,J)))
+      SourceY_etatV1p(I,J)=Gamma1*MASK9(I,J) &
+        *((P(I+1,J)-P(I,J))/DX+(Q(I,J+1)-Q(I,J))/DY)*(V4(I,J)-V1p(I,J))
+      SourceY_WK(I,J)=WaveMaker_Mass(I,J)*V(I,J)
+
       !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
       !!! CURRENT BALANCE
       IF(WaveMakerCurrentBalance)THEN

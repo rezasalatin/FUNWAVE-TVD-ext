@@ -4433,6 +4433,28 @@ SUBROUTINE PREVIEW
   TMP_NAME = TRIM(FDIR)//'SourceX_WK_'//TRIM(FILE_NAME)
   call PutFile(TMP_NAME,SourceX_WK)
 
+    TMP_NAME = TRIM(FDIR)//'R3temp_'//TRIM(FILE_NAME)
+  call PutFile(TMP_NAME,R3_temp)
+  TMP_NAME = TRIM(FDIR)//'Vbart_'//TRIM(FILE_NAME)
+  call PutFile(TMP_NAME,Vbart)
+  TMP_NAME = TRIM(FDIR)//'SourceY_'//TRIM(FILE_NAME)
+  call PutFile(TMP_NAME,SourceY)
+
+  TMP_NAME = TRIM(FDIR)//'SourceY_getagradh_'//TRIM(FILE_NAME)
+  call PutFile(TMP_NAME,SourceY_getagradh)
+  TMP_NAME = TRIM(FDIR)//'SourceY_convective_'//TRIM(FILE_NAME)
+  call PutFile(TMP_NAME,SourceY_convective)
+  TMP_NAME = TRIM(FDIR)//'SourceY_V1pp_'//TRIM(FILE_NAME)
+  call PutFile(TMP_NAME,SourceY_V1pp)
+  TMP_NAME = TRIM(FDIR)//'SourceY_V2_'//TRIM(FILE_NAME)
+  call PutFile(TMP_NAME,SourceY_V2)
+  TMP_NAME = TRIM(FDIR)//'SourceY_V3_'//TRIM(FILE_NAME)
+  call PutFile(TMP_NAME,SourceY_V3)
+  TMP_NAME = TRIM(FDIR)//'SourceY_etatV1p_'//TRIM(FILE_NAME)
+  call PutFile(TMP_NAME,SourceY_etatV1p)
+  TMP_NAME = TRIM(FDIR)//'SourceY_WK_'//TRIM(FILE_NAME)
+  call PutFile(TMP_NAME,SourceY_WK)
+
 101   continue
 
 END SUBROUTINE PREVIEW
