@@ -164,6 +164,10 @@ SUBROUTINE ESTIMATE_HUV(ISTEP)
       F_bottom=Fy(I,J)
       F_top=Fy(I,J+1)
 # if defined (CARTESIAN)
+      ! Salatin 2022
+      R2_temp=-1.0_SP/DX*(F_right*n_right+F_left*n_left) &
+      -1.0_SP/DY*(F_top*n_top+F_bottom*n_bottom)
+      
       R2(I,J)=-1.0_SP/DX*(F_right*n_right+F_left*n_left) &
       -1.0_SP/DY*(F_top*n_top+F_bottom*n_bottom) &
       +SourceX(I,J)

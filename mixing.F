@@ -77,6 +77,9 @@ SUBROUTINE MIXING_STUFF
   PERIODIC,Nghost,uMAx,uMAy,vMAx,vMAy,&
   temp1_Window,temp2_Window,temp1_MA,temp2_MA,nu_smg,nu_break)
 
+
+  CALL CALCULATE_VorticityBudget(DT,Mloc,Nloc,Ubar,Ubar0,Ubart)
+
 END SUBROUTINE MIXING_STUFF
 
 
@@ -364,3 +367,25 @@ SUBROUTINE CALCULATE_MovingAverage(DT,M,N,U,V,ETA,MASK,DX,DY,Depth,&
 
   ENDIF
 END SUBROUTINE CALCULATE_MovingAverage
+
+!-------------------------------------------------------------------------------------
+!
+!    CALCULATE_VorticityBudget is subroutine to calculate Ubart
+!      used in momentum equation
+!
+!    HISTORY:
+!      11/22/2022 Salatin
+!
+!-------------------------------------------------------------------------------------
+SUBROUTINE CALCULATE_VorticityBudget(DT,M,N,Ubar,Ubar0,Ubart)
+
+  USE PARAM
+  IMPLICIT NONE
+  REAL(SP),INTENT(IN) :: DT
+  INTEGER, INTENT(IN) :: M,N
+  REAL(SP),DIMENSION(M,N),INTENT(IN) :: Ubar,Ubar0
+  REAL(SP),DIMENSION(M,N),INTENT(OUT) :: Ubart
+
+  Ubart = (Ubar-Ubar0)/DT
+
+END SUBROUTINE CALCULATE_VorticityBudget

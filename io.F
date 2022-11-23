@@ -4411,6 +4411,14 @@ SUBROUTINE PREVIEW
   TMP_NAME = TRIM(FDIR)//'nusmgMA_'//TRIM(FILE_NAME)
   call PutFile(TMP_NAME,temp1_MA)
 
+  TMP_NAME = TRIM(FDIR)//'R2temp_'//TRIM(FILE_NAME)
+  call PutFile(TMP_NAME,R2_temp)
+  TMP_NAME = TRIM(FDIR)//'SourceX_'//TRIM(FILE_NAME)
+  call PutFile(TMP_NAME,SourceX)
+  TMP_NAME = TRIM(FDIR)//'Ubart_'//TRIM(FILE_NAME)
+  call PutFile(TMP_NAME,Ubart)
+
+
 101   continue
 
 END SUBROUTINE PREVIEW

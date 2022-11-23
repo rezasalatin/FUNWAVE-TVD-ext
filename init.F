@@ -288,6 +288,10 @@ SUBROUTINE ALLOCATE_VARIABLES
   ALLOCATE(U_gradT(Mloc,Nloc),V_gradT(Mloc,Nloc))
   U_gradT=ZERO
   V_gradT=ZERO
+
+  ALLOCATE(R2_temp(Mloc,Nloc))
+  R2_temp=ZERO
+
   
 END SUBROUTINE ALLOCATE_VARIABLES
 
