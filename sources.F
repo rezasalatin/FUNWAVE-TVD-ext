@@ -498,7 +498,7 @@ SUBROUTINE SourceTerms
       Temp1 = ZERO
       Temp2 = ZERO
       ! Lambda (C_smg) is 1 for Leith et al
-      nu_smg = (C_smg*SQRT(DX*DY)/pi)**3*SQRT(Temp3)
+      nu_smg = (C_smg)**2*(SQRT(DX*DY))**3*SQRT(Temp3)
     ELSEIF(MIX_MODEL.EQ.6)THEN
     ! Fox-Kemper
       VTYPE=1
