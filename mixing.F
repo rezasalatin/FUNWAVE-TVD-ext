@@ -268,7 +268,8 @@ SUBROUTINE CALCULATE_MovingAverage(DT,M,N,U,V,ETA,MASK,DX,DY,Depth,&
   IMPLICIT NONE
   REAL(SP),INTENT(IN) :: DT
   INTEGER, INTENT(IN) :: M,N,Ibeg,Iend,Jbeg,Jend
-  REAL(SP),DIMENSION(M,N),INTENT(IN)::U,V,ETA,Depth,MASK,vorticity
+  REAL(SP),DIMENSION(M,N),INTENT(IN)::U,V,ETA,Depth,vorticity
+  INTEGER,DIMENSION(M,N),INTENT(IN)::MASK
   REAL(SP),INTENT(IN) :: DX,DY
   LOGICAL :: OUT_uvMA,OUT_VorMA,OUT_RadStr,OUT_etaMA
   ! moving average, temporal properties
