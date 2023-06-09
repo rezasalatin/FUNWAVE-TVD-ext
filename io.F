@@ -3496,7 +3496,7 @@ if (myid.eq.0) WRITE(3,'(A14,F12.6)')'T_INTV_mean =', T_INTV_mean
 ! Chen, Salatin
 if (myid.eq.0) WRITE(3,'(A14,F12.6)')'T_INTV_UVmean =', T_INTV_UVmean
 if (myid.eq.0) WRITE(3,'(A14,F12.6)')'T_MA_STEP =', T_MA_STEP
-if (myid.eq.0) WRITE(3,'(A14,F12.6)')'MA_Window =', MA_Window
+if (myid.eq.0) WRITE(3,'(A14,I12)')'MA_Window =', MA_Window
 !!
 if (myid.eq.0) WRITE(3,'(A14,F12.6)')'STEADY_TIME =', STEADY_TIME
 # else
